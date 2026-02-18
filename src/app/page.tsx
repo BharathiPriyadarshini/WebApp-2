@@ -10,9 +10,9 @@ export default function HomePage() {
     <PageWrapper>
       <HeroSection />
       <TopBrands />
+      <ByCarType />
       <HotPicks />
       <Recommendations />
-      <ByCarType />
     </PageWrapper>
   );
 }
