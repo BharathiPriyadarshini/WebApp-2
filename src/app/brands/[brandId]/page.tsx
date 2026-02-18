@@ -17,7 +17,7 @@ export default function BrandModelsPage() {
   const models = modelsData[brandId as string] || [];
 
   return (
-    <div className="pt-32 bg-black text-white min-h-screen">
+    <div className="bg-muted/30 min-h-screen space-y-10 p-6 md:p-12">
       <div className="max-w-7xl mx-auto px-6 py-20">
         <h1 className="text-3xl font-bold mb-10 capitalize">
           {brandId} Models
@@ -27,7 +27,7 @@ export default function BrandModelsPage() {
           {models.map((model) => (
             <Link
               key={model}
-              href={`/models/${model}?brand=${brandId}`}
+              href={`/trims?brand=${brandId}&model=${model}`}
               className="p-8 bg-[#111] rounded-2xl border border-white/10 hover:border-blue-500 transition uppercase"
             >
               {model}
