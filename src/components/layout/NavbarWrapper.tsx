@@ -38,7 +38,7 @@ export default function NavbarWrapper() {
   };
 
   return (
-    <Navbar className="fixed top-0 inset-x-0 z-50">
+    <Navbar className="fixed pt-5 top-0 inset-x-0 z-50">
 
       {/* Desktop */}
       <NavBody>
@@ -66,7 +66,7 @@ export default function NavbarWrapper() {
             Logout
           </NavbarButton>
         ) : (
-          <NavbarButton as="button" onClick={login} variant="gradient">
+          <NavbarButton as="button" onClick={login} variant="dark">
             Login
           </NavbarButton>
         )}

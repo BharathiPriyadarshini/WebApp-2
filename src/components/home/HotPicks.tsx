@@ -75,9 +75,9 @@ export default function HotPicks() {
                     ₹ {car.price.toLocaleString()}
                   </span>
 
-                  <button className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-500 transition">
+                  {/* <button className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-500 transition">
                     +
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </motion.div>

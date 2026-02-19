@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-export default function Recommendations() {
+export default function SmartComparison() {
   return (
     <section className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">

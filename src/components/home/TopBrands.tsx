@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 
-const brands = ["Toyota", "BMW", "Mercedes", "Tesla", "Audi"];
+const brands = [
+  { name: "Toyota", logo: "/logos/toyota.svg" },
+  { name: "BMW", logo: "/logos/bmw.svg" },
+  { name: "Ferrari", logo: "/logos/ferrari.svg" },
+  { name: "Mercedes", logo: "/logos/mercedes.svg" }, // add if exists
+  { name: "Tesla", logo: "/logos/tesla.svg" },       // add if exists
+  { name: "Audi", logo: "/logos/audi.svg" },         // add if exists
+];
 
 export default function TopBrands() {
   return (
@@ -28,7 +36,7 @@ export default function TopBrands() {
         <div className="flex gap-6 overflow-x-auto scrollbar-hide">
           {brands.map((brand, index) => (
             <motion.div
-              key={brand}
+              key={brand.name}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -36,19 +44,23 @@ export default function TopBrands() {
               className="min-w-[160px]"
             >
               <Link
-                href={`/cars/${brand.toLowerCase()}`}
+                href={`/brands/${brand.name.toLowerCase()}`}
                 className="group block bg-[#111] border border-white/10 rounded-2xl p-8 text-center hover:bg-[#1a1a1a] transition"
               >
-                {/* Logo Circle Placeholder */}
-                <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/10 border border-white/10 group-hover:bg-blue-500/20 transition">
-                  <span className="text-white text-lg font-bold">
-                    {brand.charAt(0)}
-                  </span>
+                {/* Logo Circle */}
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-[#111]  group-hover:scale-110 transition">
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
                 </div>
 
                 {/* Brand Name */}
                 <p className="text-gray-300 group-hover:text-white transition">
-                  {brand}
+                  {brand.name}
                 </p>
               </Link>
             </motion.div>

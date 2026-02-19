@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative h-[85vh] flex items-center justify-center text-center px-4 bg-gradient-to-b from-black to-gray-900">
+    <section className="relative h-[85vh] flex items-center justify-center text-center px-4 bg-gradient-to-b from-red to-gray-900">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

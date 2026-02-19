@@ -1,8 +1,13 @@
+"use client"
 import localFont from "next/font/local";
 import "./globals.css";
 import type { Metadata } from "next";
 import NavbarWrapper from "@/components/layout/NavbarWrapper";
 import AuthModal from "@/components/AuthModal";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient()
+
 
 const urbanist = localFont({
   src: [
@@ -100,10 +105,10 @@ const urbanist = localFont({
   variable: "--font-urbanist",
 });
 
-export const metadata: Metadata = {
-  title: "Rimello",
-  description: "Luxury Automotive Platform",
-};
+// export const metadata: Metadata = {
+//   title: "Rimello",
+//   description: "Luxury Automotive Platform",
+// };
 
 export default function RootLayout({
   children,
@@ -113,12 +118,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${urbanist.variable} font-sans bg-black text-white antialiased`}>
+        <QueryClientProvider client={queryClient}>
+          <>
         <NavbarWrapper />
         <AuthModal />
 
         <main className="pt-32 min-h-screen">
           {children}
         </main>
+          </>
+        </QueryClientProvider>
       </body>
     </html>
   );
