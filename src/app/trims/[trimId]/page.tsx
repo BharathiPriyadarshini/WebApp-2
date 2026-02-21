@@ -183,13 +183,23 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             'Great mileage in city traffic',
                             'Excellent build quality',
                             'Very comfortable for long drives',
-                            'Mileage is fantastic!'
+                            'Mileage is fantastic!',
+                            'Smooth and powerful engine performance',
+                            'Low maintenance costs and reliable service',
+                            'Spacious interior with premium feel',
+                            'Advanced safety features give peace of mind',
+                            'Great value for money compared to competitors'
                         ],
                         negatives: [
                             'Engine noise at high speeds',
                             'Infotainment system lags sometimes',
                             'Suspension is a bit stiff',
-                            'Rear seat space could be better'
+                            'Rear seat space could be better',
+                            'Fuel efficiency drops on highways',
+                            'AC cooling could be more effective in peak summer',
+                            'Boot space feels limited for family trips',
+                            'Touchscreen response is not very smooth',
+                            'Headlight brightness could be better at night'
                         ]
                     }
                 }
@@ -327,7 +337,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             { label: 'Torque', value: car.torque, icon: Gauge },
                             { label: '0-60 mph', value: car.acceleration, icon: Timer }
                         ].map((spec) => (
-                            <Card key={spec.label} className="flex flex-col items-center justify-center p-6 bg-card border-none shadow-sm hover:shadow-md transition-shadow">
+                            <Card key={spec.label} className="flex flex-col items-center justify-center p-2 bg-card border-none shadow-sm hover:shadow-md transition-shadow w-50 h-50">
                                 <div className="h-10 w-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3 text-blue-600 dark:text-blue-400">
                                     <spec.icon className="h-5 w-5" />
                                 </div>
@@ -338,7 +348,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     </div>
 
                     {/* Insight Chips */}
-                    <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start ">
                         {car.insights.map((insight, index) => (
                             <InsightBadge
                                 key={index}

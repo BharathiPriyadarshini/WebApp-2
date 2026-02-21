@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { PreviousAnswer, QuestionResponse } from "@/types";
 
-const API_BASE_URL = "http://localhost:3003";
+const API_BASE_URL = "https://app-api.dev.rimello.ai";
 
 async function fetchNextQuestion(
   previousAnswers: PreviousAnswer[] = []

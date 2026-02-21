@@ -1,8 +1,10 @@
+
 "use client";
 
+console.log("🚀 SuggestionsPage file loaded");
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Car, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth.store";
 import { useNextQuestion } from "@/hooks/useQuestions";
@@ -11,6 +13,12 @@ import { QuestionResponse } from "@/types";
 
 import QuestionCard from "@/components/questions/QuestionCard";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
+/* ================= DEBUG HELPER ================= */
+
+const debug = (...args: any[]) => {
+  console.log("[SuggestionsPage]", ...args);
+};
 
 /* ================= Skeleton ================= */
 
@@ -38,7 +46,6 @@ function QuestionSkeleton() {
 export default function SuggestionsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-
   const { answers, maxQuestions, addAnswer } = useAnswersStore();
 
   const [currentQuestion, setCurrentQuestion] =
@@ -48,11 +55,22 @@ export default function SuggestionsPage() {
 
   const { mutate: fetchQuestion, isPending, error } = useNextQuestion();
 
+  /* ================= RENDER DEBUG ================= */
+
+  debug("RENDER", {
+    user,
+    answersLength: answers.length,
+    maxQuestions,
+  });
+
   /* ================= Auth Protection ================= */
 
   useEffect(() => {
+    debug("Auth effect triggered", { user });
+
     if (!user) {
-      router.replace("/login");
+      debug("No user → redirecting to /");
+      router.replace("/");
     }
   }, [user, router]);
 
@@ -61,43 +79,75 @@ export default function SuggestionsPage() {
   const loadNextQuestion = useCallback(() => {
     const currentAnswers = useAnswersStore.getState().answers;
 
-    if (currentAnswers.length >= maxQuestions) return;
+    debug("loadNextQuestion called", {
+      currentAnswers,
+      length: currentAnswers.length,
+      maxQuestions,
+    });
+
+    debug("VALUES CHECK", {
+  currentAnswersLength: currentAnswers.length,
+  maxQuestions,
+});
 
     setIsTransitioning(true);
     setShowSkeleton(true);
 
+    debug("Calling fetchQuestion mutation...");
+
     fetchQuestion(currentAnswers, {
       onSuccess: (question) => {
+        debug("API SUCCESS", question);
+
         setTimeout(() => {
           setCurrentQuestion(question);
           setIsTransitioning(false);
           setShowSkeleton(false);
         }, 400);
       },
-      onError: () => {
+      onError: (err) => {
+        debug("API ERROR", err);
         setIsTransitioning(false);
         setShowSkeleton(false);
       },
     });
   }, [maxQuestions, fetchQuestion]);
 
+  /* ================= Initial Load ================= */
+
   useEffect(() => {
-    if (!user) return;
+    debug("Initial load effect", { user, maxQuestions });
+
+    if (!user) {
+      debug("User missing — skipping load");
+      return;
+    }
 
     if (maxQuestions === 0) {
+      debug("maxQuestions is 0 → redirecting home");
       router.push("/");
       return;
     }
 
+    debug("Triggering first question load");
     loadNextQuestion();
-  }, [user]);
+  }, [user, maxQuestions, loadNextQuestion, router]);
 
   /* ================= Handle Answer ================= */
 
   const handleAnswer = (
     answer: string | number | (string | number)[]
   ) => {
-    if (!currentQuestion) return;
+    debug("handleAnswer called", {
+      answer,
+      currentQuestion,
+      answersLength: answers.length,
+    });
+
+    if (!currentQuestion) {
+      debug("No current question → aborting");
+      return;
+    }
 
     setShowSkeleton(true);
     setIsTransitioning(true);
@@ -113,7 +163,14 @@ export default function SuggestionsPage() {
     const updatedCount = answers.length + 1;
     const reachedLimit = updatedCount >= maxQuestions;
 
+    debug("After answer", {
+      updatedCount,
+      reachedLimit,
+      isFinal: currentQuestion.isFinal,
+    });
+
     if (reachedLimit || currentQuestion.isFinal) {
+      debug("Navigating to /recommendations");
       setTimeout(() => {
         router.push("/recommendations");
       }, 500);
@@ -123,14 +180,21 @@ export default function SuggestionsPage() {
     setCurrentQuestion(null);
 
     setTimeout(() => {
+      debug("Loading next question...");
       loadNextQuestion();
     }, 100);
   };
 
-  if (!user) return null; // Prevent UI flash before redirect
+  if (!user) {
+    debug("User null → returning null UI");
+    return null;
+  }
 
   const currentStep = answers.length + 1;
-  const progress = (answers.length / maxQuestions) * 100;
+  const progress =
+    maxQuestions > 0
+      ? (answers.length / maxQuestions) * 100
+      : 0;
 
   /* ================= UI ================= */
 
@@ -143,21 +207,15 @@ export default function SuggestionsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => {
+              debug("Back button clicked");
+              router.push("/");
+            }}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Back</span>
           </button>
-
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-              <Car className="w-4 h-4 text-primary-foreground" />
-            </div>
-            {/* <span className="font-semibold tracking-tight">
-              rimello
-            </span> */}
-          </div>
         </div>
 
         {/* Progress */}
@@ -200,7 +258,10 @@ export default function SuggestionsPage() {
                   Something went wrong
                 </h3>
                 <button
-                  onClick={() => loadNextQuestion()}
+                  onClick={() => {
+                    debug("Retry clicked");
+                    loadNextQuestion();
+                  }}
                   className="px-4 py-2 rounded-lg bg-primary text-primary-foreground"
                 >
                   Try Again

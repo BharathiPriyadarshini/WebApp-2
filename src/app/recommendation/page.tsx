@@ -129,7 +129,7 @@ export default function RecommendationsPage() {
     if (!isHydrated) return;
 
     if (storeAnswers.length === 0) {
-      router.push("/discover");
+      router.push("/");
       return;
     }
 
@@ -150,7 +150,7 @@ export default function RecommendationsPage() {
 
   const handleStartOver = () => {
     resetStore();
-    router.push("/discover");
+    router.push("/explore");
   };
 
   const handleUpdateAnswer = (index: number, newAnswer: string | number) => {
@@ -170,7 +170,7 @@ export default function RecommendationsPage() {
     setEditingIndex(null);
     const newAnswers = storeAnswers.filter(a => a.questionId !== questionId);
     if (newAnswers.length === 0) {
-      router.push("/discover");
+      router.push("/explore");
       return;
     }
     setStoreAnswers(newAnswers);
