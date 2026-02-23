@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import type { Metadata } from "next";
 import NavbarWrapper from "@/components/layout/NavbarWrapper";
-import AuthModal from "@/components/AuthModal";
+import AuthModal from "@/components/auth/AuthModal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient()
