@@ -2,213 +2,201 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Heart } from "lucide-react";
-import { useState } from "react";
+import {
+  Search,
+  SlidersHorizontal,
+  Heart,
+  Gauge,
+  Settings,
+} from "lucide-react";
+import { useState, useMemo } from "react";
 
+/* ---------------------------------- */
+/* Brand Mapping (Fix brandId issue)  */
+/* ---------------------------------- */
+const brandMap: Record<string, string> = {
+  "693869fe2955c01e5bd23c9c": "Kia",
+  "693869fe2955c01e5bd23c9d": "BMW",
+  "693869fe2955c01e5bd23c9e": "Mercedes",
+};
+
+/* ---------------------------------- */
+/* Mock Vehicles                      */
+/* ---------------------------------- */
 const mockVehicles = [
   {
     id: 1,
-    name: "Rimello Spectre",
-    price: "$189,500",
-    tag: "98% Lifestyle Match",
+    brand: "Kia",
+    model: "EV5",
+    name: "Kia EV5 GT-Line",
+    price: 65000,
+    fuelType: "Electric",
+    transmission: "Automatic",
+    seating: "5",
+    bodyType: "SUV",
+    horsepower: 310,
+    createdAt: 5,
   },
   {
     id: 2,
-    name: "Rimello Nomad",
-    price: "$115,000",
-    tag: "Adventure Ready",
+    brand: "Kia",
+    model: "EV5",
+    name: "Kia EV5 Standard",
+    price: 52000,
+    fuelType: "Electric",
+    transmission: "Automatic",
+    seating: "5",
+    bodyType: "SUV",
+    horsepower: 210,
+    createdAt: 3,
   },
   {
     id: 3,
-    name: "Rimello City-E",
-    price: "$42,900",
-    tag: "Urban Top Pick",
-  },
-  {
-    id: 4,
-    name: "Rimello Sovereign",
-    price: "$245,000",
-    tag: "Ultra Luxury",
-  },
-  {
-    id: 5,
-    name: "Rimello Executive",
-    price: "$92,000",
-    tag: "Business Sedan",
+    brand: "BMW",
+    model: "iX",
+    name: "BMW iX M60",
+    price: 105000,
+    fuelType: "Electric",
+    transmission: "Automatic",
+    seating: "5",
+    bodyType: "SUV",
+    horsepower: 610,
+    createdAt: 10,
   },
 ];
 
 export default function TrimsPage() {
   const params = useSearchParams();
+  const brandId = params.get("brand");
   const model = params.get("model");
-  const brand = params.get("brand");
 
-  // State for filters
-  const [fuelType, setFuelType] = useState("Electric");
-  const [transmission, setTransmission] = useState("Automatic");
-  const [seatingCapacity, setSeatingCapacity] = useState("4-5");
-  const [bodyType, setBodyType] = useState("Sedan");
+  const brandName = brandId ? brandMap[brandId] || brandId : "All Brands";
+
+  /* -------------------- */
+  /* States               */
+  /* -------------------- */
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [fuelType, setFuelType] = useState<string | null>(null);
+  const [transmission, setTransmission] = useState<string | null>(null);
+  const [bodyType, setBodyType] = useState<string | null>(null);
+
+  /* -------------------- */
+  /* Filtering Logic      */
+  /* -------------------- */
+  const filteredVehicles = useMemo(() => {
+    let vehicles = mockVehicles.filter((vehicle) => {
+      const matchBrand = brandName === "All Brands" || vehicle.brand === brandName;
+      const matchModel = model ? vehicle.model === model : true;
+      const matchSearch = vehicle.name.toLowerCase().includes(search.toLowerCase());
+      const matchFuel = fuelType ? vehicle.fuelType === fuelType : true;
+      const matchTransmission = transmission
+        ? vehicle.transmission === transmission
+        : true;
+      const matchBody = bodyType ? vehicle.bodyType === bodyType : true;
+
+      return (
+        matchBrand &&
+        matchModel &&
+        matchSearch &&
+        matchFuel &&
+        matchTransmission &&
+        matchBody
+      );
+    });
+
+    if (sort === "newest") {
+      vehicles.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    return vehicles;
+  }, [search, fuelType, transmission, bodyType, sort, brandName, model]);
 
   return (
     <div className="bg-black text-white min-h-screen pt-28">
       <div className="max-w-7xl mx-auto px-6 py-16">
 
-        {/* Header */}
+        {/* ---------------- Header ---------------- */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold">
-            Find Your Match
-          </h1>
+          <h1 className="text-4xl font-bold">Find Your Match</h1>
           <p className="text-gray-400 mt-2">
-            64 vehicles matching your preferences
+            {brandName} {model} Trims
+          </p>
+          <p className="text-gray-500 text-sm mt-1">
+            {filteredVehicles.length} vehicles matching your preferences
           </p>
         </div>
 
-        {/* Search + Sort */}
+        {/* ---------------- Search + Sort ---------------- */}
         <div className="flex flex-col md:flex-row gap-4 mb-12">
+
           <div className="flex items-center bg-[#111] border border-white/10 rounded-full px-4 py-3 flex-1">
             <Search size={18} className="text-gray-400" />
             <input
               type="text"
-              placeholder="Search by make, model, or keywords..."
+              placeholder="Search by make, model..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="bg-transparent outline-none ml-3 text-white w-full placeholder-gray-500"
             />
           </div>
 
-          <button className="flex items-center justify-center bg-[#111] border border-white/10 rounded-full px-6 py-3 hover:border-blue-500 transition">
+          <button
+            onClick={() => setSort("newest")}
+            className={`px-6 py-3 rounded-full border transition ${
+              sort === "newest"
+                ? "bg-blue-600 border-blue-600"
+                : "bg-[#111] border-white/10 hover:border-blue-500"
+            }`}
+          >
             Newest First
           </button>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-10">
 
-          {/* Sidebar */}
-          <aside className="hidden lg:block space-y-10 text-gray-300">
+          {/* ---------------- Sidebar Filters ---------------- */}
+          <aside className="hidden lg:block space-y-8">
 
-            {/* Brand */}
-            <div>
-              <h3 className="text-gray-400 text-sm mb-3 uppercase font-semibold">
-                Brand
-              </h3>
-              <div className="bg-[#111] border border-white/10 rounded-lg p-3 text-white">
-                {brand || "All Brands"}
-              </div>
-            </div>
+            <FilterGroup
+              title="Fuel Type"
+              options={["Electric", "Hybrid", "Gasoline"]}
+              selected={fuelType}
+              setSelected={setFuelType}
+            />
 
-            {/* Fuel Type */}
-            <div>
-              <h3 className="text-gray-400 text-sm mb-3 uppercase font-semibold">
-                Fuel Type
-              </h3>
-              <div className="flex flex-col gap-2">
-                {["Electric", "Hybrid", "Gasoline"].map((type) => (
-                  <label
-                    key={type}
-                    className={`cursor-pointer flex items-center gap-3 px-4 py-2 rounded-lg border ${
-                      fuelType === type
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-white/20 hover:border-white/40"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="fuelType"
-                      value={type}
-                      checked={fuelType === type}
-                      onChange={() => setFuelType(type)}
-                      className="hidden"
-                    />
-                    <span>{type}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <FilterGroup
+              title="Transmission"
+              options={["Automatic", "Manual"]}
+              selected={transmission}
+              setSelected={setTransmission}
+            />
 
-            {/* Transmission */}
-            <div>
-              <h3 className="text-gray-400 text-sm mb-3 uppercase font-semibold">
-                Transmission
-              </h3>
-              <div className="flex gap-4">
-                {["Automatic", "Manual"].map((trans) => (
-                  <button
-                    key={trans}
-                    onClick={() => setTransmission(trans)}
-                    className={`px-5 py-2 rounded-full text-sm font-medium ${
-                      transmission === trans
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#111] border border-white/10 text-gray-400 hover:bg-white/10"
-                    } transition`}
-                  >
-                    {trans}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Seating Capacity */}
-            <div>
-              <h3 className="text-gray-400 text-sm mb-3 uppercase font-semibold">
-                Seating Capacity
-              </h3>
-              <div className="flex gap-3 flex-wrap">
-                {["2", "4-5", "6", "7+"].map((seat) => (
-                  <button
-                    key={seat}
-                    onClick={() => setSeatingCapacity(seat)}
-                    className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                      seatingCapacity === seat
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#111] border border-white/10 text-gray-400 hover:bg-white/10"
-                    } transition`}
-                  >
-                    {seat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Body Type */}
-            <div>
-              <h3 className="text-gray-400 text-sm mb-3 uppercase font-semibold">
-                Body Type
-              </h3>
-              <div className="flex gap-3 flex-wrap">
-                {["Sedan", "SUV", "Coupe", "Truck"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setBodyType(type)}
-                    className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                      bodyType === type
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#111] border border-white/10 text-gray-400 hover:bg-white/10"
-                    } transition`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FilterGroup
+              title="Body Type"
+              options={["SUV", "Sedan", "Coupe"]}
+              selected={bodyType}
+              setSelected={setBodyType}
+            />
 
           </aside>
 
-          {/* Vehicles Grid */}
+          {/* ---------------- Vehicle Cards ---------------- */}
           <div className="lg:col-span-3">
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-              {mockVehicles.map((vehicle) => (
+              {filteredVehicles.map((vehicle) => (
                 <div
                   key={vehicle.id}
                   className="bg-[#111] border border-white/10 rounded-2xl p-6 hover:border-blue-500/40 transition"
                 >
-                  {/* Tag */}
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between mb-4">
                     <span className="text-xs bg-blue-600 px-3 py-1 rounded-full">
-                      {vehicle.tag}
+                      {vehicle.model}
                     </span>
                     <Heart size={18} className="text-gray-400" />
                   </div>
 
-                  {/* Image Placeholder */}
                   <div className="h-40 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6" />
 
                   <h3 className="text-lg font-semibold">
@@ -216,8 +204,20 @@ export default function TrimsPage() {
                   </h3>
 
                   <p className="text-gray-400 mt-2">
-                    {vehicle.price}
+                    ${vehicle.price.toLocaleString()}
                   </p>
+
+                  {/* Specs */}
+                  <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <Gauge size={16} />
+                      {vehicle.horsepower} HP
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Settings size={16} />
+                      {vehicle.transmission}
+                    </div>
+                  </div>
 
                   <Link
                     href={`/trims/${vehicle.id}`}
@@ -225,7 +225,6 @@ export default function TrimsPage() {
                   >
                     View Details
                   </Link>
-
                 </div>
               ))}
 
@@ -236,26 +235,54 @@ export default function TrimsPage() {
                   Not seeing the perfect fit?
                 </h3>
                 <p className="text-gray-400 mt-3 text-sm">
-                  Let our AI build a custom configuration based on your
-                  commute and hobbies.
+                  Let our AI build a custom configuration.
                 </p>
-
                 <button className="mt-6 bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-500 transition">
                   Start AI Configuration
                 </button>
               </div>
 
             </div>
-
-            {/* Load More */}
-            <div className="flex justify-center mt-14">
-              <button className="px-8 py-3 bg-[#111] border border-white/10 rounded-full hover:border-blue-500 transition">
-                Load More Vehicles
-              </button>
-            </div>
-
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Filter Component ---------------- */
+function FilterGroup({
+  title,
+  options,
+  selected,
+  setSelected,
+}: {
+  title: string;
+  options: string[];
+  selected: string | null;
+  setSelected: (val: string | null) => void;
+}) {
+  return (
+    <div>
+      <h3 className="text-gray-400 text-sm mb-4 uppercase font-semibold">
+        {title}
+      </h3>
+      <div className="flex flex-wrap gap-3">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() =>
+              selected === option ? setSelected(null) : setSelected(option)
+            }
+            className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
+              selected === option
+                ? "bg-blue-600 border-blue-600 text-white"
+                : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
+            }`}
+          >
+            {option}
+          </button>
+        ))}
       </div>
     </div>
   );

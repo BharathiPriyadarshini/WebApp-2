@@ -364,9 +364,9 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     useEffect(() => {
         const foundCar = carsData.find(c => c.id === id);
         if (foundCar) {
-            const positiveInsights = ['High Resale Value', 'Smooth Suspension', 'Fuel Efficient', 'Spacious Interiors', 'Great Handling', 'Punchy Engine'];
-            const neutralInsights = ['Standard Sound System', 'Average Boot Space', 'Common Design', 'Firm Ride', 'Plastic Quality'];
-            const negativeInsights = ['High Waiting Period', 'Expensive Spares', 'Low Ground Clearance', 'Noisy Cabin', 'Cramped Rear Seat'];
+            const positiveInsights = ['Advanced safety package (6 airbags, ADAS Level 2, 4‑wheel disc brakes, 3‑point seat belts)', 'Improved interior design and materials'];
+            const neutralInsights = ['Neutral observation: No idea about servicing and maintenance'];
+            const negativeInsights = ['Customer service at Mahindra Samrat Car showroom Vapi'];
             const getRandom = (arr: string[], count: number) => [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
 
             const enriched: EnrichedCar = {

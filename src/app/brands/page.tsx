@@ -3,38 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useBrands } from "@/hooks/useBrands";
 import { useModels } from "@/hooks/useModels";
-
-/* ================= ANIMATION CONFIG ================= */
-/* 🔥 You can tweak animations from here */
-const containerAnimation = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12, // 👈 change for faster/slower stagger
-    },
-  },
-};
-
-const cardAnimation = {
-  hidden: { opacity: 0, y: 100 }, // 👈 increase y for more dramatic entry
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.1, // 👈 speed of animation
-      ease: "easeOut",
-    },
-  },
-};
-
-/* ================= PAGE ================= */
 
 export default function BrandsPage() {
   const router = useRouter();
@@ -134,64 +107,49 @@ export default function BrandsPage() {
                 Models
               </h1>
 
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedBrand}
-                  variants={containerAnimation}
-                  initial="hidden"
-                  animate="show"
-                  exit="hidden"
-                  className="grid md:grid-cols-2 xl:grid-cols-3 gap-8"
-                >
-                  {modelsLoading
-                    ? Array.from({ length: 6 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-72 bg-[#111] rounded-2xl animate-pulse"
-                        />
-                      ))
-                    : models.map((model) => (
-                        <motion.div
-                          key={model._id}
-                          variants={cardAnimation}
-                          whileHover={{
-                            scale: 1.05, // 👈 hover zoom strength
-                          }}
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {modelsLoading
+                  ? Array.from({ length: 6 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-72 bg-[#111] rounded-2xl animate-pulse"
+                      />
+                    ))
+                  : models.map((model) => (
+                      <div key={model._id}>
+                        <Link
+                          href={`/trims?brand=${selectedBrand}&model=${model.name}`}
                         >
-                          <Link
-                            href={`/trims?brand=${selectedBrand}&model=${model.name}`}
-                          >
-                            <Card className="overflow-hidden rounded-2xl bg-[#0f0f0f] border border-white/10 hover:border-white transition-all duration-300 shadow-xl hover:shadow-white/10">
+                          <Card className="overflow-hidden rounded-2xl bg-[#0f0f0f] border border-white/10 hover:border-white transition-all duration-300 shadow-xl hover:shadow-white/10">
 
-                              {/* IMAGE */}
-                              <div className="h-44 bg-gradient-to-br from-neutral-900 to-black flex items-center justify-center">
-                                <span className="text-xl font-semibold uppercase tracking-wider text-white/70">
-                                  {model.name}
-                                </span>
+                            {/* IMAGE */}
+                            <div className="h-44 bg-gradient-to-br from-neutral-900 to-black flex items-center justify-center">
+                              <span className="text-xl font-semibold uppercase tracking-wider text-white/70">
+                                {model.name}
+                              </span>
+                            </div>
+
+                            {/* CONTENT */}
+                            <div className="p-6 space-y-3">
+                              <h3 className="text-lg font-semibold uppercase">
+                                {model.name}
+                              </h3>
+
+                              {/* PRICE RANGE */}
+                              <p className="text-white/60 text-sm">
+                                {formatLakhs(model.minPrice)} –{" "}
+                                {formatLakhs(model.maxPrice)}
+                              </p>
+
+                              <div className="flex justify-end pt-2">
+                                <ChevronRight className="h-4 w-4 text-white/40" />
                               </div>
-
-                              {/* CONTENT */}
-                              <div className="p-6 space-y-3">
-                                <h3 className="text-lg font-semibold uppercase">
-                                  {model.name}
-                                </h3>
-
-                                {/* 🔥 PRICE RANGE */}
-                                <p className="text-white/60 text-sm">
-                                  {formatLakhs(model.minPrice)} –{" "}
-                                  {formatLakhs(model.maxPrice)}
-                                </p>
-
-                                <div className="flex justify-end pt-2">
-                                  <ChevronRight className="h-4 w-4 text-white/40" />
-                                </div>
-                              </div>
-                            </Card>
-                          </Link>
-                        </motion.div>
-                      ))}
-                </motion.div>
-              </AnimatePresence>
+                            </div>
+                          </Card>
+                        </Link>
+                      </div>
+                    ))}
+              </div>
             </>
           )}
         </main>
