@@ -64,7 +64,7 @@ export default function TopBrands() {
                     href={`/brands?brand=${brand._id}`}
                     className="group block"
                   >
-                    <Card className="bg-[#111] border border-white/10 rounded-xl px-2 py-6 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
+                    <Card className="bg-[#111] border border-white/10 rounded-xl px-0 py-6 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
                       
                       {/* Inner wrapper controls spacing */}
                       <div className="flex flex-col items-center justify-center leading-none">

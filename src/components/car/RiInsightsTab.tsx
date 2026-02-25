@@ -179,15 +179,11 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                     </div>
                 </div>
 
-                {/* ══════════════════════════════════════════════════════
-                    STRICT 2×2 GRID — no divider lines
-                    Row 1: Detailed Breakdown  |  What Users Say
-                    Row 2: Overall             |  Deep Dive
-                    ══════════════════════════════════════════════════════ */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-0">
+                {/* ── 2-column layout: Detailed Breakdown | What Users Say ── */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {/* ── ROW 1 LEFT: Detailed Breakdown ── */}
-                    <div className="pb-8 pr-6 space-y-3">
+                    {/* ── LEFT: Detailed Breakdown ── */}
+                    <div className="space-y-3">
                         <h3 className="text-lg font-bold text-foreground">Detailed Breakdown</h3>
 
                         {data.categoryRatings.map((cat: any, idx: number) => {
@@ -245,14 +241,11 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                         })}
                     </div>
 
-                    {/* ── ROW 1 RIGHT: What Users Say ── */}
-                    <div className="pb-8 pl-6">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-bold text-foreground">What Users Say</h3>
-                            <Button variant="link" className="text-blue-600 p-0 h-auto text-sm">View all</Button>
-                        </div>
+                    {/* ── RIGHT: What Users Say ── */}
+                    <div className="flex flex-col">
+                        <h3 className="text-lg font-bold text-foreground mb-3">What Users Say</h3>
 
-                        <Tabs defaultValue="positives" className="w-full">
+                        <Tabs defaultValue="positives" className="w-full flex flex-col flex-1">
                             <TabsList className="w-full grid grid-cols-2 bg-muted rounded-xl p-1 h-10 mb-4">
                                 <TabsTrigger
                                     value="positives"
@@ -268,7 +261,7 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="positives" className="space-y-2">
+                            <TabsContent value="positives" className="space-y-2 flex-1">
                                 {data.userFeedback.positives.slice(0, 10).map((item: string, i: number) => (
                                     <div key={i} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-muted/50 transition-colors">
                                         <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
@@ -277,7 +270,7 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                                 ))}
                             </TabsContent>
 
-                            <TabsContent value="negatives" className="space-y-2">
+                            <TabsContent value="negatives" className="space-y-2 flex-1">
                                 {data.userFeedback.negatives.slice(0, 10).map((item: string, i: number) => (
                                     <div key={i} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-muted/50 transition-colors">
                                         <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
@@ -286,87 +279,16 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                                 ))}
                             </TabsContent>
                         </Tabs>
-                    </div>
 
-                    {/* ── ROW 2 LEFT: Overall ── */}
-                    <div className="pt-8 pr-6">
-                        <Card className="p-6 border-none shadow-xl bg-card rounded-3xl flex flex-col gap-5">
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">OVERALL</p>
-                                    <div className="text-6xl font-bold text-foreground tracking-tighter leading-none">
-                                        {data.overallRating}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-1 mt-1">
-                                    <div className="flex text-blue-600 gap-0.5">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                className={`h-4 w-4 ${
-                                                    i < Math.round(data.overallRating)
-                                                        ? 'fill-blue-600 text-blue-600'
-                                                        : 'fill-gray-200 text-gray-200'
-                                                }`}
-                                            />
-                                        ))}
-                                    </div>
-                                    <span className="text-[10px] text-gray-400 font-medium">Verified Owners</span>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-muted rounded-2xl p-4 flex flex-col gap-1.5 border border-border">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Recommend</span>
-                                    <span className="text-2xl font-bold text-green-600">{data.recommendationPercent}%</span>
-                                </div>
-                                <div className="bg-muted rounded-2xl p-4 flex flex-col gap-1.5 border border-border">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Confidence</span>
-                                    <Badge
-                                        className={`h-6 w-fit ${
-                                            data.ownershipConfidence.level === 'High'
-                                                ? 'bg-blue-600 hover:bg-blue-700'
-                                                : 'bg-blue-400 hover:bg-blue-500'
-                                        } text-[10px] px-3 rounded-full font-bold uppercase tracking-wide border-none`}
-                                    >
-                                        {data.ownershipConfidence.level}
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 rounded-xl text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                Compare Variants
+                        {/* View All — at the bottom */}
+                        <div className="mt-4 pt-4 border-t border-border">
+                            <Button
+                                variant="outline"
+                                className="w-full h-9 rounded-xl text-sm font-medium text-blue-600 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 transition-colors"
+                            >
+                                View all reviews
                             </Button>
-                        </Card>
-                    </div>
-
-                    {/* ── ROW 2 RIGHT: Deep Dive ── */}
-                    <div className="pt-8 pl-6">
-                        <Card className="p-8 border-none shadow-xl bg-[#0F172A] text-white rounded-3xl relative overflow-hidden h-full">
-                            <div className="relative z-10 flex flex-col gap-4 h-full">
-                                <div className="h-10 w-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                                    <Search className="h-5 w-5 text-blue-400" />
-                                </div>
-                                <h3 className="text-xl font-bold">Deep Dive?</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">
-                                    Select a category on the left to see detailed owner reviews and real-world experiences.
-                                </p>
-
-                                {selectedCategory && (
-                                    <div className="mt-auto pt-4 border-t border-white/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <p className="text-[10px] text-blue-400 font-semibold uppercase tracking-widest">Currently Viewing</p>
-                                        <p className="text-sm text-white font-semibold mt-1">{selectedCategory}</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="absolute -bottom-4 -right-4 opacity-10 pointer-events-none">
-                                <div className="flex gap-2">
-                                    <div className="h-24 w-24 rounded-full bg-white blur-xl" />
-                                    <div className="h-32 w-32 rounded-full bg-blue-500 blur-xl" />
-                                </div>
-                            </div>
-                        </Card>
+                        </div>
                     </div>
 
                 </div>

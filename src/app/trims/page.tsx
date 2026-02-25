@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,8 +9,10 @@ import {
   Heart,
   Gauge,
   Settings,
+  IndianRupee,
+  ChevronLeft,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -70,10 +72,9 @@ const mockVehicles = [
   },
 ];
 
-import { Suspense } from "react";
-
 function TrimsPageContent() {
   const params = useSearchParams();
+  const router = useRouter();
   const brandId = params.get("brand");
   const model = params.get("model");
 
@@ -117,7 +118,15 @@ function TrimsPageContent() {
   }, [search, fuelType, transmission, bodyType, sort, brandName, model]);
 
   return (
-    <div className="bg-black text-white min-h-screen pt-28">
+    <div className="bg-black text-white min-h-screen relative">
+      {/* Back Navigation */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-0 left-0  ml-4 flex items-center gap-2 text-gray-400 hover:text-white z-20"
+      >
+        <ChevronLeft className="w-5 h-5" /> Back
+      </button>
+
       <div className="max-w-7xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="mb-10">
@@ -146,10 +155,11 @@ function TrimsPageContent() {
           <Button
             onClick={() => setSort("newest")}
             variant={sort === "newest" ? "default" : "outline"}
-            className={`px-6 py-3 rounded-full transition ${sort === "newest"
-              ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
-              : "bg-[#111] border-white/10 hover:border-blue-500"
-              }`}
+            className={`px-6 py-3 rounded-full transition ${
+              sort === "newest"
+                ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
+                : "bg-[#111] border-white/10 hover:border-blue-500"
+            }`}
           >
             Newest First
           </Button>
@@ -184,10 +194,21 @@ function TrimsPageContent() {
               {filteredVehicles.map((vehicle) => (
                 <Card
                   key={vehicle.id}
-                  className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 py-0"
+                  className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 py-0 relative"
                 >
+                  {/* Badge */}
+                  <Badge className="absolute top-4 left-4 bg-blue-600 text-white border-transparent z-10">
+                    {vehicle.model}
+                  </Badge>
+
+                  {/* Favorite Icon */}
+                  <Heart
+                    size={18}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition cursor-pointer z-10"
+                  />
+
                   {/* Full Width Image */}
-                  <div className="relative w-full h-56">
+                  <div className="">
                     <Image
                       src="/006.png"
                       alt={vehicle.name}
@@ -202,26 +223,15 @@ function TrimsPageContent() {
                   </div>
 
                   {/* Content */}
-                  <CardContent className="p-6">
-                    <div className="flex justify-between mb-4">
-                      <Badge className="bg-blue-600 text-white border-transparent">
-                        {vehicle.model}
-                      </Badge>
-                      <Heart
-                        size={18}
-                        className="text-gray-400 hover:text-red-500 transition cursor-pointer"
-                      />
-                    </div>
+                  <CardContent className="p-4 pt-2">
+                    <h3 className="text-lg font-semibold">{vehicle.name}</h3>
 
-                    <h3 className="text-lg font-semibold">
-                      {vehicle.name}
-                    </h3>
-
-                    <p className="text-gray-400 mt-2">
-                      ${vehicle.price.toLocaleString()}
+                    <p className="text-gray-400 mt-1 flex items-center gap-1">
+                      <IndianRupee size={14} />
+                      {vehicle.price.toLocaleString()}
                     </p>
 
-                    <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+                    <div className="flex items-center gap-6 mt-2 text-sm text-gray-400">
                       <div className="flex items-center gap-2">
                         <Gauge size={16} />
                         {vehicle.horsepower} HP
@@ -232,10 +242,11 @@ function TrimsPageContent() {
                       </div>
                     </div>
 
-                    <Button asChild className="mt-6 w-full bg-white text-black font-semibold hover:scale-105 hover:bg-white/90 transition">
-                      <Link href={`/trims/${vehicle.id}`}>
-                        View Details
-                      </Link>
+                    <Button
+                      asChild
+                      className="mt-3 w-full bg-white text-black font-semibold hover:scale-105 hover:bg-white/90 transition"
+                    >
+                      <Link href={`/trims/${vehicle.id}`}>View Details</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -269,7 +280,13 @@ function TrimsPageContent() {
 
 export default function TrimsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center text-white">
+          Loading...
+        </div>
+      }
+    >
       <TrimsPageContent />
     </Suspense>
   );
@@ -300,10 +317,11 @@ function FilterGroup({
             onClick={() =>
               selected === option ? setSelected(null) : setSelected(option)
             }
-            className={`px-4 py-2 rounded-full text-sm font-medium transition ${selected === option
-              ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
-              : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
-              }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              selected === option
+                ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
+                : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
+            }`}
           >
             {option}
           </Button>
