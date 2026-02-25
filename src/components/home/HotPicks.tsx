@@ -52,6 +52,9 @@ export default function HotPicks() {
                     alt={`${car.brand} ${car.model}`}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-500"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                    }}
                   />
 
                   {/* Badge */}

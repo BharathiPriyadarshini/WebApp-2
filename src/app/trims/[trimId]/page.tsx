@@ -714,6 +714,9 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                     fill
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     unoptimized
+                                    onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                    }}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                                 <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -727,7 +730,16 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     {lightboxImg && (
                         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setLightboxImg(null)}>
                             <div className="relative w-full max-w-4xl h-[70vh] rounded-2xl overflow-hidden">
-                                <Image src={lightboxImg} alt="Gallery" fill className="object-contain" unoptimized />
+                                <Image
+                                    src={lightboxImg}
+                                    alt="Gallery"
+                                    fill
+                                    className="object-contain"
+                                    unoptimized
+                                    onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                    }}
+                                />
                             </div>
                             <button className="absolute top-6 right-6 text-white/70 hover:text-white text-2xl font-light" onClick={() => setLightboxImg(null)}>✕</button>
                         </div>

@@ -75,11 +75,18 @@ export default function TopBrands() {
                           width={40}
                           height={40}
                           className="object-contain"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                          }}
                         />
                       ) : (
-                        <span className="text-white/40 text-sm uppercase">
-                          {brand.name.slice(0, 2)}
-                        </span>
+                        <Image
+                          src="/alt.png"
+                          alt="Brand placeholder"
+                          width={40}
+                          height={40}
+                          className="object-contain opacity-70"
+                        />
                       )}
                     </div>
 

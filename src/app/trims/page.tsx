@@ -195,6 +195,9 @@ function TrimsPageContent() {
                       height={500}
                       className="object-cover object-right"
                       priority
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                      }}
                     />
                   </div>
 

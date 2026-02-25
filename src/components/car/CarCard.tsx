@@ -50,11 +50,7 @@ const CarImage = ({
       unoptimized
       className={`object-cover transition-transform duration-500 group-hover:scale-105 ${className || ''
         }`}
-      onError={() =>
-        setImgSrc(
-          "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80"
-        )
-      }
+      onError={() => setImgSrc("/alt.png")}
     />
   );
 };

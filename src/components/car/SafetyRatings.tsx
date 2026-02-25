@@ -44,6 +44,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                         alt="Global NCAP"
                         fill
                         className="object-contain"
+                        onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                        }}
                     />
                 </div>
 
@@ -56,6 +59,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                                 alt="Adult Safety"
                                 fill
                                 className="object-contain"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                }}
                             />
                         </div>
                         {renderStars(data.globalNcap.adult)}
@@ -69,6 +75,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                                 alt="Child Safety"
                                 fill
                                 className="object-contain"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                }}
                             />
                         </div>
                         {renderStars(data.globalNcap.child)}
@@ -85,6 +94,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                         alt="Bharat NCAP"
                         fill
                         className="object-contain"
+                        onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                        }}
                     />
                 </div>
 
@@ -98,6 +110,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                                     alt="Adult Safety"
                                     fill
                                     className="object-contain"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                }}
                                 />
                             </div>
                             {renderStars(data.bharatNcap.adult || 0)}
@@ -111,6 +126,9 @@ export function SafetyRatings({ data }: SafetyRatingsProps) {
                                     alt="Child Safety"
                                     fill
                                     className="object-contain"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                                }}
                                 />
                             </div>
                             {renderStars(data.bharatNcap.child || 0)}

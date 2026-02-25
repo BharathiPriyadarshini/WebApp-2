@@ -79,6 +79,9 @@ export default function ProfilePage() {
                       alt="Ferrari"
                       fill
                       className="object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                      }}
                     />
                   </div>
 
@@ -120,6 +123,9 @@ export default function ProfilePage() {
                       alt="Porsche"
                       fill
                       className="object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
+                      }}
                     />
                   </div>
 

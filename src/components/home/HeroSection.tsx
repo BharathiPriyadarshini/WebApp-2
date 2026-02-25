@@ -214,7 +214,7 @@ export default function HeroSection() {
               {/* ambient glow behind car */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-[#00aaff] blur-[50px] opacity-10 rounded-full" />
 
-              {/* placeholder for the car — in production replace src with actual car image */}
+              {/* placeholder for the car — falls back to alt image on error */}
               <motion.img
                 src="/images/hero-car.png"
                 alt="Featured vehicle"
@@ -222,8 +222,8 @@ export default function HeroSection() {
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="w-full max-w-[440px] object-contain drop-shadow-[0_0_30px_rgba(0,170,255,0.2)] relative z-10"
                 onError={(e) => {
-                  // fallback: render a styled placeholder if image is missing
-                  (e.target as HTMLImageElement).style.display = "none";
+                  // fallback: switch to global alt placeholder image
+                  (e.target as HTMLImageElement).src = "/alt.png";
                 }}
               />
 
