@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useBrands } from "@/hooks/useBrands";
+import { Card } from "@/components/ui/card";
 
 /* ================= ANIMATION ================= */
 const cardAnimation = {
@@ -45,25 +46,26 @@ export default function TopBrands() {
 
           {loadingTop
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="min-w-[160px] h-40 bg-[#111] rounded-2xl animate-pulse"
-                />
-              ))
+              <div
+                key={i}
+                className="min-w-[160px] h-40 bg-[#111] rounded-2xl animate-pulse"
+              />
+            ))
             : topBrands.map((brand, index) => (
-                <motion.div
-                  key={brand._id}
-                  custom={index}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true }}
-                  variants={cardAnimation}
-                  className="min-w-[160px]"
+              <motion.div
+                key={brand._id}
+                custom={index}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                variants={cardAnimation}
+                className="min-w-[160px]"
+              >
+                <Link
+                  href={`/brands?brand=${brand._id}`}
+                  className="group block"
                 >
-                  <Link
-                    href={`/brands?brand=${brand._id}`}
-                    className="group block bg-[#111] border border-white/10 rounded-2xl p-8 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300"
-                  >
+                  <Card className="bg-[#111] border border-white/10 rounded-2xl p-8 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
                     {/* Logo Circle */}
                     <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-black border border-white/10 group-hover:scale-110 transition">
                       {brand.logo ? (
@@ -85,9 +87,10 @@ export default function TopBrands() {
                     <p className="text-gray-300 group-hover:text-white transition capitalize">
                       {brand.name}
                     </p>
-                  </Link>
-                </motion.div>
-              ))}
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
         </div>
       </div>
     </section>

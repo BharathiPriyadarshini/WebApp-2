@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Car, Truck, Zap, Crown } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const types = [
   { name: "SUV", icon: Truck },
@@ -34,8 +35,8 @@ export default function ByCarType() {
                 viewport={{ once: true }}
                 className="min-w-[150px]"
               >
-                <button className="group w-full bg-[#111] border border-white/10 rounded-2xl py-8 px-6 flex flex-col items-center justify-center hover:bg-[#16202a] hover:border-blue-500/40 transition duration-300">
-                  
+                <Card className="group w-full bg-[#111] border border-white/10 rounded-2xl py-8 px-6 flex flex-col items-center justify-center hover:bg-[#16202a] hover:border-blue-500/40 transition duration-300 cursor-pointer">
+
                   {/* Icon */}
                   <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 mb-4 group-hover:bg-blue-500/20 transition">
                     <Icon className="text-gray-300 group-hover:text-blue-400 transition" size={22} />
@@ -45,7 +46,7 @@ export default function ByCarType() {
                   <span className="text-gray-300 group-hover:text-white transition">
                     {type.name}
                   </span>
-                </button>
+                </Card>
               </motion.div>
             );
           })}

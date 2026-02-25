@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { cars } from "@/data/mockCars";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
 
 export default function HotPicks() {
   const hotCars = cars.filter((car) => car.isHot);
@@ -12,7 +14,7 @@ export default function HotPicks() {
   return (
     <section className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6">
-        
+
         {/* Header */}
         <div className="flex items-end justify-between mb-12">
           <div>
@@ -41,45 +43,42 @@ export default function HotPicks() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300"
             >
-              {/* Image */}
-              <div className="relative h-56 w-full overflow-hidden">
-                <Image
-                  src={car.image}
-                  alt={`${car.brand} ${car.model}`}
-                  fill
-                  className="object-cover group-hover:scale-105 transition duration-500"
-                />
+              <Card className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 py-0">
+                {/* Image */}
+                <div className="relative h-56 w-full overflow-hidden">
+                  <Image
+                    src={car.image}
+                    alt={`${car.brand} ${car.model}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-500"
+                  />
 
-                {/* Badge */}
-                {car.badge && (
-                  <span className="absolute top-4 right-4 bg-blue-600 text-xs px-3 py-1 rounded-full font-medium">
-                    {car.badge}
-                  </span>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-white">
-                  {car.brand} {car.model}
-                </h3>
-
-                <p className="text-gray-400 text-sm mt-1">
-                  Most searched and recently launched vehicle
-                </p>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-white font-semibold text-lg">
-                    ₹ {car.price.toLocaleString()}
-                  </span>
-
-                  {/* <button className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-500 transition">
-                    +
-                  </button> */}
+                  {/* Badge */}
+                  {car.badge && (
+                    <Badge className="absolute top-4 right-4 bg-blue-600 text-white border-transparent">
+                      {car.badge}
+                    </Badge>
+                  )}
                 </div>
-              </div>
+
+                {/* Content */}
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-white">
+                    {car.brand} {car.model}
+                  </h3>
+
+                  <p className="text-gray-400 text-sm mt-1">
+                    Most searched and recently launched vehicle
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-white font-semibold text-lg">
+                      ₹ {car.price.toLocaleString()}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

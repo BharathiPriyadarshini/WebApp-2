@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 
 const navItems = [
   { name: "Explore", href: "/" },
@@ -13,15 +15,18 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur-lg border-b border-white/10 pt-10">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-lg border-b border-white/10 pt-safe-top">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-white">
+        {/* LOGO */}
+        <Link href="/" className="text-xl font-bold text-white z-50 relative">
           Rimello
         </Link>
 
-        <div className="flex gap-6">
+        {/* DESKTOP NAV */}
+        <div className="hidden md:flex gap-6">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
 
@@ -42,7 +47,45 @@ export default function Navbar() {
             );
           })}
         </div>
+
+        {/* MOBILE TOGGLE */}
+        <button
+          className="md:hidden text-white z-50 relative p-2 -mr-2"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle mobile menu"
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* MOBILE NAV OVERLAY */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-xl border-b border-white/10 py-6 px-6 flex flex-col gap-6 shadow-2xl"
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-lg transition font-medium ${isActive ? "text-white" : "text-gray-400 hover:text-white"
+                    }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

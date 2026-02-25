@@ -4,6 +4,8 @@ export type Model = {
   _id: string;
   name: string;
   brandId: string;
+  minPrice?: number;
+  maxPrice?: number;
   createdAt: string;
   updatedAt: string;
 };

@@ -7,4 +7,5 @@ export interface Car {
   image: string;
   description: string;
   isHot?: boolean;
+  badge?: string;
 }

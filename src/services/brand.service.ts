@@ -5,6 +5,7 @@ export type Brand = {
   name: string;
   slug: string;
   status: string;
+  logo?: string;
   createdAt: string;
   updatedAt: string;
 };

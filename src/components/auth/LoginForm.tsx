@@ -1,6 +1,8 @@
 "use client";
 
 import { useAuthStore } from "@/store/auth.store";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
 
 export default function LoginForm() {
   const { login, closeAuthModal } = useAuthStore();
@@ -11,25 +13,25 @@ export default function LoginForm() {
         Welcome Back
       </h2>
 
-      <input
+      <Input
         placeholder="Email"
-        className="w-full mb-4 p-3 rounded bg-black border border-white/10"
+        className="w-full mb-4 bg-black border-white/10"
       />
-      <input
+      <Input
         type="password"
         placeholder="Password"
-        className="w-full mb-6 p-3 rounded bg-black border border-white/10"
+        className="w-full mb-6 bg-black border-white/10"
       />
 
-      <button
+      <Button
         onClick={() => {
           login();
           closeAuthModal();
         }}
-        className="w-full py-3 rounded-lg bg-white text-black font-semibold"
+        className="w-full py-3 rounded-lg bg-white text-black font-semibold hover:bg-white/90"
       >
         Login
-      </button>
+      </Button>
     </>
   );
 }
