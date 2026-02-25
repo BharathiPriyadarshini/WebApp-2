@@ -7,9 +7,10 @@ export const cars: Car[] = [
     model: "Fortuner",
     type: "SUV",
     price: 4200000,
-    image: "/cars/fortuner.jpg",
+    image: "/alt.png",
     description: "Premium SUV with powerful engine",
     isHot: true,
+    
   },
   {
     id: "2",
@@ -17,7 +18,7 @@ export const cars: Car[] = [
     model: "X5",
     type: "SUV",
     price: 8500000,
-    image: "/cars/x5.jpg",
+    image: "/alt.png",
     description: "Luxury German SUV",
   },
 ];

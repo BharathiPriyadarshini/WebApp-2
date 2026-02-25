@@ -75,7 +75,7 @@ export default function ProfilePage() {
                 <Card className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden py-0">
                   <div className="relative h-48 bg-black">
                     <Image
-                      src="/cars/ferrari.jpg"
+                      src="/alt.png"
                       alt="Ferrari"
                       fill
                       className="object-cover"
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                 <Card className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden py-0">
                   <div className="relative h-48 bg-black">
                     <Image
-                      src="/cars/porsche.jpg"
+                      src="/alt.png"
                       alt="Porsche"
                       fill
                       className="object-cover"

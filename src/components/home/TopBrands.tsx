@@ -43,61 +43,59 @@ export default function TopBrands() {
 
         {/* Brands Row */}
         <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-
           {loadingTop
             ? Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="min-w-[160px] h-40 bg-[#111] rounded-2xl animate-pulse"
-              />
-            ))
+                <div
+                  key={i}
+                  className="min-w-[120px] h-32 bg-[#111] rounded-xl animate-pulse"
+                />
+              ))
             : topBrands.map((brand, index) => (
-              <motion.div
-                key={brand._id}
-                custom={index}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                variants={cardAnimation}
-                className="min-w-[160px]"
-              >
-                <Link
-                  href={`/brands?brand=${brand._id}`}
-                  className="group block"
+                <motion.div
+                  key={brand._id}
+                  custom={index}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true }}
+                  variants={cardAnimation}
+                  className="min-w-[120px]"
                 >
-                  <Card className="bg-[#111] border border-white/10 rounded-2xl p-8 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
-                    {/* Logo Circle */}
-                    <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-black border border-white/10 group-hover:scale-110 transition">
-                      {brand.logo ? (
-                        <Image
-                          src={brand.logo}
-                          alt={brand.name}
-                          width={40}
-                          height={40}
-                          className="object-contain"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = "/alt.png";
-                          }}
-                        />
-                      ) : (
-                        <Image
-                          src="/alt.png"
-                          alt="Brand placeholder"
-                          width={40}
-                          height={40}
-                          className="object-contain opacity-70"
-                        />
-                      )}
-                    </div>
+                  <Link
+                    href={`/brands?brand=${brand._id}`}
+                    className="group block"
+                  >
+                    <Card className="bg-[#111] border border-white/10 rounded-xl px-2 py-6 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
+                      
+                      {/* Inner wrapper controls spacing */}
+                      <div className="flex flex-col items-center justify-center leading-none">
+                        
+                        {/* Logo */}
+                        <div className="w-12 h-12 flex items-center justify-center rounded-full group-hover:scale-110 transition">
+                          {brand.logo ? (
+                            <span className="text-white/40 text-sm uppercase leading-none">
+                              {brand.name.slice(0, 2)}
+                            </span>
+                          ) : (
+                            <Image
+                              src="/logos/toyota.png"
+                              alt="Brand placeholder"
+                              width={30}
+                              height={30}
+                              className="object-contain opacity-70"
+                            />
+                          )}
+                        </div>
 
-                    {/* Brand Name */}
-                    <p className="text-gray-300 group-hover:text-white transition capitalize">
-                      {brand.name}
-                    </p>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
+                        {/* Brand Name */}
+                        <p className="text-sm leading-none mt-0 text-gray-300 group-hover:text-white transition capitalize">
+                          {brand.name}
+                        </p>
+
+                      </div>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))}
         </div>
       </div>
     </section>
