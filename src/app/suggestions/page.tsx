@@ -1,7 +1,6 @@
 
 "use client";
 
-console.log("🚀 SuggestionsPage file loaded");
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -12,13 +11,8 @@ import { useAnswersStore } from "@/store/answersStore";
 import { QuestionResponse } from "@/types";
 
 import QuestionCard from "@/components/questions/QuestionCard";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-/* ================= DEBUG HELPER ================= */
-
-const debug = (...args: any[]) => {
-  console.log("[SuggestionsPage]", ...args);
-};
 
 /* ================= Skeleton ================= */
 
@@ -55,21 +49,10 @@ export default function SuggestionsPage() {
 
   const { mutate: fetchQuestion, isPending, error } = useNextQuestion();
 
-  /* ================= RENDER DEBUG ================= */
-
-  debug("RENDER", {
-    user,
-    answersLength: answers.length,
-    maxQuestions,
-  });
-
   /* ================= Auth Protection ================= */
 
   useEffect(() => {
-    debug("Auth effect triggered", { user });
-
     if (!user) {
-      debug("No user → redirecting to /");
       router.replace("/");
     }
   }, [user, router]);
@@ -79,34 +62,18 @@ export default function SuggestionsPage() {
   const loadNextQuestion = useCallback(() => {
     const currentAnswers = useAnswersStore.getState().answers;
 
-    debug("loadNextQuestion called", {
-      currentAnswers,
-      length: currentAnswers.length,
-      maxQuestions,
-    });
-
-    debug("VALUES CHECK", {
-  currentAnswersLength: currentAnswers.length,
-  maxQuestions,
-});
-
     setIsTransitioning(true);
     setShowSkeleton(true);
 
-    debug("Calling fetchQuestion mutation...");
-
     fetchQuestion(currentAnswers, {
       onSuccess: (question) => {
-        debug("API SUCCESS", question);
-
         setTimeout(() => {
           setCurrentQuestion(question);
           setIsTransitioning(false);
           setShowSkeleton(false);
         }, 400);
       },
-      onError: (err) => {
-        debug("API ERROR", err);
+      onError: () => {
         setIsTransitioning(false);
         setShowSkeleton(false);
       },
@@ -116,20 +83,13 @@ export default function SuggestionsPage() {
   /* ================= Initial Load ================= */
 
   useEffect(() => {
-    debug("Initial load effect", { user, maxQuestions });
-
-    if (!user) {
-      debug("User missing — skipping load");
-      return;
-    }
+    if (!user) return;
 
     if (maxQuestions === 0) {
-      debug("maxQuestions is 0 → redirecting home");
       router.push("/");
       return;
     }
 
-    debug("Triggering first question load");
     loadNextQuestion();
   }, [user, maxQuestions, loadNextQuestion, router]);
 
@@ -138,16 +98,7 @@ export default function SuggestionsPage() {
   const handleAnswer = (
     answer: string | number | (string | number)[]
   ) => {
-    debug("handleAnswer called", {
-      answer,
-      currentQuestion,
-      answersLength: answers.length,
-    });
-
-    if (!currentQuestion) {
-      debug("No current question → aborting");
-      return;
-    }
+    if (!currentQuestion) return;
 
     setShowSkeleton(true);
     setIsTransitioning(true);
@@ -163,14 +114,7 @@ export default function SuggestionsPage() {
     const updatedCount = answers.length + 1;
     const reachedLimit = updatedCount >= maxQuestions;
 
-    debug("After answer", {
-      updatedCount,
-      reachedLimit,
-      isFinal: currentQuestion.isFinal,
-    });
-
     if (reachedLimit || currentQuestion.isFinal) {
-      debug("Navigating to /recommendations");
       setTimeout(() => {
         router.push("/recommendations");
       }, 500);
@@ -180,13 +124,11 @@ export default function SuggestionsPage() {
     setCurrentQuestion(null);
 
     setTimeout(() => {
-      debug("Loading next question...");
       loadNextQuestion();
     }, 100);
   };
 
   if (!user) {
-    debug("User null → returning null UI");
     return null;
   }
 
@@ -206,16 +148,14 @@ export default function SuggestionsPage() {
       <div className="relative z-10 min-h-screen flex flex-col px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => {
-              debug("Back button clicked");
-              router.push("/");
-            }}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition"
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Back</span>
-          </button>
+          </Button>
         </div>
 
         {/* Progress */}
@@ -232,7 +172,7 @@ export default function SuggestionsPage() {
 
           <div className="relative h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-accent rounded-full transition-all duration-500"
+              className="absolute inset-y-0 left-0 bg-linear-to-r from-primary via-primary to-accent rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -253,20 +193,18 @@ export default function SuggestionsPage() {
             )}
 
             {error && !isPending && (
-              <div className="p-6 rounded-2xl border border-destructive/30 text-center mt-6">
-                <h3 className="font-semibold text-destructive mb-2">
-                  Something went wrong
-                </h3>
-                <button
-                  onClick={() => {
-                    debug("Retry clicked");
-                    loadNextQuestion();
-                  }}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground"
-                >
-                  Try Again
-                </button>
-              </div>
+              <Card className="border border-destructive/30 mt-6">
+                <CardContent className="p-6 text-center">
+                  <h3 className="font-semibold text-destructive mb-2">
+                    Something went wrong
+                  </h3>
+                  <Button
+                    onClick={() => loadNextQuestion()}
+                  >
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search,
   SlidersHorizontal,
@@ -10,6 +11,10 @@ import {
   Settings,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
 
 /* ---------------------------------- */
 /* Brand Mapping (Fix brandId issue)  */
@@ -65,30 +70,29 @@ const mockVehicles = [
   },
 ];
 
-export default function TrimsPage() {
+import { Suspense } from "react";
+
+function TrimsPageContent() {
   const params = useSearchParams();
   const brandId = params.get("brand");
   const model = params.get("model");
 
   const brandName = brandId ? brandMap[brandId] || brandId : "All Brands";
 
-  /* -------------------- */
-  /* States               */
-  /* -------------------- */
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
   const [fuelType, setFuelType] = useState<string | null>(null);
   const [transmission, setTransmission] = useState<string | null>(null);
   const [bodyType, setBodyType] = useState<string | null>(null);
 
-  /* -------------------- */
-  /* Filtering Logic      */
-  /* -------------------- */
   const filteredVehicles = useMemo(() => {
     let vehicles = mockVehicles.filter((vehicle) => {
-      const matchBrand = brandName === "All Brands" || vehicle.brand === brandName;
+      const matchBrand =
+        brandName === "All Brands" || vehicle.brand === brandName;
       const matchModel = model ? vehicle.model === model : true;
-      const matchSearch = vehicle.name.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = vehicle.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
       const matchFuel = fuelType ? vehicle.fuelType === fuelType : true;
       const matchTransmission = transmission
         ? vehicle.transmission === transmission
@@ -115,8 +119,7 @@ export default function TrimsPage() {
   return (
     <div className="bg-black text-white min-h-screen pt-28">
       <div className="max-w-7xl mx-auto px-6 py-16">
-
-        {/* ---------------- Header ---------------- */}
+        {/* Header */}
         <div className="mb-10">
           <h1 className="text-4xl font-bold">Find Your Match</h1>
           <p className="text-gray-400 mt-2">
@@ -127,126 +130,145 @@ export default function TrimsPage() {
           </p>
         </div>
 
-        {/* ---------------- Search + Sort ---------------- */}
+        {/* Search + Sort */}
         <div className="flex flex-col md:flex-row gap-4 mb-12">
-
           <div className="flex items-center bg-[#111] border border-white/10 rounded-full px-4 py-3 flex-1">
             <Search size={18} className="text-gray-400" />
-            <input
+            <Input
               type="text"
               placeholder="Search by make, model..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none ml-3 text-white w-full placeholder-gray-500"
+              className="bg-transparent border-none outline-none ml-3 text-white w-full placeholder-gray-500 shadow-none focus-visible:ring-0 h-auto p-0"
             />
           </div>
 
-          <button
+          <Button
             onClick={() => setSort("newest")}
-            className={`px-6 py-3 rounded-full border transition ${
-              sort === "newest"
-                ? "bg-blue-600 border-blue-600"
-                : "bg-[#111] border-white/10 hover:border-blue-500"
-            }`}
+            variant={sort === "newest" ? "default" : "outline"}
+            className={`px-6 py-3 rounded-full transition ${sort === "newest"
+              ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
+              : "bg-[#111] border-white/10 hover:border-blue-500"
+              }`}
           >
             Newest First
-          </button>
+          </Button>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-10">
-
-          {/* ---------------- Sidebar Filters ---------------- */}
-          <aside className="hidden lg:block space-y-8">
-
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Sidebar */}
+          <aside className="w-full lg:w-64 space-y-8 order-2 lg:order-1">
             <FilterGroup
               title="Fuel Type"
               options={["Electric", "Hybrid", "Gasoline"]}
               selected={fuelType}
               setSelected={setFuelType}
             />
-
             <FilterGroup
               title="Transmission"
               options={["Automatic", "Manual"]}
               selected={transmission}
               setSelected={setTransmission}
             />
-
             <FilterGroup
               title="Body Type"
               options={["SUV", "Sedan", "Coupe"]}
               selected={bodyType}
               setSelected={setBodyType}
             />
-
           </aside>
 
-          {/* ---------------- Vehicle Cards ---------------- */}
-          <div className="lg:col-span-3">
+          {/* Vehicle Cards */}
+          <div className="flex-1 order-1 lg:order-2">
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-
               {filteredVehicles.map((vehicle) => (
-                <div
+                <Card
                   key={vehicle.id}
-                  className="bg-[#111] border border-white/10 rounded-2xl p-6 hover:border-blue-500/40 transition"
+                  className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 py-0"
                 >
-                  <div className="flex justify-between mb-4">
-                    <span className="text-xs bg-blue-600 px-3 py-1 rounded-full">
-                      {vehicle.model}
-                    </span>
-                    <Heart size={18} className="text-gray-400" />
+                  {/* Full Width Image */}
+                  <div className="relative w-full h-56">
+                    <Image
+                      src="/006.png"
+                      alt={vehicle.name}
+                      width={800}
+                      height={500}
+                      className="object-cover object-right"
+                      priority
+                    />
                   </div>
 
-                  <div className="h-40 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6" />
-
-                  <h3 className="text-lg font-semibold">
-                    {vehicle.name}
-                  </h3>
-
-                  <p className="text-gray-400 mt-2">
-                    ${vehicle.price.toLocaleString()}
-                  </p>
-
-                  {/* Specs */}
-                  <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <Gauge size={16} />
-                      {vehicle.horsepower} HP
+                  {/* Content */}
+                  <CardContent className="p-6">
+                    <div className="flex justify-between mb-4">
+                      <Badge className="bg-blue-600 text-white border-transparent">
+                        {vehicle.model}
+                      </Badge>
+                      <Heart
+                        size={18}
+                        className="text-gray-400 hover:text-red-500 transition cursor-pointer"
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Settings size={16} />
-                      {vehicle.transmission}
-                    </div>
-                  </div>
 
-                  <Link
-                    href={`/trims/${vehicle.id}`}
-                    className="mt-6 block text-center w-full bg-white text-black py-2 rounded-lg font-semibold hover:scale-105 transition"
-                  >
-                    View Details
-                  </Link>
-                </div>
+                    <h3 className="text-lg font-semibold">
+                      {vehicle.name}
+                    </h3>
+
+                    <p className="text-gray-400 mt-2">
+                      ${vehicle.price.toLocaleString()}
+                    </p>
+
+                    <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Gauge size={16} />
+                        {vehicle.horsepower} HP
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Settings size={16} />
+                        {vehicle.transmission}
+                      </div>
+                    </div>
+
+                    <Button asChild className="mt-6 w-full bg-white text-black font-semibold hover:scale-105 hover:bg-white/90 transition">
+                      <Link href={`/trims/${vehicle.id}`}>
+                        View Details
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
 
               {/* AI Card */}
-              <div className="border border-dashed border-white/20 rounded-2xl flex flex-col items-center justify-center p-10 text-center">
-                <SlidersHorizontal size={28} className="text-blue-500 mb-4" />
-                <h3 className="text-lg font-semibold">
-                  Not seeing the perfect fit?
-                </h3>
-                <p className="text-gray-400 mt-3 text-sm">
-                  Let our AI build a custom configuration.
-                </p>
-                <button className="mt-6 bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-500 transition">
-                  Start AI Configuration
-                </button>
-              </div>
-
+              <Card className="border border-dashed border-white/20 rounded-2xl bg-transparent">
+                <CardContent className="flex flex-col items-center justify-center p-10 text-center">
+                  <SlidersHorizontal
+                    size={28}
+                    className="text-blue-500 mb-4"
+                  />
+                  <h3 className="text-lg font-semibold">
+                    Not seeing the perfect fit?
+                  </h3>
+                  <p className="text-gray-400 mt-3 text-sm">
+                    Let our AI build a custom configuration.
+                  </p>
+                  <Button className="mt-6 bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-500 transition">
+                    Start AI Configuration
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TrimsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+      <TrimsPageContent />
+    </Suspense>
   );
 }
 
@@ -269,19 +291,19 @@ function FilterGroup({
       </h3>
       <div className="flex flex-wrap gap-3">
         {options.map((option) => (
-          <button
+          <Button
             key={option}
+            variant={selected === option ? "default" : "outline"}
             onClick={() =>
               selected === option ? setSelected(null) : setSelected(option)
             }
-            className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-              selected === option
-                ? "bg-blue-600 border-blue-600 text-white"
-                : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${selected === option
+              ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
+              : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
+              }`}
           >
             {option}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

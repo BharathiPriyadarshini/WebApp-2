@@ -78,6 +78,7 @@ export interface EnrichedCar extends BaseCar {
     horsepower: number;
     torque: string;
     acceleration: string;
+    transmission?: string;
     colors: string[];
     description: string;
     safetyRatings: SafetyRatingData;
@@ -267,27 +268,24 @@ function FeatureAccordion({
 
             {/* Expandable body */}
             <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                }`}
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
             >
                 <div className="bg-card px-5 py-4">
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {category.features.map((feature) => (
                             <li
                                 key={feature.name}
-                                className={`flex items-center gap-2.5 text-sm py-1.5 px-3 rounded-lg transition-colors ${
-                                    feature.available
-                                        ? 'text-foreground'
-                                        : 'text-muted-foreground/50'
-                                }`}
+                                className={`flex items-center gap-2.5 text-sm py-1.5 px-3 rounded-lg transition-colors ${feature.available
+                                    ? 'text-foreground'
+                                    : 'text-muted-foreground/50'
+                                    }`}
                             >
                                 <CheckCircle2
-                                    className={`h-4 w-4 flex-shrink-0 ${
-                                        feature.available
-                                            ? 'text-green-500'
-                                            : 'text-gray-300 dark:text-gray-600'
-                                    }`}
+                                    className={`h-4 w-4 flex-shrink-0 ${feature.available
+                                        ? 'text-green-500'
+                                        : 'text-gray-300 dark:text-gray-600'
+                                        }`}
                                 />
                                 <span className={feature.available ? '' : 'line-through opacity-50'}>
                                     {feature.name}
@@ -693,11 +691,10 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                 <button
                                     key={tab}
                                     onClick={() => setActiveGalleryTab(tab)}
-                                    className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
-                                        activeGalleryTab === tab
-                                            ? 'bg-card shadow text-foreground'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                    }`}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${activeGalleryTab === tab
+                                        ? 'bg-card shadow text-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                        }`}
                                 >
                                     {tab}
                                 </button>
@@ -794,7 +791,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             <span>+18.2% YoY</span>
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                             { label: 'Total Units (2024)', value: '23,170', sub: 'Annual Sales' },
                             { label: 'Best Month', value: 'Dec', sub: '2,600 units' },

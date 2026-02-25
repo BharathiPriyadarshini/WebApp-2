@@ -27,23 +27,23 @@ export default function BrandModelsPage({
       <div className="max-w-7xl mx-auto px-6 py-20">
         <h1 className="text-3xl font-bold mb-10 capitalize">Models</h1>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading && models.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
-                <Card
-                  key={i}
-                  className="p-8 bg-[#111] rounded-2xl animate-pulse h-20"
-                />
-              ))
+              <Card
+                key={i}
+                className="p-8 bg-[#111] rounded-2xl animate-pulse h-20"
+              />
+            ))
             : models.map((model) => (
-                <Link
-                  key={model._id}
-                  href={`/trims?brand=${id}&model=${model.name}`}
-                  className="p-8 bg-[#111] rounded-2xl border border-white/10 hover:border-blue-500 transition uppercase"
-                >
-                  {model.name}
-                </Link>
-              ))}
+              <Link
+                key={model._id}
+                href={`/trims?brand=${id}&model=${model.name}`}
+                className="p-8 bg-[#111] rounded-2xl border border-white/10 hover:border-blue-500 transition uppercase text-center md:text-left"
+              >
+                {model.name}
+              </Link>
+            ))}
         </div>
 
         {page < totalPages && (
