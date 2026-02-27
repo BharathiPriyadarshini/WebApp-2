@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Star,
     ShieldCheck,
@@ -8,7 +8,6 @@ import {
     CheckCircle2,
     XCircle,
     Zap,
-    Search,
     X,
     ThumbsDown,
 } from 'lucide-react';
@@ -21,49 +20,172 @@ interface RiInsightsTabProps {
     data: any;
 }
 
+// ── All mock reviews ──────────────────────────────────────────────────────
 const ALL_REVIEWS: Record<string, any[]> = {
     "Build Quality & Safety": [
-        { id: 101, title: "Solid Build", text: "The door thud feels very premium. Gives a sense of safety.", user: "Amit K.", sentiment: "positive", likes: 45, date: "3d ago" },
-        { id: 102, title: "Panel Gaps", text: "Noticed some uneven panel gaps near the bonnet.", user: "Vikram R.", sentiment: "negative", likes: 12, date: "1mo ago" },
-        { id: 103, title: "Paint Quality", text: "Paint finish is excellent, very glossy.", user: "Sneha G.", sentiment: "positive", likes: 8, date: "2w ago" },
-        { id: 104, title: "Rust Concerns", text: "Slight rust on door edges after 2 years.", user: "Manish T.", sentiment: "negative", likes: 23, date: "3w ago" },
-        { id: 105, title: "Frame Rigidity", text: "Feels very rigid on bumpy roads, great safety.", user: "Kavya L.", sentiment: "positive", likes: 67, date: "4d ago" },
-        { id: 106, title: "Airbag System", text: "6 airbags standard, very reassuring for family.", user: "Ravi M.", sentiment: "positive", likes: 91, date: "1w ago" },
+        { id: 101, title: "Solid Build", text: "The door thud feels very premium. Gives a real sense of safety on the road.", sentiment: "positive", likes: 45, dislikes: 3 },
+        { id: 102, title: "Panel Gaps", text: "Noticed some uneven panel gaps near the bonnet after a few months of ownership.", sentiment: "negative", likes: 12, dislikes: 8 },
+        { id: 103, title: "Paint Quality", text: "Paint finish is excellent, very glossy and holds up well against minor scratches.", sentiment: "positive", likes: 8, dislikes: 1 },
+        { id: 104, title: "Rust Concerns", text: "Slight rust started appearing on door edges after about two years of use.", sentiment: "negative", likes: 23, dislikes: 5 },
+        { id: 105, title: "Frame Rigidity", text: "Feels very rigid on bumpy roads. The chassis absorbs impact well and inspires confidence.", sentiment: "positive", likes: 67, dislikes: 2 },
+        { id: 106, title: "Airbag System", text: "Having 6 airbags as standard is very reassuring, especially for long family trips.", sentiment: "positive", likes: 91, dislikes: 1 },
+        { id: 107, title: "Seatbelt Quality", text: "Seatbelts feel sturdy and reliable even at high speeds on the highway.", sentiment: "positive", likes: 34, dislikes: 0 },
+        { id: 108, title: "Bumper Build", text: "Bumper cracked after a minor tap in parking. Expected better quality at this price.", sentiment: "negative", likes: 19, dislikes: 4 },
+        { id: 109, title: "Underbody Protection", text: "Good underbody cladding for rough Indian roads. No scraping even on broken patches.", sentiment: "positive", likes: 28, dislikes: 2 },
+        { id: 110, title: "Door Hinges", text: "Door hinges started squeaking after about 6 months of use. Needs attention.", sentiment: "negative", likes: 14, dislikes: 3 },
+        { id: 111, title: "Windshield Quality", text: "Windshield is thick enough — no vibration or noise at highway speeds.", sentiment: "positive", likes: 22, dislikes: 1 },
+        { id: 112, title: "Crash Test", text: "5-star safety rating gives real confidence when driving with family.", sentiment: "positive", likes: 55, dislikes: 0 },
     ],
     "Features & Tech": [
-        { id: 201, title: "Touchscreen Lag", text: "The infotainment system freezes occasionally.", user: "Rohan D.", sentiment: "negative", likes: 56, date: "5d ago" },
-        { id: 202, title: "Sound System", text: "Speakers are absolute blast! Bass is punchy.", user: "Karthik", sentiment: "positive", likes: 89, date: "1w ago" },
-        { id: 203, title: "Wireless Charging", text: "Works flawlessly, one of the best features.", user: "Nisha P.", sentiment: "positive", likes: 44, date: "2w ago" },
-        { id: 204, title: "ADAS Reliability", text: "Lane assist is a bit oversensitive on highways.", user: "Suresh K.", sentiment: "negative", likes: 31, date: "3d ago" },
+        { id: 201, title: "Touchscreen Lag", text: "The infotainment system freezes occasionally, especially when using maps and music together.", sentiment: "negative", likes: 56, dislikes: 7 },
+        { id: 202, title: "Sound System", text: "Speakers are an absolute blast! Bass is punchy and mids are clean.", sentiment: "positive", likes: 89, dislikes: 4 },
+        { id: 203, title: "Wireless Charging", text: "Works flawlessly every single time. One of the best features in this segment.", sentiment: "positive", likes: 44, dislikes: 2 },
+        { id: 204, title: "ADAS Reliability", text: "Lane assist is a bit oversensitive on highways with painted road markings.", sentiment: "negative", likes: 31, dislikes: 9 },
+        { id: 205, title: "OTA Updates", text: "OTA updates feel like getting a new car every few months. Keeps things fresh.", sentiment: "positive", likes: 62, dislikes: 1 },
+        { id: 206, title: "Voice Assistant", text: "Voice commands work well even in noisy city traffic conditions.", sentiment: "positive", likes: 37, dislikes: 3 },
     ],
     "Comfort & Interiors": [
-        { id: 301, title: "Plush Seating", text: "Long drives are a breeze, seats are very supportive.", user: "Anjali P.", sentiment: "positive", likes: 120, date: "2d ago" },
-        { id: 302, title: "Back Seat", text: "Rear legroom is tight for tall passengers.", user: "Deepak S.", sentiment: "neutral", likes: 34, date: "3w ago" },
-        { id: 303, title: "Climate Control", text: "Dual zone AC works brilliantly even in peak summer.", user: "Pooja R.", sentiment: "positive", likes: 78, date: "1w ago" },
-        { id: 304, title: "Noise Insulation", text: "Wind noise creeps in above 100 kmph.", user: "Arjun V.", sentiment: "negative", likes: 19, date: "5d ago" },
+        { id: 301, title: "Plush Seating", text: "Long drives are a breeze — seats are very supportive and don't cause fatigue.", sentiment: "positive", likes: 120, dislikes: 3 },
+        { id: 302, title: "Back Seat", text: "Rear legroom is tight for tall passengers above 6 feet. Could be better.", sentiment: "neutral", likes: 34, dislikes: 12 },
+        { id: 303, title: "Climate Control", text: "Dual zone AC works brilliantly even in peak summer. Cools down fast.", sentiment: "positive", likes: 78, dislikes: 2 },
+        { id: 304, title: "Noise Insulation", text: "Wind noise creeps in above 100 kmph. The cabin could be better insulated.", sentiment: "negative", likes: 19, dislikes: 6 },
+        { id: 305, title: "Sunroof Quality", text: "Panoramic sunroof gives a brilliant open-air feel on evening drives.", sentiment: "positive", likes: 95, dislikes: 1 },
+        { id: 306, title: "Dashboard Feel", text: "Dashboard materials feel premium and well-stitched throughout.", sentiment: "positive", likes: 41, dislikes: 2 },
     ],
 };
 
-const getMockReviews = (category: string, limit?: number) => {
-    const reviews = ALL_REVIEWS[category] || [
-        { id: 1, title: "Great experience so far", text: "Really impressed with how this handles daily usage.", user: "Rahul M.", sentiment: "positive", likes: 15, date: "2d ago" },
-        { id: 2, title: "Could be better", text: "Expected more based on the price point.", user: "Priya S.", sentiment: "negative", likes: 7, date: "1w ago" },
-    ];
-    return limit ? reviews.slice(0, limit) : reviews;
-};
+const DEFAULT_REVIEWS = [
+    { id: 1,  title: "Great experience so far",  text: "Really impressed with how this handles daily usage in city conditions.",   sentiment: "positive", likes: 15, dislikes: 2 },
+    { id: 2,  title: "Could be better",          text: "Expected more based on the price point. Some features feel half-baked.",  sentiment: "negative", likes: 7,  dislikes: 4 },
+    { id: 3,  title: "Good overall",             text: "Solid choice for the segment, no major complaints after 8 months.",      sentiment: "positive", likes: 11, dislikes: 1 },
+    { id: 4,  title: "Service concerns",         text: "Service centre availability is limited in smaller cities.",               sentiment: "negative", likes: 9,  dislikes: 2 },
+    { id: 5,  title: "Value for money",          text: "The features offered at this price point are genuinely unbeatable.",     sentiment: "positive", likes: 33, dislikes: 0 },
+    { id: 6,  title: "Fuel efficiency",          text: "Getting around 16–17 kmpl in mixed city and highway conditions.",        sentiment: "positive", likes: 47, dislikes: 1 },
+];
 
-// ── Review Modal ──
-function ReviewModal({ category, score, onClose }: { category: string; score: number; onClose: () => void }) {
-    const reviews = getMockReviews(category);
+const getAllReviews = (category: string) =>
+    ALL_REVIEWS[category] || DEFAULT_REVIEWS;
+
+// ── Vote state per review ─────────────────────────────────────────────────
+type VoteMap = Record<number, 'liked' | 'disliked' | null>;
+
+// ── Single review card — plain text, no author, functional like/dislike ───
+function ReviewCard({
+    review,
+    vote,
+    onVote,
+}: {
+    review: any;
+    vote: 'liked' | 'disliked' | null;
+    onVote: (id: number, action: 'liked' | 'disliked') => void;
+}) {
+    const liked    = vote === 'liked';
+    const disliked = vote === 'disliked';
+
+    return (
+        <div className="py-4">
+            {/* Title */}
+            <p className="text-sm font-semibold text-foreground mb-1.5">{review.title}</p>
+
+            {/* Review text — no box, no border, just text */}
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {review.text}
+            </p>
+
+            {/* Functional like / dislike */}
+            <div className="flex items-center gap-5 mt-3">
+                <button
+                    onClick={() => onVote(review.id, 'liked')}
+                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
+                        liked
+                            ? 'text-green-600 dark:text-green-500'
+                            : 'text-muted-foreground hover:text-green-600 dark:hover:text-green-500'
+                    }`}
+                >
+                    <ThumbsUp className={`h-3.5 w-3.5 transition-all ${liked ? 'fill-green-600 dark:fill-green-500 scale-110' : ''}`} />
+                    <span>{review.likes + (liked ? 1 : 0)}</span>
+                </button>
+
+                <button
+                    onClick={() => onVote(review.id, 'disliked')}
+                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
+                        disliked
+                            ? 'text-red-500'
+                            : 'text-muted-foreground hover:text-red-500'
+                    }`}
+                >
+                    <ThumbsDown className={`h-3.5 w-3.5 transition-all ${disliked ? 'fill-red-500 scale-110' : ''}`} />
+                    <span>{review.dislikes + (disliked ? 1 : 0)}</span>
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// ── Review Modal — plain list, infinity scroll, no load more button ───────
+function ReviewModal({
+    category,
+    score,
+    onClose,
+}: {
+    category: string;
+    score: number;
+    onClose: () => void;
+}) {
+    const allReviews      = getAllReviews(category);
+    const PAGE_SIZE       = 3;
+
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const [votes,        setVotes]        = useState<VoteMap>({});
+    const [loading,      setLoading]      = useState(false);
+
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const loaderRef = useRef<HTMLDivElement>(null);
+
+    const hasMore        = visibleCount < allReviews.length;
+    const visibleReviews = allReviews.slice(0, visibleCount);
+
+    const loadMore = useCallback(() => {
+        if (loading || !hasMore) return;
+        setLoading(true);
+        setTimeout(() => {
+            setVisibleCount(prev => Math.min(prev + PAGE_SIZE, allReviews.length));
+            setLoading(false);
+        }, 500);
+    }, [loading, hasMore, allReviews.length]);
+
+    // IntersectionObserver for infinity scroll
+    useEffect(() => {
+        const sentinel = loaderRef.current;
+        const root     = scrollRef.current;
+        if (!sentinel || !root) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) loadMore(); },
+            { root, threshold: 0.1 }
+        );
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [loadMore]);
+
+    const handleVote = (id: number, action: 'liked' | 'disliked') => {
+        setVotes(prev => ({
+            ...prev,
+            [id]: prev[id] === action ? null : action,
+        }));
+    };
+
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="relative w-full max-w-lg bg-card rounded-3xl shadow-2xl border border-border animate-in slide-in-from-bottom-6 fade-in duration-300 overflow-hidden">
-                <div className="flex items-start justify-between p-6 border-b border-border">
+            <div className="relative w-full max-w-lg bg-card rounded-3xl shadow-2xl border border-border animate-in slide-in-from-bottom-6 fade-in duration-300 overflow-hidden flex flex-col max-h-[82vh]">
+
+                {/* Modal header */}
+                <div className="flex items-start justify-between px-6 pt-6 pb-4 flex-shrink-0">
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Detailed Reviews</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reviews</p>
                         <h3 className="text-lg font-bold text-foreground">{category}</h3>
                     </div>
                     <div className="flex items-center gap-3">
@@ -76,48 +198,45 @@ function ReviewModal({ category, score, onClose }: { category: string; score: nu
                         </button>
                     </div>
                 </div>
-                <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-                    {reviews.map((review, i) => (
-                        <div
+
+                {/* Scrollable list — no dividers between review items, no author */}
+                <div
+                    ref={scrollRef}
+                    className="flex-1 overflow-y-auto px-6 pb-6"
+                >
+                    {visibleReviews.map((review, i) => (
+                        <ReviewCard
                             key={review.id}
-                            className="p-4 rounded-2xl border border-border bg-muted/30 animate-in fade-in slide-in-from-bottom-2 duration-300"
-                            style={{ animationDelay: `${i * 60}ms` }}
-                        >
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                                <p className="font-semibold text-foreground text-sm">{review.title}</p>
-                                {review.sentiment === 'positive' ? (
-                                    <ThumbsUp className="h-3.5 w-3.5 text-green-500 shrink-0 mt-0.5" />
-                                ) : review.sentiment === 'negative' ? (
-                                    <ThumbsDown className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
-                                ) : (
-                                    <MessageSquare className="h-3.5 w-3.5 text-gray-400 shrink-0 mt-0.5" />
-                                )}
-                            </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-3">"{review.text}"</p>
-                            <div className="flex items-center justify-between text-[10px] text-gray-400">
-                                <span className="font-medium">{review.user}</span>
-                                <div className="flex items-center gap-3">
-                                    <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> {review.likes}</span>
-                                    <span>{review.date}</span>
-                                </div>
-                            </div>
-                        </div>
+                            review={review}
+                            vote={votes[review.id] ?? null}
+                            onVote={handleVote}
+                        />
                     ))}
-                </div>
-                <div className="px-6 pb-6 pt-2">
-                    <Button className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm">
-                        Load More Reviews
-                    </Button>
+
+                    {/* Infinity scroll sentinel */}
+                    <div ref={loaderRef} className="h-2" />
+
+                    {loading && (
+                        <div className="flex justify-center py-4">
+                            <div className="h-4 w-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+                        </div>
+                    )}
+
+                    {!hasMore && visibleReviews.length > 0 && (
+                        <p className="text-center text-xs text-muted-foreground py-4">
+                            All {allReviews.length} reviews loaded
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
 
-// ── Main Component ──
+// ── Main Component ────────────────────────────────────────────────────────
 export function RiInsightsTab({ data }: RiInsightsTabProps) {
     const [selectedCategory, setSelectedCategory] = useState<string | null>("Build Quality & Safety");
-    const [modalCategory, setModalCategory] = useState<string | null>(null);
+    const [modalCategory,    setModalCategory]    = useState<string | null>(null);
 
     const modalCategoryData = modalCategory
         ? data.categoryRatings.find((c: any) => c.label === modalCategory)
@@ -179,7 +298,7 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                     </div>
                 </div>
 
-                {/* ── 2-column layout: Detailed Breakdown | What Users Say ── */}
+                {/* ── 2-column layout ── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     {/* ── LEFT: Detailed Breakdown ── */}
@@ -187,8 +306,8 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                         <h3 className="text-lg font-bold text-foreground">Detailed Breakdown</h3>
 
                         {data.categoryRatings.map((cat: any, idx: number) => {
-                            const isOpen = selectedCategory === cat.label;
-                            const previewReviews = getMockReviews(cat.label, 2);
+                            const isOpen         = selectedCategory === cat.label;
+                            const previewReviews = getAllReviews(cat.label).slice(0, 2);
 
                             return (
                                 <div
@@ -219,11 +338,7 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                                                 {previewReviews.map((review: any) => (
                                                     <div key={review.id} className="text-sm">
                                                         <p className="font-semibold text-foreground text-xs">{review.title}</p>
-                                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"{review.text}"</p>
-                                                        <div className="flex justify-between mt-1 text-[10px] text-gray-400">
-                                                            <span>{review.user}</span>
-                                                            <span>{review.date}</span>
-                                                        </div>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">"{review.text}"</p>
                                                     </div>
                                                 ))}
                                                 <Button

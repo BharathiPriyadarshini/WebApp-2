@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useBrands } from "@/hooks/useBrands";
 import { useModels } from "@/hooks/useModels";
+import { getModels } from "@/services/model.service";
 import { Suspense } from "react";
 
 interface ModelWithMock {
@@ -42,12 +43,48 @@ function BrandsPageContent() {
   const selectedBrand = searchParams.get("brand") || "";
 
   const { allBrands, loadMore, page, totalPages, loadingAll } = useBrands();
-  const { models: rawModels, loading: modelsLoading } = useModels(selectedBrand);
+  const { models: rawModels, loading: modelsLoading } =
+    useModels(selectedBrand);
 
   const [search, setSearch] = useState("");
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // Filter brands for search
+  // ✅ REAL COUNT STATE
+  const [modelCounts, setModelCounts] = useState<Record<string, number>>({});
+  const [countsLoading, setCountsLoading] = useState(false);
+
+  // 🔥 Use SAME service as useModels
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!allBrands.length) return;
+
+      setCountsLoading(true);
+
+      const counts: Record<string, number> = {};
+
+      await Promise.all(
+        allBrands.map(async (brand) => {
+          try {
+            const data = await getModels({
+              brandId: brand._id,
+              page: 1,
+              limit: 1, // we only need total
+            });
+
+            counts[brand._id] = data.total; // ✅ THIS IS THE FIX
+          } catch {
+            counts[brand._id] = 0;
+          }
+        })
+      );
+
+      setModelCounts(counts);
+      setCountsLoading(false);
+    };
+
+    fetchCounts();
+  }, [allBrands]);
+
   const filteredBrands = allBrands.filter((brand) =>
     brand.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -56,7 +93,6 @@ function BrandsPageContent() {
     (brand) => brand._id === selectedBrand
   );
 
-  // Extend models with mock data to fix TS errors
   const models: ModelWithMock[] = rawModels.map((model) => ({
     ...model,
     fuelTypes: model.fuelTypes || ["Petrol", "Diesel"],
@@ -65,7 +101,6 @@ function BrandsPageContent() {
     maxPrice: model.maxPrice || 1500000,
   }));
 
-  // Infinite scroll
   useEffect(() => {
     if (!observerRef.current) return;
 
@@ -86,22 +121,26 @@ function BrandsPageContent() {
     router.push(`/brands?brand=${brandId}`);
   };
 
-  const formatLakhs = (price: number) => `₹${(price / 100000).toFixed(0)}L`;
+  const formatLakhs = (price: number) =>
+    `₹${(price / 100000).toFixed(0)}L`;
 
   return (
-
     <div className="bg-black text-white min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col lg:flex-row gap-10">
 
         {/* LEFT SIDEBAR */}
         <aside className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/10 pb-6 lg:pb-0 lg:pr-6 space-y-8">
+
           <button
             onClick={() => router.back()}
-            className="absolute top-0 left-0 mt-20 ml-4 flex items-center gap-2 text-gray-400 hover:text-white"
+            className="flex items-center gap-2 text-gray-400 hover:text-white"
           >
             <ChevronLeft className="w-5 h-5" /> Back
           </button>
-          <h2 className="text-gray-400 text-sm uppercase font-semibold">Select Brand</h2>
+
+          <h2 className="text-gray-400 text-sm uppercase font-semibold">
+            Select Brand
+          </h2>
 
           <div className="flex items-center bg-[#111] border border-white/10 rounded-full px-4 py-3">
             <Search size={18} className="text-gray-400" />
@@ -117,16 +156,18 @@ function BrandsPageContent() {
           <div className="space-y-2 max-h-[40vh] lg:max-h-[70vh] overflow-y-auto pr-2">
             {filteredBrands.map((brand) => {
               const isSelected = selectedBrand === brand._id;
+
               return (
                 <Button
                   key={brand._id}
                   variant={isSelected ? "default" : "outline"}
                   onClick={() => handleBrandClick(brand._id)}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-full transition-all duration-300 text-sm font-medium
-                  ${isSelected
+                  ${
+                    isSelected
                       ? "bg-blue-600 border-blue-600 text-white font-semibold hover:bg-blue-700"
                       : "bg-[#111] border-white/10 text-gray-400 hover:border-blue-500/40"
-                    }`}
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <Image
@@ -134,15 +175,17 @@ function BrandsPageContent() {
                       alt={brand.name}
                       width={30}
                       height={30}
-                      className="object-contain rounded-full bg-white p-1"
+                      className="object-contain"
                     />
                     <span className="capitalize">{brand.name}</span>
                   </div>
-                  {isSelected && (
-                    <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                      {modelsLoading ? "..." : models.length}
-                    </span>
-                  )}
+
+                  {/* ✅ NOW MATCHES RIGHT SIDE */}
+                  <span className="text-xs bg-white/10 px-2 py-1 rounded-full">
+                    {countsLoading
+                      ? "..."
+                      : modelCounts[brand._id] ?? 0}
+                  </span>
                 </Button>
               );
             })}
@@ -153,10 +196,6 @@ function BrandsPageContent() {
 
         {/* RIGHT SIDE */}
         <main className="flex-1 relative">
-
-          {/* BACK BUTTON */}
-
-
           {!selectedBrand && (
             <div className="h-40 lg:h-[60vh] flex items-center justify-center text-gray-500">
               Select a brand to view models
@@ -166,74 +205,64 @@ function BrandsPageContent() {
           {selectedBrand && (
             <>
               <div className="mb-10 mt-8">
-                <h1 className="text-4xl font-bold capitalize">{selectedBrandData?.name}</h1>
+                <h1 className="text-4xl font-bold capitalize">
+                  {selectedBrandData?.name}
+                </h1>
                 <p className="text-gray-400 mt-2">
-                  {modelsLoading ? "Loading cars..." : `${models.length} Available Cars`}
+                  {modelsLoading
+                    ? "Loading cars..."
+                    : `${models.length} Available Cars`}
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {modelsLoading
-                  ? Array.from({ length: 6 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-80 bg-[#111] border border-white/10 rounded-2xl animate-pulse"
-                    />
-                  ))
-                  : models.map((model) => (
-                    <div key={model._id}>
-                      <Link
-                        href={`/trims?brand=${selectedBrand}&model=${model.name}`}
-                      >
-                        <Card className="relative bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300">
+                {models.map((model) => (
+                  <div key={model._id}>
+                    <Link
+                      href={`/trims?brand=${selectedBrand}&model=${model.name}`}
+                    >
+                      <Card className="relative bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300">
+                        <div className="absolute top-4 left-4 z-10">
+                          <Badge className="bg-blue-600 text-white border-transparent">
+                            {model.name}
+                          </Badge>
+                        </div>
 
-                          {/* TOP LEFT BADGE */}
-                          <div className="absolute top-4 left-4 z-10">
-                            <Badge className="bg-blue-600 text-white border-transparent">
-                              {model.name}
-                            </Badge>
+                        <img
+                          src="/006.png"
+                          alt="Model image"
+                          className="h-full w-full object-cover"
+                        />
+
+                        <CardContent className="p-6 space-y-3">
+                          <div className="flex items-center gap-2 text-gray-400 text-sm">
+                            <IndianRupee className="w-4 h-4" />
+                            <span>
+                              From{" "}
+                              <span className="text-white font-medium">
+                                {formatLakhs(model.minPrice!)}
+                              </span>{" "}
+                              to{" "}
+                              <span className="text-white font-medium">
+                                {formatLakhs(model.maxPrice!)}
+                              </span>
+                            </span>
                           </div>
 
-                          <img
-                            src="/006.png"
-                            alt="Model image"
-                            onError={(e) => {
-                              e.currentTarget.src = "/alt.png";
-                            }}
-                            className="h-full w-full object-cover"
-                          />
+                          <div className="flex items-center gap-2 text-gray-400 text-sm">
+                            <Fuel className="w-4 h-4" />
+                            <span>{model.fuelTypes?.join(", ")}</span>
+                          </div>
 
-                          <CardContent className="p-6 space-y-3">
-                            {/* PRICE RANGE */}
-                            {model.minPrice != null && model.maxPrice != null && (
-                              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                                <IndianRupee className="w-4 h-4" />
-                                <span>
-                                  From <span className="text-white font-medium">{formatLakhs(model.minPrice)}</span> to <span className="text-white font-medium">{formatLakhs(model.maxPrice)}</span>
-                                </span>
-                              </div>
-                            )}
-
-                            {/* FUEL TYPES */}
-                            {model.fuelTypes && model.fuelTypes.length > 0 && (
-                              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                                <Fuel className="w-4 h-4" />
-                                <span>{model.fuelTypes.join(", ")}</span>
-                              </div>
-                            )}
-
-                            {/* SEATING CAPACITY */}
-                            {model.seatingCapacity && (
-                              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                                <Users className="w-4 h-4" />
-                                <span>{model.seatingCapacity} Seater</span>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    </div>
-                  ))}
+                          <div className="flex items-center gap-2 text-gray-400 text-sm">
+                            <Users className="w-4 h-4" />
+                            <span>{model.seatingCapacity} Seater</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </div>
+                ))}
               </div>
             </>
           )}
