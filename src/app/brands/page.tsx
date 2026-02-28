@@ -234,7 +234,7 @@ function BrandsPageContent() {
                           className="h-full w-full object-cover"
                         />
 
-                        <CardContent className="p-6 space-y-3">
+                        <CardContent className=" space-y-3">
                           <div className="flex items-center gap-2 text-gray-400 text-sm">
                             <IndianRupee className="w-4 h-4" />
                             <span>

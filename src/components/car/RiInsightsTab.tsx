@@ -55,12 +55,12 @@ const ALL_REVIEWS: Record<string, any[]> = {
 };
 
 const DEFAULT_REVIEWS = [
-    { id: 1,  title: "Great experience so far",  text: "Really impressed with how this handles daily usage in city conditions.",   sentiment: "positive", likes: 15, dislikes: 2 },
-    { id: 2,  title: "Could be better",          text: "Expected more based on the price point. Some features feel half-baked.",  sentiment: "negative", likes: 7,  dislikes: 4 },
-    { id: 3,  title: "Good overall",             text: "Solid choice for the segment, no major complaints after 8 months.",      sentiment: "positive", likes: 11, dislikes: 1 },
-    { id: 4,  title: "Service concerns",         text: "Service centre availability is limited in smaller cities.",               sentiment: "negative", likes: 9,  dislikes: 2 },
-    { id: 5,  title: "Value for money",          text: "The features offered at this price point are genuinely unbeatable.",     sentiment: "positive", likes: 33, dislikes: 0 },
-    { id: 6,  title: "Fuel efficiency",          text: "Getting around 16–17 kmpl in mixed city and highway conditions.",        sentiment: "positive", likes: 47, dislikes: 1 },
+    { id: 1, title: "Great experience so far", text: "Really impressed with how this handles daily usage in city conditions.", sentiment: "positive", likes: 15, dislikes: 2 },
+    { id: 2, title: "Could be better", text: "Expected more based on the price point. Some features feel half-baked.", sentiment: "negative", likes: 7, dislikes: 4 },
+    { id: 3, title: "Good overall", text: "Solid choice for the segment, no major complaints after 8 months.", sentiment: "positive", likes: 11, dislikes: 1 },
+    { id: 4, title: "Service concerns", text: "Service centre availability is limited in smaller cities.", sentiment: "negative", likes: 9, dislikes: 2 },
+    { id: 5, title: "Value for money", text: "The features offered at this price point are genuinely unbeatable.", sentiment: "positive", likes: 33, dislikes: 0 },
+    { id: 6, title: "Fuel efficiency", text: "Getting around 16–17 kmpl in mixed city and highway conditions.", sentiment: "positive", likes: 47, dislikes: 1 },
 ];
 
 const getAllReviews = (category: string) =>
@@ -79,7 +79,7 @@ function ReviewCard({
     vote: 'liked' | 'disliked' | null;
     onVote: (id: number, action: 'liked' | 'disliked') => void;
 }) {
-    const liked    = vote === 'liked';
+    const liked = vote === 'liked';
     const disliked = vote === 'disliked';
 
     return (
@@ -96,11 +96,10 @@ function ReviewCard({
             <div className="flex items-center gap-5 mt-3">
                 <button
                     onClick={() => onVote(review.id, 'liked')}
-                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
-                        liked
+                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${liked
                             ? 'text-green-600 dark:text-green-500'
                             : 'text-muted-foreground hover:text-green-600 dark:hover:text-green-500'
-                    }`}
+                        }`}
                 >
                     <ThumbsUp className={`h-3.5 w-3.5 transition-all ${liked ? 'fill-green-600 dark:fill-green-500 scale-110' : ''}`} />
                     <span>{review.likes + (liked ? 1 : 0)}</span>
@@ -108,11 +107,10 @@ function ReviewCard({
 
                 <button
                     onClick={() => onVote(review.id, 'disliked')}
-                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
-                        disliked
+                    className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${disliked
                             ? 'text-red-500'
                             : 'text-muted-foreground hover:text-red-500'
-                    }`}
+                        }`}
                 >
                     <ThumbsDown className={`h-3.5 w-3.5 transition-all ${disliked ? 'fill-red-500 scale-110' : ''}`} />
                     <span>{review.dislikes + (disliked ? 1 : 0)}</span>
@@ -132,17 +130,17 @@ function ReviewModal({
     score: number;
     onClose: () => void;
 }) {
-    const allReviews      = getAllReviews(category);
-    const PAGE_SIZE       = 3;
+    const allReviews = getAllReviews(category);
+    const PAGE_SIZE = 3;
 
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-    const [votes,        setVotes]        = useState<VoteMap>({});
-    const [loading,      setLoading]      = useState(false);
+    const [votes, setVotes] = useState<VoteMap>({});
+    const [loading, setLoading] = useState(false);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const loaderRef = useRef<HTMLDivElement>(null);
 
-    const hasMore        = visibleCount < allReviews.length;
+    const hasMore = visibleCount < allReviews.length;
     const visibleReviews = allReviews.slice(0, visibleCount);
 
     const loadMore = useCallback(() => {
@@ -157,7 +155,7 @@ function ReviewModal({
     // IntersectionObserver for infinity scroll
     useEffect(() => {
         const sentinel = loaderRef.current;
-        const root     = scrollRef.current;
+        const root = scrollRef.current;
         if (!sentinel || !root) return;
 
         const observer = new IntersectionObserver(
@@ -236,7 +234,7 @@ function ReviewModal({
 // ── Main Component ────────────────────────────────────────────────────────
 export function RiInsightsTab({ data }: RiInsightsTabProps) {
     const [selectedCategory, setSelectedCategory] = useState<string | null>("Build Quality & Safety");
-    const [modalCategory,    setModalCategory]    = useState<string | null>(null);
+    const [modalCategory, setModalCategory] = useState<string | null>(null);
 
     const modalCategoryData = modalCategory
         ? data.categoryRatings.find((c: any) => c.label === modalCategory)
@@ -282,22 +280,25 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                 </div>
 
                 {/* ── Ownership Confidence ── */}
-                <div className="bg-blue-100 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900 rounded-3xl p-6 relative overflow-hidden">
+                <div className="bg-[#8B9FEE] dark:bg-[#8B9FEE]/10 border border-[#8B9FEE] rounded-3xl p-6 relative overflow-hidden">
                     <div className="relative z-10">
-                        <h3 className="text-blue-600 font-semibold mb-3">Ownership Confidence</h3>
+                        <h3 className="text-white font-semibold mb-3">Ownership Confidence</h3>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-card p-2 rounded-xl shadow-sm border border-blue-100 dark:border-blue-900/50 flex items-center gap-2 px-4">
-                                <ShieldCheck className="h-5 w-5 text-blue-600" />
-                                <span className="font-bold text-lg text-foreground">{data.ownershipConfidence.level}</span>
+                            <div className="bg-card p-2 rounded-xl shadow-sm border border-white/30 flex items-center gap-2 px-4">
+                                <ShieldCheck className="h-5 w-5 text-white" />
+                                <span className="font-bold text-lg text-foreground">
+                                    {data.ownershipConfidence.level}
+                                </span>
                             </div>
                         </div>
-                        <p className="text-gray-500 italic text-sm">{data.ownershipConfidence.description}</p>
+                        <p className="text-white/80 italic text-sm">
+                            {data.ownershipConfidence.description}
+                        </p>
                     </div>
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
                         <ShieldCheck className="h-64 w-64 text-blue-600" />
                     </div>
                 </div>
-
                 {/* ── 2-column layout ── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -306,16 +307,15 @@ export function RiInsightsTab({ data }: RiInsightsTabProps) {
                         <h3 className="text-lg font-bold text-foreground">Detailed Breakdown</h3>
 
                         {data.categoryRatings.map((cat: any, idx: number) => {
-                            const isOpen         = selectedCategory === cat.label;
+                            const isOpen = selectedCategory === cat.label;
                             const previewReviews = getAllReviews(cat.label).slice(0, 2);
 
                             return (
                                 <div
                                     key={idx}
                                     onClick={() => setSelectedCategory(isOpen ? null : cat.label)}
-                                    className={`rounded-2xl border bg-card transition-all cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 ${
-                                        isOpen ? 'border-blue-400 dark:border-blue-600 shadow-sm' : 'border-border'
-                                    }`}
+                                    className={`rounded-2xl border bg-card transition-all cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 ${isOpen ? 'border-blue-400 dark:border-blue-600 shadow-sm' : 'border-border'
+                                        }`}
                                 >
                                     <div className="p-4">
                                         <div className="flex items-start justify-between gap-2">

@@ -119,15 +119,18 @@ function TrimsPageContent() {
 
   return (
     <div className="bg-black text-white min-h-screen relative">
-      {/* Back Navigation */}
-      <button
-        onClick={() => router.back()}
-        className="absolute top-0 left-0  ml-4 flex items-center gap-2 text-gray-400 hover:text-white z-20"
-      >
-        <ChevronLeft className="w-5 h-5" /> Back
-      </button>
-
       <div className="max-w-7xl mx-auto px-6 py-16">
+        {/* Back Navigation */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Back
+        </button>
+
+
+
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-4xl font-bold">Find Your Match</h1>
@@ -155,11 +158,10 @@ function TrimsPageContent() {
           <Button
             onClick={() => setSort("newest")}
             variant={sort === "newest" ? "default" : "outline"}
-            className={`px-6 py-3 rounded-full transition ${
-              sort === "newest"
+            className={`px-6 py-3 rounded-full transition ${sort === "newest"
                 ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
                 : "bg-[#111] border-white/10 hover:border-blue-500"
-            }`}
+              }`}
           >
             Newest First
           </Button>
@@ -317,11 +319,10 @@ function FilterGroup({
             onClick={() =>
               selected === option ? setSelected(null) : setSelected(option)
             }
-            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-              selected === option
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${selected === option
                 ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
                 : "bg-[#111] border-white/10 text-gray-400 hover:border-white/30"
-            }`}
+              }`}
           >
             {option}
           </Button>
