@@ -70,7 +70,7 @@ export default function TopBrands() {
                       <div className="flex flex-col items-center justify-center leading-none">
                         
                         {/* Logo */}
-                        <div className="w-12 h-12 flex items-center justify-center rounded-full group-hover:scale-110 transition">
+                        <div className="w-12 h-12  flex items-center justify-center rounded-full group-hover:scale-110 transition">
                           {brand.logo ? (
                             <span className="text-white/40 text-sm uppercase leading-none">
                               {brand.name.slice(0, 2)}
@@ -87,7 +87,7 @@ export default function TopBrands() {
                         </div>
 
                         {/* Brand Name */}
-                        <p className="text-sm leading-none mt-0 text-gray-300 group-hover:text-white transition capitalize">
+                        <p className="text-sm pb-2 leading-none mt-0 text-gray-300 group-hover:text-white transition capitalize">
                           {brand.name}
                         </p>
 

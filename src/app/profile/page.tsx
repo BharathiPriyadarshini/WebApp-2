@@ -243,7 +243,7 @@ export default function ProfilePage() {
             </Card>
 
             {/* SAVED FILTERS */}
-            <Card className="bg-white/5 border border-white/10 rounded-2xl">
+            {/* <Card className="bg-white/5 border border-white/10 rounded-2xl">
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Saved Filters</h3>
                 <div className="flex flex-wrap gap-2">
@@ -261,7 +261,7 @@ export default function ProfilePage() {
                   Clear all
                 </Button>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* MEMBERSHIP */}
             <Card className="bg-gradient-to-br from-gray-800 to-black rounded-2xl border-transparent">
