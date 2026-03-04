@@ -206,7 +206,6 @@ const FEATURE_CATEGORIES = [
     },
 ];
 
-// ── CHANGE 2 & 4: Feature row — no icon, no divider lines, regular font weight ──
 function FeatureRow({ name, available }: { name: string; available: boolean }) {
     return (
         <div className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/20 transition-colors">
@@ -226,7 +225,6 @@ function FeatureRow({ name, available }: { name: string; available: boolean }) {
     );
 }
 
-// ── CHANGE 1: Single-open accordion — controlled by parent ────────────────
 function FeatureAccordion({
     category,
     isOpen,
@@ -243,7 +241,6 @@ function FeatureAccordion({
 
     return (
         <div className="rounded-xl border border-border overflow-hidden">
-            {/* Header */}
             <button
                 onClick={onToggle}
                 className="w-full flex items-center justify-between px-4 py-3.5 bg-card hover:bg-muted/40 transition-colors"
@@ -273,7 +270,6 @@ function FeatureAccordion({
                 </div>
             </button>
 
-            {/* CHANGE 2: No column sub-header, no icon boxes, no border-b between rows */}
             <div
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
                     isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
@@ -293,7 +289,6 @@ function FeatureAccordion({
     );
 }
 
-// ── Gallery Lightbox with prev/next arrows and image title ────────────────
 function GalleryLightbox({
     images,
     initialIndex,
@@ -310,7 +305,6 @@ function GalleryLightbox({
     const next = useCallback(() =>
         setCurrent(i => (i + 1) % images.length), [images.length]);
 
-    // Keyboard navigation
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (e.key === 'ArrowLeft')  prev();
@@ -326,7 +320,6 @@ function GalleryLightbox({
             className="fixed inset-0 z-50 bg-black/92 flex flex-col items-center justify-center backdrop-blur-sm"
             onClick={onClose}
         >
-            {/* Close button */}
             <button
                 className="absolute top-5 right-5 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10"
                 onClick={onClose}
@@ -334,12 +327,10 @@ function GalleryLightbox({
                 <X className="h-5 w-5 text-white" />
             </button>
 
-            {/* Counter */}
             <p className="absolute top-5 left-1/2 -translate-x-1/2 text-white/50 text-xs font-medium tracking-widest uppercase select-none">
                 {current + 1} / {images.length}
             </p>
 
-            {/* Image */}
             <div
                 className="relative w-full max-w-4xl px-16"
                 style={{ height: '65vh' }}
@@ -355,12 +346,10 @@ function GalleryLightbox({
                 />
             </div>
 
-            {/* Image title */}
             <p className="mt-5 text-white font-semibold text-base tracking-wide select-none">
                 {images[current].title}
             </p>
 
-            {/* Prev arrow */}
             <button
                 className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors"
                 onClick={(e) => { e.stopPropagation(); prev(); }}
@@ -368,7 +357,6 @@ function GalleryLightbox({
                 <ArrowLeft className="h-5 w-5 text-white" />
             </button>
 
-            {/* Next arrow */}
             <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors"
                 onClick={(e) => { e.stopPropagation(); next(); }}
@@ -376,7 +364,6 @@ function GalleryLightbox({
                 <ArrowRight className="h-5 w-5 text-white" />
             </button>
 
-            {/* Dot indicators */}
             <div className="absolute bottom-6 flex items-center gap-2">
                 {images.map((_, i) => (
                     <button
@@ -406,7 +393,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     const [activeGalleryTab, setActiveGalleryTab] = useState<'exterior' | 'interior'>('exterior');
     const [lightbox,         setLightbox]         = useState<{ index: number; tab: 'exterior' | 'interior' } | null>(null);
 
-    // CHANGE 1: single open category (null = all closed)
     const [openCategory, setOpenCategory] = useState<string | null>('safety');
 
     const toggleCategory = (id: string) =>
@@ -537,25 +523,18 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
         );
     }
 
-    const ringImages          = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
+    const ringImages           = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
     const currentGalleryImages = activeGalleryTab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES;
 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground pb-24">
 
-            {/* ── 1. Top Nav ── */}
+            {/* ── 1. Top Nav — back button + action icons only, no car name ── */}
             <nav className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-transparent pointer-events-none">
                 <div className="flex items-center gap-4 pointer-events-auto">
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-white/10 text-white rounded-full">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
-                    <div className="flex flex-col ml-2">
-                        <h1 className="text-lg font-bold text-white leading-tight tracking-tight">{car.brand} {car.model}</h1>
-                        <div className="flex items-center gap-1 text-white/60 text-xs font-medium cursor-pointer hover:text-white transition-colors">
-                            <span>Premium Plus</span>
-                            <ChevronDown className="h-3 w-3" />
-                        </div>
-                    </div>
                 </div>
                 <div className="flex items-center gap-2 pointer-events-auto">
                     <Button variant="ghost" size="icon" className="text-white/80 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors">
@@ -567,7 +546,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </nav>
 
-            {/* ── 2. Hero ── */}
+            {/* ── 2. Hero — car name + variant now lives here ── */}
             <section className="pt-16 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '520px' }}>
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#1E293B_0%,_#0F172A_60%,_#020617_100%)] z-0" />
                 <div
@@ -578,13 +557,27 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     }}
                 />
                 <div className="relative z-10 container mx-auto px-4 flex flex-col items-center">
-                    <div className="mt-20 mb-4 flex items-center gap-3">
+
+                    {/* ── Car name in hero ── */}
+                    <div className="mt-6 flex flex-col items-center gap-1">
+                        <h1 className="text-2xl font-bold text-white leading-tight tracking-tight">
+                            {car.brand} {car.model}
+                        </h1>
+                        <div className="flex items-center gap-1 text-white/50 text-xs font-medium cursor-pointer hover:text-white/80 transition-colors">
+                            <span>Premium Plus</span>
+                            <ChevronDown className="h-3 w-3" />
+                        </div>
+                    </div>
+
+                    {/* Rating badge + drag hint */}
+                    <div className="mt-20  mb-4 flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 px-4 py-1.5 rounded-full">
                             <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
                             <span className="text-yellow-400 font-bold text-sm">{car.rating}</span>
                         </div>
                         <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Drag to Explore</span>
                     </div>
+
                     <div className="w-full" style={{ height: '340px', position: 'relative' }}>
                         <ThreeDImageRing
                             images={ringImages}
@@ -690,7 +683,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 {/* ── Features ── */}
                 <section id="features" className="scroll-mt-32 space-y-5">
 
-                    {/* Header */}
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-foreground">Features & Equipment</h2>
@@ -698,7 +690,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                 {FEATURE_CATEGORIES.reduce((acc, c) => acc + c.features.filter(f => f.available).length, 0)} features across {FEATURE_CATEGORIES.length} categories
                             </p>
                         </div>
-                        {/* Collapse all only (single-open doesn't need expand all) */}
                         <button
                             onClick={collapseAll}
                             className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
@@ -707,7 +698,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         </button>
                     </div>
 
-                    {/* Summary chips */}
                     <div className="flex flex-wrap gap-2">
                         {car.features.map(f => (
                             <span
@@ -720,7 +710,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         ))}
                     </div>
 
-                    {/* CHANGE 1: single-open accordion */}
                     <div className="space-y-2">
                         {FEATURE_CATEGORIES.map((category) => (
                             <FeatureAccordion
@@ -731,8 +720,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             />
                         ))}
                     </div>
-
-                    {/* CHANGE 3: legend removed entirely */}
                 </section>
 
                 {/* ── Ri-Sights ── */}
@@ -777,7 +764,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                     onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/alt.png"; }}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                                {/* Show title on hover */}
                                 <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm">
                                         {img.title}
@@ -870,7 +856,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </div>
 
-            {/* ── Gallery Lightbox — rendered at root level to avoid clipping ── */}
+            {/* ── Gallery Lightbox ── */}
             {lightbox && (
                 <GalleryLightbox
                     images={lightbox.tab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES}
