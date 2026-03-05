@@ -181,7 +181,7 @@ function BrandsPageContent() {
                   </div>
 
                   {/* ✅ NOW MATCHES RIGHT SIDE */}
-                  <span className="text-xs bg-white/10 px-2 py-1 rounded-full">
+                  <span className="text-xs text-gray-500 tabular-nums">
                     {countsLoading
                       ? "..."
                       : modelCounts[brand._id] ?? 0}

@@ -19,7 +19,7 @@ export default function HotPicks() {
         <div className="flex items-end justify-between mb-12">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              TRENDING CARS & LATEST LAUNCHES
+              TRENDING CARS 
             </h2>
             <p className="text-gray-400 mt-2">
               Most searched and recently launched vehicles in your region

@@ -17,7 +17,7 @@ export default function ByCarType() {
     <section className="py-20 bg-black">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Heading */}
-        <h2 className="text-xl md:text-2xl font-semibold tracking-wide text-white mb-10 uppercase">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-10 uppercase">
           Find By Body Type
         </h2>
 

@@ -29,7 +29,7 @@ export default function TopBrands() {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-xl md:text-2xl font-semibold tracking-wide text-white">
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
             POPULAR BRANDS
           </h2>
 

@@ -22,8 +22,8 @@ const cars: CarItem[] = [
     id: 1,
     name: "Rimello X2 Concept",
     category: "SUV",
-    status: "upcoming",
-    date: "Expected Launch: 26 March 2026",
+    status: "launched",
+    date: "Launched At: 26 March 2026",
     image: "/alt.png",
     link: "/cars/1",
   },
@@ -31,8 +31,8 @@ const cars: CarItem[] = [
     id: 2,
     name: "Rimello E5 Electric",
     category: "Electric",
-    status: "upcoming",
-    date: "Expected Launch: 15 April 2026",
+    status: "launched",
+    date: "Launched At: 15 April 2026",
     image: "/alt.png",
     link: "/cars/2",
   },
@@ -55,10 +55,10 @@ export default function UpcomingCars() {
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Upcoming & Recently Launched Cars
+               Recently Launched Cars
             </h2>
             <p className="text-gray-400 mt-2 max-w-xl">
-              Stay ahead with the latest upcoming cars and recently launched models. Explore specs, features, and launch timelines to choose your perfect ride.
+              Stay ahead with the recently launched models. Explore specs, features, and launch timelines to choose your perfect ride.
             </p>
           </div>
 

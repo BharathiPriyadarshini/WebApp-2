@@ -3,14 +3,15 @@
 import PageWrapper from "@/components/layout/PageWrapper";
 import HeroSection from "@/components/home/HeroSection";
 import TopBrands from "@/components/home/TopBrands";
-import HotPicks from "@/components/home/HotPicks";
+import HotPicks from "@/components/home/TrendingCars";
 import SmartComparison from "@/components/home/SmartComparison";
 import ByCarType from "@/components/home/ByCarType";
-import News from "@/components/home/news";
+import News from "@/components/home/News";
 import AISuggestionCard from "@/components/home/Aisuggestioncard";
-import ExpertReview from "@/components/home/expertreview";
-import UpcomingCars from "@/components/home/up-coming";
+import ExpertReview from "@/components/home/ExpertReview";
+import UpcomingCars from "@/components/home/UpComing";
 import ByBudget from "@/components/home/ByBudget"; 
+import RecentlyLaunched from "@/components/home/Recently-Launched";
 
 
 // ── Model Cards — Original 6 styles ───────────────────────────────────────
@@ -49,6 +50,7 @@ export default function HomePage() {
       <HeroSection />
       <ByBudget />
       <UpcomingCars />
+      <RecentlyLaunched />
       <TopBrands />
       <HotPicks />
       <ByCarType />
