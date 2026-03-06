@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { InsightBadge, type InsightType } from "@/components/car/InsightBadge";
 import { RiInsightsTab } from "@/components/car/RiInsightsTab";
 import { SafetyRatings, type SafetyRatingData } from "@/components/car/SafetyRatings";
-import { ThreeDImageRing } from "@/components/lightswind/3d-image-ring";
+import { ThreeDImageRing } from "@/components/ui/3d-image-ring";
 import {
     ArrowLeft,
     ArrowRight,

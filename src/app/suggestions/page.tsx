@@ -1,214 +1,155 @@
-
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import ProgressBar from "@/components/questions/ProgressBar";
+import QuestionCard, { QuestionData } from "@/components/questions/QuestionCard";
 
-import { useAuthStore } from "@/store/auth.store";
-import { useNextQuestion } from "@/hooks/useQuestions";
-import { useAnswersStore } from "@/store/answersStore";
-import { QuestionResponse } from "@/types";
-
-import QuestionCard from "@/components/questions/QuestionCard";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-/* ================= Skeleton ================= */
-
-function QuestionSkeleton() {
-  return (
-    <Card className="glass border border-primary/30 glow-primary animate-pulse">
-      <CardHeader className="space-y-3 pb-4">
-        <div className="h-4 w-24 bg-primary/20 rounded" />
-        <div className="space-y-2">
-          <div className="h-6 w-full bg-muted rounded" />
-          <div className="h-6 w-3/4 bg-muted rounded" />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="h-14 w-full bg-muted/50 rounded-xl" />
-        <div className="h-14 w-full bg-muted/50 rounded-xl" />
-        <div className="h-14 w-full bg-muted/50 rounded-xl" />
-      </CardContent>
-    </Card>
-  );
-}
-
-/* ================= Page ================= */
+/* ════════════════════════════════════════
+   MOCK DATA — remove when API is wired up
+════════════════════════════════════════ */
+const QUESTIONS: QuestionData[] = [
+  {
+    id: "q1",
+    question: "What's your primary use for this car?",
+    context: "This helps us understand your lifestyle and driving habits.",
+    answerType: "single_choice",
+    options: ["Daily city commute", "Family road trips", "Off-road adventures", "Weekend drives", "Business travel"],
+  },
+  {
+    id: "q2",
+    question: "What's your budget range?",
+    context: "We'll find the best value within your comfort zone.",
+    answerType: "single_choice",
+    options: ["Under ₹8 Lakh", "₹8 – 15 Lakh", "₹15 – 25 Lakh", "₹25 – 50 Lakh", "Above ₹50 Lakh"],
+  },
+  {
+    id: "q3",
+    question: "Which fuel types are you open to?",
+    answerType: "multi_choice",
+    options: ["Petrol", "Diesel", "Electric", "CNG", "Hybrid"],
+  },
+  {
+    id: "q4",
+    question: "How many seats do you need?",
+    answerType: "single_choice",
+    options: ["2 seats", "4 – 5 seats", "6 – 7 seats", "8+ seats"],
+  },
+  {
+    id: "q5",
+    question: "Which features matter most to you?",
+    answerType: "multi_choice",
+    options: [
+      "Sunroof / Panoramic roof",
+      "ADAS & Safety suite",
+      "Premium audio system",
+      "Large infotainment screen",
+      "Ventilated seats",
+      "360° camera",
+    ],
+  },
+  {
+    id: "q6",
+    question: "What transmission do you prefer?",
+    answerType: "single_choice",
+    options: ["Manual", "Automatic", "No preference"],
+    isFinal: true,
+  },
+];
+/* ════════════════════════════════════════ */
 
 export default function SuggestionsPage() {
-  const router = useRouter();
-  const { user } = useAuthStore();
-  const { answers, maxQuestions, addAnswer } = useAnswersStore();
+  const router    = useRouter();
+  const [qIndex,  setQIndex]  = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [dir,     setDir]     = useState(1);
 
-  const [currentQuestion, setCurrentQuestion] =
-    useState<QuestionResponse | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true);
+  const total   = QUESTIONS.length;
+  const current = QUESTIONS[qIndex];
 
-  const { mutate: fetchQuestion, isPending, error } = useNextQuestion();
+  const advance = (answer: string | number | (string | number)[]) => {
+    const val     = Array.isArray(answer) ? answer.map(String) : String(answer);
+    const updated = { ...answers, [current.id]: val };
+    setAnswers(updated);
 
-  /* ================= Auth Protection ================= */
-
-  useEffect(() => {
-    if (!user) {
-      router.replace("/");
-    }
-  }, [user, router]);
-
-  /* ================= Load Question ================= */
-
-  const loadNextQuestion = useCallback(() => {
-    const currentAnswers = useAnswersStore.getState().answers;
-
-    setIsTransitioning(true);
-    setShowSkeleton(true);
-
-    fetchQuestion(currentAnswers, {
-      onSuccess: (question) => {
-        setTimeout(() => {
-          setCurrentQuestion(question);
-          setIsTransitioning(false);
-          setShowSkeleton(false);
-        }, 400);
-      },
-      onError: () => {
-        setIsTransitioning(false);
-        setShowSkeleton(false);
-      },
-    });
-  }, [maxQuestions, fetchQuestion]);
-
-  /* ================= Initial Load ================= */
-
-  useEffect(() => {
-    if (!user) return;
-
-    if (maxQuestions === 0) {
-      router.push("/");
+    if (qIndex + 1 >= total || current.isFinal) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("rimello_answers", JSON.stringify(updated));
+      }
+      router.push("/recommendation");
       return;
     }
 
-    loadNextQuestion();
-  }, [user, maxQuestions, loadNextQuestion, router]);
-
-  /* ================= Handle Answer ================= */
-
-  const handleAnswer = (
-    answer: string | number | (string | number)[]
-  ) => {
-    if (!currentQuestion) return;
-
-    setShowSkeleton(true);
-    setIsTransitioning(true);
-
-    addAnswer({
-      questionId: currentQuestion.id,
-      question: currentQuestion.question,
-      answer,
-      answerType: currentQuestion.answerType,
-      options: currentQuestion.options,
-    });
-
-    const updatedCount = answers.length + 1;
-    const reachedLimit = updatedCount >= maxQuestions;
-
-    if (reachedLimit || currentQuestion.isFinal) {
-      setTimeout(() => {
-        router.push("/recommendations");
-      }, 500);
-      return;
-    }
-
-    setCurrentQuestion(null);
-
-    setTimeout(() => {
-      loadNextQuestion();
-    }, 100);
+    setDir(1);
+    setQIndex((i) => i + 1);
   };
 
-  if (!user) {
-    return null;
-  }
+  const goBack = () => {
+    if (qIndex === 0) { router.push("/"); return; }
+    setDir(-1);
+    setQIndex((i) => i - 1);
+  };
 
-  const currentStep = answers.length + 1;
-  const progress =
-    maxQuestions > 0
-      ? (answers.length / maxQuestions) * 100
-      : 0;
-
-  /* ================= UI ================= */
+  const variants = {
+    enter:  (d: number) => ({ opacity: 0, x: d > 0 ? 48 : -48 }),
+    center: { opacity: 1, x: 0 },
+    exit:   (d: number) => ({ opacity: 0, x: d > 0 ? -48 : 48 }),
+  };
 
   return (
-    <div className="min-h-screen relative overflow-hidden noise-overlay">
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[100px]" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/6 rounded-full blur-[80px]" />
+    <section className="min-h-screen bg-black flex flex-col">
 
-      <div className="relative z-10 min-h-screen flex flex-col px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
-          </Button>
-        </div>
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/[0.06]">
+        <button
+          onClick={goBack}
+          className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
+        <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
+        <span className="text-xs text-gray-600 tabular-nums">
+          {qIndex + 1}<span className="text-gray-700"> / {total}</span>
+        </span>
+      </div>
 
-        {/* Progress */}
-        <div className="max-w-xl mx-auto w-full mb-8">
-          <div className="flex justify-between mb-3">
-            <span className="text-sm text-muted-foreground">
-              Question {Math.min(currentStep, maxQuestions)} of{" "}
-              {maxQuestions}
-            </span>
-            <span className="text-sm font-medium text-primary">
-              {Math.round(progress)}% complete
-            </span>
-          </div>
+      {/* Progress bar */}
+      <div className="px-6 pt-6 pb-2 max-w-lg mx-auto w-full">
+        <ProgressBar current={qIndex + 1} total={total} />
+      </div>
 
-          <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className="absolute inset-y-0 left-0 bg-linear-to-r from-primary via-primary to-accent rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Question Area */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-xl">
-            {showSkeleton && <QuestionSkeleton />}
-
-            {!showSkeleton && currentQuestion && (
+      {/* Question */}
+      <div className="flex-1 flex items-start justify-center px-6 py-8">
+        <div className="w-full max-w-lg">
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div
+              key={current.id}
+              custom={dir}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            >
               <QuestionCard
-                question={currentQuestion}
-                onAnswer={handleAnswer}
-                isLoading={isPending}
-                disabled={isPending}
+                question={current}
+                onAnswer={advance}
+                orderLabel={String(qIndex + 1).padStart(2, "0")}
               />
-            )}
-
-            {error && !isPending && (
-              <Card className="border border-destructive/30 mt-6">
-                <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold text-destructive mb-2">
-                    Something went wrong
-                  </h3>
-                  <Button
-                    onClick={() => loadNextQuestion()}
-                  >
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+
+      {/* Footer */}
+      <div className="py-6 text-center">
+        <p className="text-[11px] text-gray-700 tracking-wide">
+          Your answers are used only to find your ideal vehicle
+        </p>
+      </div>
+    </section>
   );
 }

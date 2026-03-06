@@ -2,364 +2,300 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useRecommendations } from "@/hooks/useRecommendations";
-import { useAnswersStore } from "@/store/answersStore";
-import { PreviousAnswer, RecommendationResponse } from "@/types";
-import CarCard from "@/components/questions/CarCard";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Car, ArrowLeft, SlidersHorizontal, Sparkles, RotateCcw, X, Check, Edit2, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, SlidersHorizontal, RotateCcw, Sparkles, X, Star } from "lucide-react";
+import SmartCarCard, { SmartRecommendationResult } from "@/components/questions/SmartCarCard";
 
-// Component to edit a single answer inline
-function AnswerEditor({
-  answer,
-  onUpdate,
-  onRemove,
-  onClose
-}: {
-  answer: PreviousAnswer;
-  onUpdate: (newAnswer: string | number) => void;
-  onRemove: () => void;
-  onClose: () => void;
-}) {
-  const [value, setValue] = useState(String(answer.answer));
+/* ════════════════════════════════════════
+   MOCK DATA — remove when API is wired up
+════════════════════════════════════════ */
+const MOCK_RECOMMENDATIONS: SmartRecommendationResult[] = [
+  {
+    brand: { name: "Rimello" },
+    model: { name: "X5 R", bodyType: "SUV" },
+    trim:  { name: "Sport AWD", price: 1699000, fuelType: "Petrol", transmission: "Automatic", mileage: "16.8 kmpl", seating: 7 },
+    score: 97,
+    explanation: "Perfectly aligned with your family road trip needs and budget. The 7-seat capacity and ADAS suite make it a standout in its class.",
+    scoreBreakdown: {
+      budgetScore: 94,
+      popularityScore: 88,
+      needScores: [
+        { need: "Family seating",    score: 100 },
+        { need: "Safety features",   score: 96  },
+        { need: "Fuel efficiency",   score: 82  },
+      ],
+    },
+  },
+  {
+    brand: { name: "Rimello" },
+    model: { name: "E5 X", bodyType: "Sub Compact SUV" },
+    trim:  { name: "Electric Premium", price: 1595000, fuelType: "Electric", transmission: "Automatic", mileage: "520 km range", seating: 5 },
+    score: 93,
+    explanation: "Your preference for Electric fuel makes this a top pick. Best-in-segment range with premium features at a competitive price point.",
+    scoreBreakdown: {
+      budgetScore: 90,
+      popularityScore: 92,
+      needScores: [
+        { need: "Electric range",    score: 98 },
+        { need: "Tech features",     score: 95 },
+        { need: "Running cost",      score: 100 },
+      ],
+    },
+  },
+  {
+    brand: { name: "Rimello" },
+    model: { name: "S7", bodyType: "SUV" },
+    trim:  { name: "Diesel 4WD", price: 2499000, fuelType: "Diesel", transmission: "Automatic", mileage: "15.2 kmpl", seating: 7 },
+    score: 89,
+    explanation: "The diesel powertrain delivers exceptional long-distance efficiency. A strong match for highway-heavy driving patterns.",
+    scoreBreakdown: {
+      budgetScore: 75,
+      popularityScore: 85,
+      needScores: [
+        { need: "Highway efficiency", score: 95 },
+        { need: "Towing capability",  score: 90 },
+        { need: "Ride comfort",       score: 88 },
+      ],
+    },
+  },
+  {
+    brand: { name: "Rimello" },
+    model: { name: "A4 E", bodyType: "Sedan" },
+    trim:  { name: "Hybrid Prestige", price: 1895000, fuelType: "Hybrid", transmission: "Automatic", mileage: "22.1 kmpl", seating: 5 },
+    score: 85,
+    explanation: "Best fuel economy in the lineup. Ideal for city commuters who want low running costs without sacrificing comfort.",
+    scoreBreakdown: {
+      budgetScore: 88,
+      popularityScore: 80,
+      needScores: [
+        { need: "Fuel economy",      score: 98 },
+        { need: "City driveability", score: 93 },
+        { need: "Cabin refinement",  score: 85 },
+      ],
+    },
+  },
+  {
+    brand: { name: "Rimello" },
+    model: { name: "V6 X", bodyType: "Sub Compact SUV" },
+    trim:  { name: "Electric Sport", price: 2295000, fuelType: "Electric", transmission: "Automatic", mileage: "480 km range", seating: 5 },
+    score: 81,
+    explanation: "Sport-tuned suspension and the fastest acceleration in the electric lineup. Perfect if performance is a priority.",
+    scoreBreakdown: {
+      budgetScore: 72,
+      popularityScore: 78,
+      needScores: [
+        { need: "Performance",       score: 98 },
+        { need: "Design appeal",     score: 92 },
+        { need: "Practicality",      score: 72 },
+      ],
+    },
+  },
+  {
+    brand: { name: "Rimello" },
+    model: { name: "G8 E", bodyType: "Sedan" },
+    trim:  { name: "Electric Luxury", price: 2899000, fuelType: "Electric", transmission: "Automatic", mileage: "560 km range", seating: 5 },
+    score: 77,
+    explanation: "The flagship electric sedan with the highest range available. Best suited for buyers who want the absolute top-of-the-range experience.",
+    scoreBreakdown: {
+      budgetScore: 62,
+      popularityScore: 75,
+      needScores: [
+        { need: "Prestige",          score: 100 },
+        { need: "Long-range travel", score: 100 },
+        { need: "Tech features",     score: 98  },
+      ],
+    },
+  },
+];
 
-  const handleSave = () => {
-    if (value.trim()) {
-      onUpdate(value.trim());
-      onClose();
-    }
-  };
+const FUEL_FILTERS = ["All", "Petrol", "Diesel", "Electric", "Hybrid", "CNG"];
+const SORT_OPTIONS = ["Best Match", "Price: Low → High", "Price: High → Low"];
+/* ════════════════════════════════════════ */
 
+/* ── Pill tab ── */
+function PillTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <div className="p-4 rounded-xl glass border border-primary/30 space-y-3 animate-in fade-in zoom-in-95 duration-200">
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-medium flex-1">{answer.question}</p>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
+    <button
+      onClick={onClick}
+      className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+        active
+          ? "bg-blue-600 text-white shadow-[0_0_14px_rgba(59,130,246,0.45)]"
+          : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ── Skeleton ── */
+function SkeletonCard() {
+  return (
+    <div className="bg-[#0f0f0f] rounded-2xl border border-white/[0.06] overflow-hidden animate-pulse">
+      <div className="h-[160px] bg-white/[0.03]" />
+      <div className="p-5 space-y-3">
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <div className="h-4 w-36 bg-white/[0.06] rounded-lg" />
+            <div className="h-3 w-24 bg-white/[0.04] rounded-lg" />
+          </div>
+          <div className="w-16 h-16 rounded-full bg-white/[0.04]" />
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {[80, 64, 72].map((w) => (
+            <div key={w} className="h-7 rounded-lg bg-white/[0.04]" style={{ width: w }} />
+          ))}
+        </div>
+        <div className="h-12 rounded-xl bg-white/[0.03]" />
+        <div className="h-9 rounded-xl bg-white/[0.04]" />
       </div>
-
-      {answer.answerType === "option" && answer.options && answer.options.length > 0 ? (
-        <div className="grid gap-2 max-h-48 overflow-y-auto">
-          {answer.options.map((option, idx) => {
-            const optionKey = typeof option === 'string' ? option : option.key;
-            const optionValue = typeof option === 'string' ? option : option.value;
-
-            return (
-              <button
-                key={`${optionKey}-${idx}`}
-                onClick={() => {
-                  onUpdate(optionValue || optionKey);
-                  onClose();
-                }}
-                className={`w-full text-left p-3 rounded-lg border transition-all duration-200 ${(optionValue || optionKey) === answer.answer
-                    ? "bg-primary/20 border-primary text-foreground"
-                    : "bg-muted/50 border-border hover:border-primary/50 hover:bg-primary/10"
-                  }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm">{optionValue || optionKey}</span>
-                  {(optionValue || optionKey) === answer.answer && (
-                    <Check className="w-4 h-4 text-primary" />
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="flex gap-2">
-          <Input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSave()}
-            className="flex-1"
-            autoFocus
-          />
-          <Button onClick={handleSave} size="icon" className="shrink-0">
-            <Check className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
-
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onRemove}
-        className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/50"
-      >
-        <X className="w-4 h-4 mr-2" />
-        Remove this filter
-      </Button>
     </div>
   );
 }
 
 export default function RecommendationsPage() {
   const router = useRouter();
-  const storeAnswers = useAnswersStore((state) => state.answers);
-  const setStoreAnswers = useAnswersStore((state) => state.setAnswers);
-  const updateStoreAnswer = useAnswersStore((state) => state.updateAnswer);
-  const removeStoreAnswer = useAnswersStore((state) => state.removeAnswer);
-  const resetStore = useAnswersStore((state) => state.reset);
-
-  const [isHydrated, setIsHydrated] = useState(false);
-  const [recommendations, setRecommendations] = useState<RecommendationResponse | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-
-  const { mutate: fetchRecs, isPending, error } = useRecommendations();
+  const [isLoading, setIsLoading]   = useState(true);
+  const [fuelFilter, setFuelFilter] = useState("All");
+  const [sortBy, setSortBy]         = useState("Best Match");
+  const [answers, setAnswers]       = useState<Record<string, string | string[]>>({});
 
   useEffect(() => {
-    setIsHydrated(true);
+    const t = setTimeout(() => setIsLoading(false), 1400);
+    try {
+      const s = localStorage.getItem("rimello_answers");
+      if (s) setAnswers(JSON.parse(s));
+    } catch {}
+    return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    if (storeAnswers.length === 0) {
-      router.push("/");
-      return;
-    }
-
-    fetchRecs(storeAnswers, {
-      onSuccess: (data) => {
-        console.log("Recommendations received:", data);
-        setRecommendations(data);
-      },
-      onError: (err) => {
-        console.error("Failed to fetch recommendations:", err);
-      },
+  const displayed = MOCK_RECOMMENDATIONS
+    .filter((r) => fuelFilter === "All" || r.trim?.fuelType === fuelFilter)
+    .sort((a, b) => {
+      if (sortBy === "Price: Low → High") return (a.trim?.price ?? 0) - (b.trim?.price ?? 0);
+      if (sortBy === "Price: High → Low") return (b.trim?.price ?? 0) - (a.trim?.price ?? 0);
+      return (b.score ?? 0) - (a.score ?? 0);
     });
-  }, [isHydrated, storeAnswers, fetchRecs, router]);
 
-  const handleRefine = () => {
-    router.push("/refine");
+  const answerEntries = Object.entries(answers);
+
+  const removeAnswer = (k: string) => {
+    const c = { ...answers };
+    delete c[k];
+    setAnswers(c);
+    localStorage.setItem("rimello_answers", JSON.stringify(c));
   };
-
-  const handleStartOver = () => {
-    resetStore();
-    router.push("/explore");
-  };
-
-  const handleUpdateAnswer = (index: number, newAnswer: string | number) => {
-    updateStoreAnswer(index, { answer: newAnswer });
-    setEditingIndex(null);
-    const updatedAnswers = [...storeAnswers];
-    updatedAnswers[index] = { ...updatedAnswers[index], answer: newAnswer };
-    fetchRecs(updatedAnswers, {
-      onSuccess: (data) => {
-        setRecommendations(data);
-      },
-    });
-  };
-
-  const handleRemoveAnswer = (questionId: string) => {
-    removeStoreAnswer(questionId);
-    setEditingIndex(null);
-    const newAnswers = storeAnswers.filter(a => a.questionId !== questionId);
-    if (newAnswers.length === 0) {
-      router.push("/explore");
-      return;
-    }
-    setStoreAnswers(newAnswers);
-    fetchRecs(newAnswers, {
-      onSuccess: (data) => {
-        setRecommendations(data);
-      },
-    });
-  };
-
-  if (!isHydrated || (isPending && !recommendations)) {
-    return (
-      <div className="min-h-screen relative overflow-hidden noise-overlay flex items-center justify-center">
-        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
-        <div className="text-center animate-in fade-in duration-500">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mx-auto mb-6 glow-primary">
-            <Car className="w-8 h-8 text-primary-foreground animate-pulse" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Finding Your Perfect Match</h2>
-          <p className="text-muted-foreground">Analyzing your preferences...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen relative overflow-hidden noise-overlay flex items-center justify-center p-6">
-        <Card className="max-w-md glass border-destructive/30">
-          <CardHeader>
-            <CardTitle className="text-destructive">Something went wrong</CardTitle>
-            <CardDescription>
-              {error instanceof Error ? error.message : "Failed to fetch recommendations"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleStartOver} className="w-full">
-              Start Over
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen relative overflow-hidden noise-overlay">
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] bg-accent/6 rounded-full blur-[100px] pointer-events-none" />
+    <section className="min-h-screen bg-black">
 
-      <div className="relative z-10 min-h-screen px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-top-4 duration-500">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-              <Car className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold tracking-tight">rimello</span>
-          </div>
-        </div>
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/[0.06]">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
+        <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
+        <button
+          onClick={() => { localStorage.removeItem("rimello_answers"); router.push("/explore"); }}
+          className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          Restart
+        </button>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
 
         {/* Hero */}
-        <div className="text-center max-w-3xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            Your <span className="text-gradient">Perfect Matches</span>
+        <div className="mb-10">
+          <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3">
+            AI Curated Results
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-3">
+            Your Perfect Matches
           </h1>
-          <p className="text-lg text-muted-foreground mb-2">
-            Based on your preferences, here are our top recommendations.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Found <span className="text-primary font-semibold">{recommendations?.totalResults || 0}</span> matching {recommendations?.totalResults === 1 ? "vehicle" : "vehicles"}
+          <p className="text-gray-500 text-sm leading-relaxed max-w-xl">
+            {isLoading
+              ? "Analysing your preferences…"
+              : `Found ${displayed.length} vehicle${displayed.length !== 1 ? "s" : ""} tailored for you.`}
           </p>
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-wrap gap-3 justify-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-          <Button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            variant="outline"
-            className="gap-2"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filters ({storeAnswers.length})
-          </Button>
-          <Button
-            onClick={handleRefine}
-            className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 glow-primary"
-          >
-            <Sparkles className="w-4 h-4" />
-            Add More Criteria
-          </Button>
-          <Button
-            onClick={handleStartOver}
-            variant="outline"
-            className="gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Start Over
-          </Button>
-        </div>
-
-        {/* Collapsible Filters Section */}
-        {isFilterOpen && (
-          <div className="max-w-3xl mx-auto mb-10 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="p-4 rounded-xl glass border border-border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Your Filters</h3>
-                <button
-                  onClick={() => setIsFilterOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ChevronUp className="w-4 h-4" />
+        {/* Active answer chips */}
+        {!isLoading && answerEntries.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {answerEntries.map(([k, v]) => (
+              <span key={k} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs text-gray-400">
+                {Array.isArray(v) ? v.join(", ") : String(v)}
+                <button onClick={() => removeAnswer(k)} className="text-gray-600 hover:text-gray-300 transition-colors">
+                  <X className="w-3 h-3" />
                 </button>
-              </div>
+              </span>
+            ))}
+          </div>
+        )}
 
-              {isPending && (
-                <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm text-primary">Updating recommendations...</span>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                {storeAnswers.map((ans, idx) => (
-                  <div key={ans.questionId}>
-                    {editingIndex === idx ? (
-                      <AnswerEditor
-                        answer={ans}
-                        onUpdate={(newAnswer) => handleUpdateAnswer(idx, newAnswer)}
-                        onRemove={() => handleRemoveAnswer(ans.questionId)}
-                        onClose={() => setEditingIndex(null)}
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border group hover:border-primary/30 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground truncate">{ans.question}</p>
-                          <p className="text-sm font-medium truncate">{String(ans.answer)}</p>
-                        </div>
-                        <button
-                          onClick={() => setEditingIndex(idx)}
-                          className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+        {/* Controls */}
+        {!isLoading && (
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+            <div className="flex gap-2 flex-wrap">
+              {FUEL_FILTERS.map((f) => (
+                <PillTab key={f} active={fuelFilter === f} onClick={() => setFuelFilter(f)}>{f}</PillTab>
+              ))}
+            </div>
+            <div className="flex items-center gap-3">
+              <SlidersHorizontal className="w-4 h-4 text-gray-600" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-[#111] border border-white/[0.08] rounded-lg text-gray-400 text-sm px-3 py-1.5 outline-none cursor-pointer"
+              >
+                {SORT_OPTIONS.map((s) => <option key={s} value={s} style={{ background: "#111" }}>{s}</option>)}
+              </select>
+              <button
+                onClick={() => router.push("/suggestions")}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10 transition-all"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                Refine
+              </button>
             </div>
           </div>
         )}
 
-        {/* Results Grid */}
-        {recommendations && recommendations.recommendations && recommendations.recommendations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {recommendations.recommendations.map((car, index) => (
-              <div
-                key={car._id || `car-${index}`}
-                className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-                style={{ animationDelay: `${(index + 3) * 100}ms` }}
-              >
-                <CarCard car={car} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <Card className="max-w-lg mx-auto glass border-border">
-            <CardHeader className="text-center">
-              <CardTitle>No Matches Found</CardTitle>
-              <CardDescription>
-                We couldn&apos;t find any cars matching your criteria. Try refining your preferences.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={handleRefine} className="w-full">
-                Refine Your Preferences
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence mode="wait">
+            {isLoading
+              ? [0,1,2,3,4,5].map((i) => <SkeletonCard key={i} />)
+              : displayed.length > 0
+                ? displayed.map((rec, i) => (
+                    <SmartCarCard key={`${rec.brand?.name}-${rec.model?.name}-${i}`} recommendation={rec} rank={i + 1} index={i} />
+                  ))
+                : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="col-span-full text-center py-20"
+                  >
+                    <p className="text-gray-500 text-sm mb-4">No vehicles match this filter.</p>
+                    <button
+                      onClick={() => setFuelFilter("All")}
+                      className="px-5 py-2 rounded-full text-sm font-medium bg-blue-600 text-white hover:bg-blue-500 transition-colors"
+                    >
+                      Clear filters
+                    </button>
+                  </motion.div>
+                )
+            }
+          </AnimatePresence>
+        </div>
+
       </div>
-    </div>
+    </section>
   );
 }
