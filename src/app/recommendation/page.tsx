@@ -131,23 +131,23 @@ function PillTab({ active, onClick, children }: { active: boolean; onClick: () =
 /* ── Skeleton ── */
 function SkeletonCard() {
   return (
-    <div className="bg-[#0f0f0f] rounded-2xl border border-white/[0.06] overflow-hidden animate-pulse">
-      <div className="h-[160px] bg-white/[0.03]" />
+    <div className="bg-[#0f0f0f] rounded-2xl border border-white/6 overflow-hidden animate-pulse">
+      <div className="h-[160px] bg-white/3" />
       <div className="p-5 space-y-3">
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <div className="h-4 w-36 bg-white/[0.06] rounded-lg" />
-            <div className="h-3 w-24 bg-white/[0.04] rounded-lg" />
+            <div className="h-4 w-36 bg-white/6 rounded-lg" />
+            <div className="h-3 w-24 bg-white/4 rounded-lg" />
           </div>
-          <div className="w-16 h-16 rounded-full bg-white/[0.04]" />
+          <div className="w-16 h-16 rounded-full bg-white/4" />
         </div>
         <div className="flex gap-2 flex-wrap">
           {[80, 64, 72].map((w) => (
-            <div key={w} className="h-7 rounded-lg bg-white/[0.04]" style={{ width: w }} />
+            <div key={w} className="h-7 rounded-lg bg-white/4" style={{ width: w }} />
           ))}
         </div>
-        <div className="h-12 rounded-xl bg-white/[0.03]" />
-        <div className="h-9 rounded-xl bg-white/[0.04]" />
+        <div className="h-12 rounded-xl bg-white/3" />
+        <div className="h-9 rounded-xl bg-white/4" />
       </div>
     </div>
   );
@@ -190,7 +190,7 @@ export default function RecommendationsPage() {
     <section className="min-h-screen bg-black">
 
       {/* Sticky top bar */}
-      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/6">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
@@ -229,7 +229,7 @@ export default function RecommendationsPage() {
         {!isLoading && answerEntries.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
             {answerEntries.map(([k, v]) => (
-              <span key={k} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs text-gray-400">
+              <span key={k} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/4 border border-white/8 text-xs text-gray-400">
                 {Array.isArray(v) ? v.join(", ") : String(v)}
                 <button onClick={() => removeAnswer(k)} className="text-gray-600 hover:text-gray-300 transition-colors">
                   <X className="w-3 h-3" />
@@ -252,7 +252,7 @@ export default function RecommendationsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-[#111] border border-white/[0.08] rounded-lg text-gray-400 text-sm px-3 py-1.5 outline-none cursor-pointer"
+                className="bg-[#111] border border-white/8 rounded-lg text-gray-400 text-sm px-3 py-1.5 outline-none cursor-pointer"
               >
                 {SORT_OPTIONS.map((s) => <option key={s} value={s} style={{ background: "#111" }}>{s}</option>)}
               </select>

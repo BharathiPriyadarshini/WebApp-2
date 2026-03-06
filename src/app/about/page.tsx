@@ -295,7 +295,7 @@ export default function AboutPage() {
         </div>
 
         <div className="mt-16 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-          <div className="h-64 md:h-[420px] bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-gray-500">
+          <div className="h-64 md:h-[420px] bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center text-gray-500">
             Hero Image
           </div>
         </div>

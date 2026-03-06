@@ -102,7 +102,7 @@ export default function SuggestionsPage() {
     <section className="min-h-screen bg-black flex flex-col">
 
       {/* Sticky top bar */}
-      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/6">
         <button
           onClick={goBack}
           className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"

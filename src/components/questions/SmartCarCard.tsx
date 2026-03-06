@@ -55,7 +55,7 @@ function ScoreRing({ score }: { score: number }) {
     score >= 50 ? "#f59e0b" : "#ef4444";
 
   return (
-    <div className="relative w-16 h-16 flex-shrink-0">
+    <div className="relative w-16 h-16 shrink-0">
       <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90">
         <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
         <motion.circle
@@ -94,7 +94,7 @@ function ScoreBar({
   return (
     <div className="flex items-center gap-3">
       <div
-        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
         style={{ background: `${color}15` }}
       >
         <span style={{ color }}>{icon}</span>
@@ -106,7 +106,7 @@ function ScoreBar({
             {Math.round(value)}%
           </span>
         </div>
-        <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="h-1.5 rounded-full bg-white/6 overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: `linear-gradient(90deg, ${color}, ${color}99)` }}
@@ -123,8 +123,8 @@ function ScoreBar({
 /* ── Spec chip ── */
 function SpecChip({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-      <span className="text-gray-500 flex-shrink-0">{icon}</span>
+    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/4 border border-white/6">
+      <span className="text-gray-500 shrink-0">{icon}</span>
       <span className="text-xs text-gray-300 font-medium whitespace-nowrap">{value}</span>
     </div>
   );
@@ -186,7 +186,7 @@ export default function SmartCarCard({
         </div>
       )}
 
-      <div className="relative bg-[#0f0f0f] rounded-2xl border border-white/[0.08] overflow-hidden transition-all duration-300 group-hover:border-blue-500/35 group-hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)]">
+      <div className="relative bg-[#0f0f0f] rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 group-hover:border-blue-500/35 group-hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)]">
 
         {/* ── Top image band ── */}
         <div className="relative h-[160px] overflow-hidden"
@@ -236,7 +236,7 @@ export default function SmartCarCard({
           )}
 
           {/* Top-right fade */}
-          <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-[#0f0f0f] to-transparent" />
+          <div className="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-[#0f0f0f] to-transparent" />
         </div>
 
         {/* ── Card body ── */}
@@ -306,7 +306,7 @@ export default function SmartCarCard({
                 >
                   <ChevronDown className="w-3.5 h-3.5 text-gray-600 group-hover/toggle:text-gray-400 transition-colors" />
                 </motion.div>
-                <div className="flex-1 h-px bg-white/[0.05] ml-1" />
+                <div className="flex-1 h-px bg-white/5 ml-1" />
               </button>
 
               <AnimatePresence>
@@ -344,11 +344,11 @@ export default function SmartCarCard({
           )}
 
           {/* Divider */}
-          <div className="h-px bg-white/[0.06] mb-4" />
+          <div className="h-px bg-white/6 mb-4" />
 
           {/* CTAs */}
           <div className="flex gap-2">
-            <button className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-xs font-semibold text-gray-400 hover:text-white hover:border-white/20 transition-all duration-200">
+            <button className="flex-1 py-2.5 rounded-xl border border-white/8 text-xs font-semibold text-gray-400 hover:text-white hover:border-white/20 transition-all duration-200">
               View Details
             </button>
             <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all duration-200 shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_28px_rgba(59,130,246,0.45)]">

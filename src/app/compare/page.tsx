@@ -571,7 +571,7 @@ function CarSlot({
           {/* image */}
           <div className="relative h-44 bg-[#111] overflow-hidden">
             <Image src={car.image} alt={car.model} fill className="object-cover opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-[#0d0d0d] via-transparent to-transparent" />
             {/* slot label */}
             <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${slot === 0 ? "bg-white/10 text-white" : "bg-blue-600 text-white"}`}>
               {label}
@@ -628,9 +628,9 @@ function CarSlot({
                     <button
                       key={c.id}
                       onClick={() => { onSelect(c); setOpen(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition text-left border-b border-white/[0.04] last:border-0"
+                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/4 transition text-left border-b border-white/4 last:border-0"
                     >
-                      <div className="relative w-12 h-8 rounded-lg overflow-hidden bg-[#222] flex-shrink-0">
+                      <div className="relative w-12 h-8 rounded-lg overflow-hidden bg-[#222] shrink-0">
                         <Image src={c.image} alt={c.model} fill className="object-cover" />
                       </div>
                       <div>
@@ -664,12 +664,12 @@ function SpecRow({
   alt: boolean;
 }) {
   return (
-    <div className={`grid grid-cols-[1fr_180px_1fr] ${alt ? "bg-white/[0.015]" : ""}`}>
+    <div className={`grid grid-cols-[1fr_180px_1fr] ${alt ? "bg-white/1.5" : ""}`}>
       <div className={`px-6 py-3.5 text-sm ${isWinner[0] ? "text-white font-semibold" : "text-gray-400"}`}>
         {valA}
         {isWinner[0] && <span className="ml-2 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">best</span>}
       </div>
-      <div className="px-4 py-3.5 flex items-center justify-center border-x border-white/[0.05]">
+      <div className="px-4 py-3.5 flex items-center justify-center border-x border-white/5">
         <span className="text-gray-600 text-xs text-center">{label}</span>
       </div>
       <div className={`px-6 py-3.5 text-sm ${isWinner[1] ? "text-white font-semibold" : "text-gray-400"}`}>
@@ -691,9 +691,9 @@ function FeatureRow({ label, valA, valB, alt }: { label: string; valA: boolean; 
     </div>
   );
   return (
-    <div className={`grid grid-cols-[1fr_180px_1fr] ${alt ? "bg-white/[0.015]" : ""}`}>
+    <div className={`grid grid-cols-[1fr_180px_1fr] ${alt ? "bg-white/1.5" : ""}`}>
       <div className="px-6 py-3 flex items-center justify-start"><Cell v={valA} /></div>
-      <div className="px-4 py-3 flex items-center justify-center border-x border-white/[0.05]">
+      <div className="px-4 py-3 flex items-center justify-center border-x border-white/5">
         <span className="text-gray-600 text-xs">{label}</span>
       </div>
       <div className="px-6 py-3 flex items-center justify-start"><Cell v={valB} /></div>
@@ -728,8 +728,8 @@ export default function ComparePage() {
 
       {/* ── background atmosphere ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-blue-600/[0.04] blur-3xl" />
-        <div className="absolute bottom-1/3 right-0 w-[400px] h-[400px] rounded-full bg-blue-900/[0.06] blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-blue-600/4 blur-3xl" />
+        <div className="absolute bottom-1/3 right-0 w-[400px] h-[400px] rounded-full bg-blue-900/6 blur-3xl" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 py-16">
@@ -755,7 +755,7 @@ export default function ComparePage() {
           </p>
           <h1 className="text-5xl md:text-7xl font-black text-white leading-none tracking-tight">
             Compare<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/25">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-white/25">
               Cars
             </span>
           </h1>
@@ -774,7 +774,7 @@ export default function ComparePage() {
           <CarSlot car={carA} slot={0} onSelect={setCarA} onRemove={() => setCarA(null)} allCars={carDatabase} usedIds={usedIds} />
 
           {/* VS badge */}
-          <div className="flex-shrink-0 flex items-center justify-center w-12 h-44 mt-0">
+          <div className="shrink-0 flex items-center justify-center w-12 h-44 mt-0">
             <div className="flex flex-col items-center gap-1">
               <div className="w-px h-12 bg-white/10" />
               <span className="text-[11px] font-black tracking-[0.2em] text-gray-700 uppercase">vs</span>
@@ -800,7 +800,7 @@ export default function ComparePage() {
                 <p className="text-gray-600 text-xs mt-1">AI-computed ratings across key ownership dimensions</p>
               </div>
 
-              <div className="grid grid-cols-2 divide-x divide-white/[0.05]">
+              <div className="grid grid-cols-2 divide-x divide-white/5">
                 {/* Car A scores */}
                 <div className="px-8 py-8">
                   <p className="text-xs uppercase tracking-[0.2em] text-gray-600 font-semibold mb-6">
@@ -852,7 +852,7 @@ export default function ComparePage() {
                         {carA.brand} {carA.model}
                       </span>
                     </div>
-                    <div className="px-4 py-4 flex items-center justify-center gap-2 border-x border-white/[0.05] bg-white/[0.015]">
+                    <div className="px-4 py-4 flex items-center justify-center gap-2 border-x border-white/5 bg-white/1.5">
                       <SIcon size={14} className="text-blue-400" strokeWidth={1.5} />
                       <span className="text-white text-xs font-bold">{section.title}</span>
                     </div>
@@ -864,7 +864,7 @@ export default function ComparePage() {
                   </div>
 
                   {/* rows */}
-                  <div className="divide-y divide-white/[0.04]">
+                  <div className="divide-y divide-white/4">
                     {section.rows.map((row, ri) => {
                       const vA = specVal(carA, row.key);
                       const vB = specVal(carB, row.key);
@@ -891,7 +891,7 @@ export default function ComparePage() {
                 <div className="px-6 py-4">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-semibold">{carA.brand} {carA.model}</span>
                 </div>
-                <div className="px-4 py-4 flex items-center justify-center gap-2 border-x border-white/[0.05] bg-white/[0.015]">
+                <div className="px-4 py-4 flex items-center justify-center gap-2 border-x border-white/5 bg-white/1.5">
                   <Zap size={14} className="text-blue-400" strokeWidth={1.5} />
                   <span className="text-white text-xs font-bold">Features</span>
                 </div>
@@ -900,7 +900,7 @@ export default function ComparePage() {
                 </div>
               </div>
 
-              <div className="divide-y divide-white/[0.04]">
+              <div className="divide-y divide-white/4">
                 {featureRows.map((f, fi) => (
                   <FeatureRow
                     key={f.key}
@@ -922,7 +922,7 @@ export default function ComparePage() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-2 divide-x divide-white/[0.05]">
+              <div className="grid grid-cols-2 divide-x divide-white/5">
                 {[carA, carB].map((car, ci) => (
                   <div key={ci} className="px-8 py-7 flex flex-col gap-4">
                     <p className={`text-xs uppercase tracking-[0.2em] font-semibold ${ci === 0 ? "text-gray-500" : "text-blue-500"}`}>

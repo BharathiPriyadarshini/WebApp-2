@@ -81,7 +81,7 @@ function StarRating({ rating }: { rating: number }) {
 function FuelTypes({ types }: { types: string[] }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <Fuel className="w-4 h-4 text-gray-500 flex-shrink-0" />
+      <Fuel className="w-4 h-4 text-gray-500 shrink-0" />
       <span className="flex items-center gap-1.5">
         {types.map((t, i) => (
           <span key={t} className="flex items-center gap-1.5">
@@ -114,7 +114,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
         <div className="group relative flex flex-col w-full bg-[#111] rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_32px_rgba(59,130,246,0.12)]">
 
           {/* image */}
-          <div className="relative h-[170px] flex-shrink-0 overflow-hidden">
+          <div className="relative h-[170px] shrink-0 overflow-hidden">
             <div className="absolute top-4 left-4 z-10">
               <span className="px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full leading-none">
                 {car.name}
@@ -126,7 +126,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
               fill
               className="object-contain transition duration-500 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-[#111] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-8 bg-linear-to-t from-[#111] to-transparent" />
           </div>
 
           {/* body */}
@@ -142,7 +142,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
 
             {/* price */}
             <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <IndianRupee className="w-4 h-4 flex-shrink-0" />
+              <IndianRupee className="w-4 h-4 shrink-0" />
               <span>
                 From <span className="text-white font-medium">{from}</span>
                 {" "}to <span className="text-white font-medium">{to}</span>
@@ -155,7 +155,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
             {/* seating + know more on same row — no dead space below */}
             <div className="flex items-center justify-between pt-0.5">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <Users className="w-4 h-4 flex-shrink-0" />
+                <Users className="w-4 h-4 shrink-0" />
                 <span>{car.seating} Seater</span>
               </div>
               <span className="flex items-center gap-1 text-blue-400 text-[13px] font-medium group-hover:gap-2 transition-all">

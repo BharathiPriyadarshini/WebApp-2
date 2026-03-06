@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { InsightBadge, type InsightType } from "@/components/car/InsightBadge";
 import { RiInsightsTab } from "@/components/car/RiInsightsTab";
-import { SafetyRatings, type SafetyRatingData } from "@/components/car/SafetyRatings";
 import { ThreeDImageRing } from "@/components/ui/3d-image-ring";
+import { CompareCars } from "@/components/car/CompareCars";
 import {
     ArrowLeft,
     ArrowRight,
@@ -20,23 +20,14 @@ import {
     ChevronDown,
     CheckCircle2,
     TrendingUp,
-    Camera,
+    Shield,
     Wifi,
     Car as CarIcon,
     Armchair,
-    Shield,
     Lightbulb,
-    Navigation,
-    SunMedium,
-    KeyRound,
-    MonitorSmartphone,
-    ShieldAlert,
-    Radar,
-    Wind,
-    Disc,
-    BatteryCharging,
-    Volume2,
     X,
+    AlertTriangle,
+    ChevronRight,
 } from 'lucide-react';
 
 import {
@@ -52,7 +43,6 @@ import {
 } from "recharts";
 
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/card";
 
 import carsData from "@/data/cars.json";
@@ -80,6 +70,11 @@ export interface InsightData {
     };
 }
 
+export interface SafetyRatingData {
+    globalNcap: { adult: number; child: number };
+    bharatNcap: { status: string; adult: number; child: number };
+}
+
 export interface EnrichedCar extends BaseCar {
     horsepower: number;
     torque: string;
@@ -97,12 +92,22 @@ export interface EnrichedCar extends BaseCar {
     };
 }
 
+// ── Variants mock data ─────────────────────────────────────────────────────
+const VARIANTS = [
+    { name: 'Base',         priceLabel: '₹ 11.99 L', transmission: 'Manual',    fuel: 'Petrol'        },
+    { name: 'Smart',        priceLabel: '₹ 13.49 L', transmission: 'Manual',    fuel: 'Petrol'        },
+    { name: 'Smart+',       priceLabel: '₹ 14.99 L', transmission: 'Automatic', fuel: 'Petrol'        },
+    { name: 'Premium',      priceLabel: '₹ 16.49 L', transmission: 'Automatic', fuel: 'Petrol/Diesel' },
+    { name: 'Premium Plus', priceLabel: '₹ 17.99 L', transmission: 'Automatic', fuel: 'Diesel'        },
+    { name: 'Luxury',       priceLabel: '₹ 19.49 L', transmission: 'Automatic', fuel: 'Diesel'        },
+];
+
 // ── Gallery image data with titles ────────────────────────────────────────
 const EXTERIOR_IMAGES = [
-    { src: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=800&q=80", title: "Front Quarter View"  },
-    { src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80", title: "Side Profile"       },
-    { src: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=800&q=80", title: "Rear View"           },
-    { src: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=80", title: "Dynamic Angle"       },
+    { src: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=800&q=80", title: "Front Quarter View" },
+    { src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80", title: "Side Profile"      },
+    { src: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=800&q=80", title: "Rear View"          },
+    { src: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=80", title: "Dynamic Angle"      },
 ];
 
 const INTERIOR_IMAGES = [
@@ -206,6 +211,122 @@ const FEATURE_CATEGORIES = [
     },
 ];
 
+// ── Star rating renderer ───────────────────────────────────────────────────
+function StarRating({ filled, total = 5 }: { filled: number; total?: number }) {
+    return (
+        <div className="flex items-center gap-0.5">
+            {Array.from({ length: total }).map((_, i) => (
+                <Star
+                    key={i}
+                    className={`h-4 w-4 ${
+                        i < filled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'
+                    }`}
+                />
+            ))}
+        </div>
+    );
+}
+
+// ── Revised Safety Ratings component ──────────────────────────────────────
+function SafetyRatingsRevised({ data }: { data: SafetyRatingData }) {
+    return (
+        <div className="space-y-4">
+            <h3 className="text-base font-semibold text-foreground">Safety Ratings</h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Global NCAP */}
+                <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-foreground">Global NCAP</p>
+                            <p className="text-xs text-muted-foreground">Safety Crash Test</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Adult Occupant</p>
+                                <StarRating filled={data.globalNcap.adult} />
+                            </div>
+                            <div className="text-right">
+                                <span className="text-2xl font-black text-foreground">{data.globalNcap.adult}</span>
+                                <span className="text-sm text-muted-foreground font-medium">/5</span>
+                            </div>
+                        </div>
+
+                        <div className="h-px bg-border" />
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Child Occupant</p>
+                                <StarRating filled={data.globalNcap.child} />
+                            </div>
+                            <div className="text-right">
+                                <span className="text-2xl font-black text-foreground">{data.globalNcap.child}</span>
+                                <span className="text-sm text-muted-foreground font-medium">/5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bharat NCAP */}
+                <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
+                            <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-foreground">Bharat NCAP</p>
+                            <p className="text-xs text-muted-foreground">Indian Safety Standard</p>
+                        </div>
+                    </div>
+
+                    {data.bharatNcap.status === 'Not Tested' ? (
+                        <div className="flex flex-col items-center justify-center py-4 gap-2 rounded-xl bg-muted/30 border border-dashed border-border">
+                            <AlertTriangle className="h-5 w-5 text-amber-500" />
+                            <p className="text-sm font-semibold text-foreground">Not Tested</p>
+                            <p className="text-xs text-muted-foreground text-center">
+                                This vehicle hasn't been submitted for Bharat NCAP testing yet.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Adult Occupant</p>
+                                    <StarRating filled={data.bharatNcap.adult} />
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-2xl font-black text-foreground">{data.bharatNcap.adult}</span>
+                                    <span className="text-sm text-muted-foreground font-medium">/5</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-border" />
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Child Occupant</p>
+                                    <StarRating filled={data.bharatNcap.child} />
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-2xl font-black text-foreground">{data.bharatNcap.child}</span>
+                                    <span className="text-sm text-muted-foreground font-medium">/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Feature components ────────────────────────────────────────────────────
 function FeatureRow({ name, available }: { name: string; available: boolean }) {
     return (
         <div className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/20 transition-colors">
@@ -213,13 +334,9 @@ function FeatureRow({ name, available }: { name: string; available: boolean }) {
                 {name}
             </span>
             {available ? (
-                <span className="text-sm font-medium text-green-600 dark:text-green-500 flex-shrink-0 ml-4">
-                    Yes
-                </span>
+                <span className="text-sm font-medium text-green-600 dark:text-green-500 shrink-0 ml-4">Yes</span>
             ) : (
-                <span className="text-sm text-muted-foreground/35 flex-shrink-0 ml-4">
-                    —
-                </span>
+                <span className="text-sm text-muted-foreground/35 shrink-0 ml-4">—</span>
             )}
         </div>
     );
@@ -277,11 +394,7 @@ function FeatureAccordion({
             >
                 <div className="bg-card border-t border-border py-1">
                     {category.features.map((feature) => (
-                        <FeatureRow
-                            key={feature.name}
-                            name={feature.name}
-                            available={feature.available}
-                        />
+                        <FeatureRow key={feature.name} name={feature.name} available={feature.available} />
                     ))}
                 </div>
             </div>
@@ -289,6 +402,7 @@ function FeatureAccordion({
     );
 }
 
+// ── Gallery Lightbox ───────────────────────────────────────────────────────
 function GalleryLightbox({
     images,
     initialIndex,
@@ -300,10 +414,8 @@ function GalleryLightbox({
 }) {
     const [current, setCurrent] = useState(initialIndex);
 
-    const prev = useCallback(() =>
-        setCurrent(i => (i - 1 + images.length) % images.length), [images.length]);
-    const next = useCallback(() =>
-        setCurrent(i => (i + 1) % images.length), [images.length]);
+    const prev = useCallback(() => setCurrent(i => (i - 1 + images.length) % images.length), [images.length]);
+    const next = useCallback(() => setCurrent(i => (i + 1) % images.length), [images.length]);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -316,68 +428,96 @@ function GalleryLightbox({
     }, [prev, next, onClose]);
 
     return (
-        <div
-            className="fixed inset-0 z-50 bg-black/92 flex flex-col items-center justify-center backdrop-blur-sm"
-            onClick={onClose}
-        >
-            <button
-                className="absolute top-5 right-5 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10"
-                onClick={onClose}
-            >
+        <div className="fixed inset-0 z-50 bg-black/92 flex flex-col items-center justify-center backdrop-blur-sm" onClick={onClose}>
+            <button className="absolute top-5 right-5 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10" onClick={onClose}>
                 <X className="h-5 w-5 text-white" />
             </button>
-
             <p className="absolute top-5 left-1/2 -translate-x-1/2 text-white/50 text-xs font-medium tracking-widest uppercase select-none">
                 {current + 1} / {images.length}
             </p>
-
-            <div
-                className="relative w-full max-w-4xl px-16"
-                style={{ height: '65vh' }}
-                onClick={(e) => e.stopPropagation()}
-            >
+            <div className="relative w-full max-w-4xl px-16" style={{ height: '65vh' }} onClick={(e) => e.stopPropagation()}>
                 <Image
-                    src={images[current].src}
-                    alt={images[current].title}
-                    fill
-                    className="object-contain"
-                    unoptimized
+                    src={images[current].src} alt={images[current].title} fill
+                    className="object-contain" unoptimized
                     onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/alt.png"; }}
                 />
             </div>
-
             <p className="mt-5 text-white font-semibold text-base tracking-wide select-none">
                 {images[current].title}
             </p>
-
-            <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors"
-                onClick={(e) => { e.stopPropagation(); prev(); }}
-            >
+            <button className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors" onClick={(e) => { e.stopPropagation(); prev(); }}>
                 <ArrowLeft className="h-5 w-5 text-white" />
             </button>
-
-            <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors"
-                onClick={(e) => { e.stopPropagation(); next(); }}
-            >
+            <button className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors" onClick={(e) => { e.stopPropagation(); next(); }}>
                 <ArrowRight className="h-5 w-5 text-white" />
             </button>
-
             <div className="absolute bottom-6 flex items-center gap-2">
                 {images.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                            i === current ? 'w-5 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/60'
-                        }`}
+                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? 'w-5 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/60'}`}
                     />
                 ))}
             </div>
         </div>
     );
 }
+
+// ── Variants Dropdown ──────────────────────────────────────────────────────
+function VariantsDropdown({
+    isOpen,
+    onClose,
+    currentVariant,
+    onSelect,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    currentVariant: string;
+    onSelect: (name: string) => void;
+}) {
+    if (!isOpen) return null;
+    return (
+        <>
+            {/* Backdrop */}
+            <div className="fixed inset-0 z-40" onClick={onClose} />
+            {/* Panel */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-72 rounded-2xl border border-white/15 bg-[#0F172A]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/10">
+                    <p className="text-white/50 text-[10px] uppercase tracking-widest font-semibold">Select Variant</p>
+                </div>
+                {VARIANTS.map((v) => (
+                    <button
+                        key={v.name}
+                        onClick={() => { onSelect(v.name); onClose(); }}
+                        className={`w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/6 transition-colors border-b border-white/5 last:border-0 ${
+                            currentVariant === v.name ? 'bg-white/6' : ''
+                        }`}
+                    >
+                        <div className="text-left">
+                            <p className={`text-sm font-semibold ${currentVariant === v.name ? 'text-blue-400' : 'text-white'}`}>
+                                {v.name}
+                            </p>
+                            <p className="text-xs text-white/40 mt-0.5">{v.transmission} · {v.fuel}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-white/80">{v.priceLabel}</span>
+                            {currentVariant === v.name && <ChevronRight className="h-3.5 w-3.5 text-blue-400" />}
+                        </div>
+                    </button>
+                ))}
+            </div>
+        </>
+    );
+}
+
+// ── NAV TABS ───────────────────────────────────────────────────────────────
+const NAV_TABS = [
+    { id: 'details',  label: 'Details'   },
+    { id: 'features', label: 'Features'  },
+    { id: 'ri-sights',label: 'Ri-Sights' },
+    { id: 'design',   label: 'Design'    },
+    { id: 'compare',  label: 'Compare'   },
+    { id: 'sales',    label: 'Sales'     },
+];
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
@@ -387,52 +527,63 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     const id             = Number(resolvedParams.trimId);
 
     const [car,              setCar]              = useState<EnrichedCar | null>(null);
-    const [compareCar,       setCompareCar]       = useState<EnrichedCar | null>(null);
     const [selectedColor,    setSelectedColor]    = useState<string>('');
     const [activeSection,    setActiveSection]    = useState('details');
     const [activeGalleryTab, setActiveGalleryTab] = useState<'exterior' | 'interior'>('exterior');
     const [lightbox,         setLightbox]         = useState<{ index: number; tab: 'exterior' | 'interior' } | null>(null);
+    const [openCategory,     setOpenCategory]     = useState<string | null>('safety');
+    const [variantOpen,      setVariantOpen]      = useState(false);
+    const [selectedVariant,  setSelectedVariant]  = useState('Premium Plus');
 
-    const [openCategory, setOpenCategory] = useState<string | null>('safety');
+    // Refs for sections — used for reliable scroll
+    const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-    const toggleCategory = (id: string) =>
-        setOpenCategory(prev => prev === id ? null : id);
-    const collapseAll = () => setOpenCategory(null);
+    const toggleCategory = (id: string) => setOpenCategory(prev => prev === id ? null : id);
+    const collapseAll    = () => setOpenCategory(null);
 
-    const scrollToSection = (sectionId: string) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            const offsetPosition = element.getBoundingClientRect().top + window.scrollY - 85;
-            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-            setActiveSection(sectionId);
-        }
-    };
+    // ── Fixed scroll-to-section ───────────────────────────────────────────
+    const scrollToSection = useCallback((sectionId: string) => {
+        const el = sectionRefs.current[sectionId] ?? document.getElementById(sectionId);
+        if (!el) return;
+        const navHeight = 56 + 48; // top sticky nav (56px) + section nav (48px)
+        const top = el.getBoundingClientRect().top + window.scrollY - navHeight - 8;
+        window.scrollTo({ top, behavior: 'smooth' });
+        setActiveSection(sectionId);
+    }, []);
 
+    // ── Active-section tracker via IntersectionObserver ──────────────────
     useEffect(() => {
         if (!car) return;
-        const handleScroll = () => {
-            const sections = ['details', 'features', 'ri-sights', 'design', 'compare', 'sales'];
-            let current = sections[0];
-            for (const sid of sections) {
-                const el = document.getElementById(sid);
-                if (el && el.getBoundingClientRect().top <= 100) current = sid;
-            }
-            setActiveSection(current);
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                // Pick the topmost visible section
+                const visible = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                if (visible.length > 0) {
+                    setActiveSection(visible[0].target.id);
+                }
+            },
+            { rootMargin: '-104px 0px -50% 0px', threshold: 0 }
+        );
+
+        NAV_TABS.forEach(({ id }) => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
     }, [car]);
 
     useEffect(() => {
         const foundCar = carsData.find(c => c.id === id);
         if (foundCar) {
             const positiveInsights = [
-                'Advanced safety package (6 airbags, ADAS Level 2, 4‑wheel disc brakes, 3‑point seat belts)',
+                'Advanced safety package (6 airbags, ADAS Level 2, 4‑wheel disc brakes)',
                 'Improved interior design and materials',
             ];
-            const neutralInsights  = ['Neutral observation: No idea about servicing and maintenance'];
-            const negativeInsights = ['Customer service at Mahindra Samrat Car showroom Vapi'];
+            const neutralInsights  = ['Neutral: No idea about servicing and maintenance'];
+            const negativeInsights = ['Customer service at authorised dealerships'];
             const getRandom = (arr: string[], count: number) =>
                 [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
 
@@ -473,13 +624,11 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     userFeedback: {
                         positives: [
                             'Great mileage in city traffic', 'Excellent build quality', 'Very comfortable for long drives',
-                            'Mileage is fantastic!', 'Smooth and powerful engine performance', 'Low maintenance costs and reliable service',
-                            'Spacious interior with premium feel', 'Advanced safety features give peace of mind', 'Great value for money compared to competitors',
+                            'Mileage is fantastic!', 'Smooth and powerful engine performance', 'Low maintenance costs',
                         ],
                         negatives: [
                             'Engine noise at high speeds', 'Infotainment system lags sometimes', 'Suspension is a bit stiff',
-                            'Rear seat space could be better', 'Fuel efficiency drops on highways', 'AC cooling could be more effective in peak summer',
-                            'Boot space feels limited for family trips', 'Touchscreen response is not very smooth', 'Headlight brightness could be better at night',
+                            'AC cooling could be more effective in peak summer',
                         ],
                     },
                 },
@@ -490,28 +639,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
             };
             setCar(enriched);
             setSelectedColor('#FFFFFF');
-
-            const otherCar = carsData.find(c => c.id !== id);
-            if (otherCar) {
-                setCompareCar({
-                    ...otherCar,
-                    horsepower: 110 + Math.floor(Math.random() * 200),
-                    torque: `${150 + Math.floor(Math.random() * 300)} Nm`,
-                    acceleration: `${(4 + Math.random() * 6).toFixed(1)}s`,
-                    colors: [], description: '',
-                    safetyRatings: { globalNcap: { adult: 4, child: 3 }, bharatNcap: { status: 'Not Tested', adult: 4, child: 3 } },
-                    features: ["ABS", "Airbags", "Cruise Control", "Rear Camera"],
-                    insights: [],
-                    riInsights: {
-                        overallRating: Number((3 + Math.random() * 2).toFixed(1)),
-                        recommendationPercent: 65 + Math.floor(Math.random() * 25),
-                        mostMentioned: 'Comfort', topAdvantage: 'Value for Money',
-                        ownershipConfidence: { level: 'Moderate', description: '' },
-                        categoryRatings: [], userFeedback: { positives: [], negatives: [] },
-                    },
-                    gallery: { exterior: [], interior: [] },
-                });
-            }
         }
     }, [id]);
 
@@ -526,11 +653,16 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     const ringImages           = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
     const currentGalleryImages = activeGalleryTab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES;
 
+    // Helper to register section refs
+    const registerRef = (id: string) => (el: HTMLElement | null) => {
+        sectionRefs.current[id] = el;
+    };
+
     return (
         <div className="min-h-screen bg-background font-sans text-foreground pb-24">
 
-            {/* ── 1. Top Nav — back button + action icons only, no car name ── */}
-            <nav className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-transparent pointer-events-none">
+            {/* ── 1. Top Nav ── */}
+            <nav className="absolute top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-6 bg-transparent pointer-events-none">
                 <div className="flex items-center gap-4 pointer-events-auto">
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-white/10 text-white rounded-full">
                         <ArrowLeft className="h-5 w-5" />
@@ -546,9 +678,9 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </nav>
 
-            {/* ── 2. Hero — car name + variant now lives here ── */}
-            <section className="pt-16 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '520px' }}>
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#1E293B_0%,_#0F172A_60%,_#020617_100%)] z-0" />
+            {/* ── 2. Hero ── */}
+            <section className="pt-14 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '500px' }}>
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1E293B_0%,#0F172A_60%,#020617_100%)] z-0" />
                 <div
                     className="absolute inset-0 z-0 opacity-[0.04]"
                     style={{
@@ -558,19 +690,30 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 />
                 <div className="relative z-10 container mx-auto px-4 flex flex-col items-center">
 
-                    {/* ── Car name in hero ── */}
-                    <div className="mt-6 flex flex-col items-center gap-1">
+                    {/* Car name + variant selector */}
+                    <div className="mt-5 flex flex-col items-center gap-1 relative">
                         <h1 className="text-2xl font-bold text-white leading-tight tracking-tight">
                             {car.brand} {car.model}
                         </h1>
-                        <div className="flex items-center gap-1 text-white/50 text-xs font-medium cursor-pointer hover:text-white/80 transition-colors">
-                            <span>Premium Plus</span>
-                            <ChevronDown className="h-3 w-3" />
-                        </div>
+                        <button
+                            onClick={() => setVariantOpen(v => !v)}
+                            className="flex items-center gap-1 text-white/50 text-xs font-medium hover:text-white/80 transition-colors"
+                        >
+                            <span>{selectedVariant}</span>
+                            <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${variantOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Variants dropdown */}
+                        <VariantsDropdown
+                            isOpen={variantOpen}
+                            onClose={() => setVariantOpen(false)}
+                            currentVariant={selectedVariant}
+                            onSelect={setSelectedVariant}
+                        />
                     </div>
 
                     {/* Rating badge + drag hint */}
-                    <div className="mt-20  mb-4 flex items-center gap-3">
+                    <div className="mt-16 mb-4 flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 px-4 py-1.5 rounded-full">
                             <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
                             <span className="text-yellow-400 font-bold text-sm">{car.rating}</span>
@@ -578,6 +721,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Drag to Explore</span>
                     </div>
 
+                    {/* 3D ring — images now show title below each image */}
                     <div className="w-full" style={{ height: '340px', position: 'relative' }}>
                         <ThreeDImageRing
                             images={ringImages}
@@ -587,37 +731,38 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             mobileScaleFactor={0.75} inertiaPower={0.7} inertiaTimeConstant={350}
                             inertiaVelocityMultiplier={18}
                             containerClassName="rounded-xl" imageClassName="rounded-xl shadow-2xl"
+                            // Pass label per image via data attribute if ThreeDImageRing supports it;
+                            // otherwise we overlay labels below the ring container
                         />
                     </div>
+
+                    {/* Image labels row — shown beneath the ring for context */}
+                    <div className="mt-1 flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full px-2">
+                        {[...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].slice(0, 8).map((img, i) => (
+                            <span
+                                key={i}
+                                className="shrink-0 text-white/30 text-[10px] font-medium px-2 py-0.5 rounded-full border border-white/10 bg-white/5 whitespace-nowrap"
+                            >
+                                {img.title}
+                            </span>
+                        ))}
+                    </div>
+
                     <p className="mt-2 text-white/30 text-[11px] tracking-widest uppercase font-medium select-none">
                         ← Drag to rotate →
                     </p>
-                    <div className="mt-6 flex items-center gap-3 bg-gray-800/50 p-2 rounded-full backdrop-blur-sm border border-gray-700/50">
-                        {car.colors.map((color) => (
-                            <button
-                                key={color}
-                                onClick={() => setSelectedColor(color)}
-                                className={`h-8 w-8 rounded-full border-2 transition-transform ${
-                                    selectedColor === color ? 'border-white scale-110' : 'border-transparent hover:scale-105'
-                                }`}
-                                style={{ backgroundColor: color }}
-                                aria-label={`Select color ${color}`}
-                            />
-                        ))}
-                    </div>
                 </div>
             </section>
 
-            {/* ── 3. Sticky Nav ── */}
+            {/* ── 3. Sticky Section Nav ── */}
             <div className="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">
                 <div className="container mx-auto px-4 max-w-5xl">
-                    <div className="flex items-center justify-center gap-8 overflow-x-auto no-scrollbar">
-                        {['Details', 'Features', 'Ri-Sights', 'Design', 'Compare', 'Sales'].map((tab) => {
-                            const tabId    = tab.toLowerCase();
+                    <div className="flex items-center justify-center gap-6 overflow-x-auto no-scrollbar">
+                        {NAV_TABS.map(({ id: tabId, label }) => {
                             const isActive = activeSection === tabId;
                             return (
                                 <button
-                                    key={tab}
+                                    key={tabId}
                                     onClick={() => scrollToSection(tabId)}
                                     className={`relative py-4 px-2 font-medium text-sm transition-colors whitespace-nowrap ${
                                         isActive
@@ -625,7 +770,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                             : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
                                     }`}
                                 >
-                                    {tab}
+                                    {label}
                                     {isActive && (
                                         <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
                                     )}
@@ -636,15 +781,15 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </div>
 
-            {/* ── 4. Sections ── */}
+            {/* ── 4. Content sections ── */}
             <div className="container mx-auto px-4 max-w-5xl space-y-24 pb-32 pt-12">
 
                 {/* ── Details ── */}
-                <section id="details" className="scroll-mt-32 space-y-8">
+                <section id="details" ref={registerRef('details')} className="scroll-mt-28 space-y-8">
                     <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{car.description}</p>
 
                     {/* Spec Cards */}
-                    <div className="flex justify-center gap-4">
+                    <div className="flex justify-center gap-4 flex-wrap">
                         {[
                             { label: 'Horsepower', value: `${car.horsepower} HP`, icon: Zap,   sub: 'Max Power'    },
                             { label: 'Torque',     value: car.torque,             icon: Gauge, sub: 'Peak Torque'  },
@@ -653,7 +798,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             <div
                                 key={spec.label}
                                 className="flex flex-col items-center justify-center text-center gap-2
-                                           bg-card border border-border rounded-2xl w-50 aspect-square p-4
+                                           bg-card border border-border rounded-2xl w-44 aspect-square p-4
                                            shadow-sm hover:shadow-md transition-shadow"
                             >
                                 <div className="h-8 w-8 bg-muted rounded-xl flex items-center justify-center">
@@ -674,15 +819,12 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         ))}
                     </div>
 
-                    {/* Safety Ratings */}
-                    <div className="[&_*]:!text-sm [&_.text-4xl]:!text-2xl [&_.text-3xl]:!text-xl [&_p.text-lg]:!text-base">
-                        <SafetyRatings data={car.safetyRatings} />
-                    </div>
+                    {/* ── Revised Safety Ratings ── */}
+                    <SafetyRatingsRevised data={car.safetyRatings} />
                 </section>
 
                 {/* ── Features ── */}
-                <section id="features" className="scroll-mt-32 space-y-5">
-
+                <section id="features" ref={registerRef('features')} className="scroll-mt-28 space-y-5">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-foreground">Features & Equipment</h2>
@@ -690,20 +832,14 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                 {FEATURE_CATEGORIES.reduce((acc, c) => acc + c.features.filter(f => f.available).length, 0)} features across {FEATURE_CATEGORIES.length} categories
                             </p>
                         </div>
-                        <button
-                            onClick={collapseAll}
-                            className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
-                        >
+                        <button onClick={collapseAll} className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline">
                             Collapse all
                         </button>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
                         {car.features.map(f => (
-                            <span
-                                key={f}
-                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800"
-                            >
+                            <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
                                 <CheckCircle2 className="h-3 w-3" />
                                 {f}
                             </span>
@@ -723,12 +859,12 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </section>
 
                 {/* ── Ri-Sights ── */}
-                <section id="ri-sights" className="scroll-mt-32">
+                <section id="ri-sights" ref={registerRef('ri-sights')} className="scroll-mt-28">
                     {car.riInsights && <RiInsightsTab data={car.riInsights} />}
                 </section>
 
                 {/* ── Design / Gallery ── */}
-                <section id="design" className="scroll-mt-32 space-y-6">
+                <section id="design" ref={registerRef('design')} className="scroll-mt-28 space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-foreground">Gallery</h2>
                         <div className="flex items-center gap-1 bg-muted rounded-xl p-1">
@@ -748,6 +884,27 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         </div>
                     </div>
 
+                    {/* Color picker moved here from hero */}
+                    <div>
+                        <p className="text-sm font-semibold text-foreground mb-3">Colour Options</p>
+                        <div className="flex items-center gap-3">
+                            {car.colors.map((color) => (
+                                <button
+                                    key={color}
+                                    onClick={() => setSelectedColor(color)}
+                                    className={`h-9 w-9 rounded-full border-2 transition-all ${
+                                        selectedColor === color
+                                            ? 'border-blue-500 scale-110 shadow-md'
+                                            : 'border-border hover:scale-105'
+                                    }`}
+                                    style={{ backgroundColor: color }}
+                                    aria-label={`Select color ${color}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Gallery grid with titles */}
                     <div className="grid grid-cols-2 gap-4">
                         {currentGalleryImages.map((img, i) => (
                             <div
@@ -756,16 +913,15 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                 onClick={() => setLightbox({ index: i, tab: activeGalleryTab })}
                             >
                                 <Image
-                                    src={img.src}
-                                    alt={img.title}
-                                    fill
+                                    src={img.src} alt={img.title} fill
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     unoptimized
                                     onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/alt.png"; }}
                                 />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                                <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm">
+                                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+                                {/* Always-visible title at bottom */}
+                                <div className="absolute bottom-3 left-3">
+                                    <span className="text-white text-xs font-semibold bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-sm">
                                         {img.title}
                                     </span>
                                 </div>
@@ -774,11 +930,24 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     </div>
                 </section>
 
-                {/* ── Compare (commented out) ── */}
-                {/* <section id="compare" className="scroll-mt-32 space-y-6"> ... </section> */}
+                {/* ── Compare ── */}
+                <section id="compare" ref={registerRef('compare')} className="scroll-mt-28">
+                    <CompareCars
+                        primaryCar={{
+                            id:           car.id,
+                            brand:        car.brand,
+                            model:        car.model,
+                            priceLabel:   car.priceLabel,
+                            rating:       car.rating,
+                            horsepower:   car.horsepower,
+                            torque:       car.torque,
+                            acceleration: car.acceleration,
+                        }}
+                    />
+                </section>
 
                 {/* ── Sales ── */}
-                <section id="sales" className="scroll-mt-32 space-y-6">
+                <section id="sales" ref={registerRef('sales')} className="scroll-mt-28 space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-foreground">Sales Trend</h2>
                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-semibold">
@@ -864,7 +1033,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     onClose={() => setLightbox(null)}
                 />
             )}
-
         </div>
     );
 }

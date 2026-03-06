@@ -23,7 +23,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
           return (
             <div key={i} className="flex items-center flex-1 min-w-0">
               {/* Dot */}
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <motion.div
                   animate={{
                     scale: active ? 1.15 : 1,
@@ -36,7 +36,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
                       ? "bg-blue-600 text-white"
                       : active
                       ? "bg-blue-600/20 text-blue-400 border-2 border-blue-500"
-                      : "bg-white/[0.04] text-gray-600 border border-white/[0.08]"
+                      : "bg-white/4 text-gray-600 border border-white/8"
                     }
                   `}
                 >
@@ -50,7 +50,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
 
               {/* Connector */}
               {i < total - 1 && (
-                <div className="flex-1 h-[2px] mx-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <div className="flex-1 h-[2px] mx-1 rounded-full bg-white/6 overflow-hidden">
                   <motion.div
                     className="h-full bg-blue-600 origin-left"
                     initial={{ scaleX: 0 }}
@@ -65,7 +65,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
       </div>
 
       {/* Thin progress bar */}
-      <div className="relative h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
+      <div className="relative h-[3px] bg-white/6 rounded-full overflow-hidden">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{

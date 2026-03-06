@@ -71,7 +71,7 @@ export default function TrendingCars() {
                   <div className={`group relative flex flex-col w-full h-[400px] bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300 ${rank.border} ${rank.glow}`}>
 
                     {/* image */}
-                    <div className="relative h-[200px] flex-shrink-0 overflow-hidden bg-[#141414]">
+                    <div className="relative h-[200px] shrink-0 overflow-hidden bg-[#141414]">
 
                       <div className="absolute top-3 left-3 z-10">
                         <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${rank.badge}`}>
@@ -94,7 +94,7 @@ export default function TrendingCars() {
                         fill
                         className="object-contain transition duration-500 group-hover:scale-105 p-2"
                       />
-                      <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-[#0f0f0f] to-transparent" />
+                      <div className="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-[#0f0f0f] to-transparent" />
                     </div>
 
                     {/* body */}
@@ -107,7 +107,7 @@ export default function TrendingCars() {
 
                       {/* search trend bar */}
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                        <div className="flex-1 h-1 rounded-full bg-white/6 overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-blue-500"
                             initial={{ width: 0 }}
@@ -119,19 +119,19 @@ export default function TrendingCars() {
                         <span className="text-gray-600 text-[10px] tabular-nums">{car.searchPct}%</span>
                       </div>
 
-                      <div className="h-px bg-white/[0.06]" />
+                      <div className="h-px bg-white/6" />
 
                       {/* price + rating */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <IndianRupee size={13} className="text-gray-500 flex-shrink-0" />
+                          <IndianRupee size={13} className="text-gray-500 shrink-0" />
                           <span className="text-white font-bold text-base">
                             {(car.price / 100000).toFixed(1)} L
                           </span>
                           <span className="text-gray-600 text-xs">onwards</span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/8">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/4 border border-white/8">
                           <Star size={11} className="text-amber-400 fill-amber-400" />
                           <span className="text-white text-xs font-semibold">{car.rating}</span>
                           <span className="text-gray-600 text-[10px]">({car.reviews.toLocaleString()})</span>

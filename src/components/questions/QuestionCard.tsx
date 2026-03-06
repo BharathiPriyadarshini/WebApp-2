@@ -58,20 +58,20 @@ function OptionRow({
         ${selected
           ? "bg-blue-600/10 border-blue-500/70 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
           : disabled
-          ? "bg-white/[0.02] border-white/[0.05] opacity-50 cursor-not-allowed"
-          : "bg-white/[0.03] border-white/[0.08] hover:bg-blue-600/5 hover:border-blue-500/30 cursor-pointer"
+          ? "bg-white/2 border-white/5 opacity-50 cursor-not-allowed"
+          : "bg-white/3 border-white/8 hover:bg-blue-600/5 hover:border-blue-500/30 cursor-pointer"
         }
       `}
     >
       {/* Shimmer on selected */}
       {selected && (
-        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent pointer-events-none" />
+        <span className="absolute inset-0 bg-linear-to-r from-transparent via-blue-500/5 to-transparent pointer-events-none" />
       )}
 
       {/* Indicator */}
       <span
         className={`
-          flex-shrink-0 flex items-center justify-center transition-all duration-200
+          shrink-0 flex items-center justify-center transition-all duration-200
           ${multi
             ? `w-5 h-5 rounded-[5px] border-2 ${selected ? "bg-blue-500 border-blue-500" : "border-white/20"}`
             : `w-5 h-5 rounded-full border-2 ${selected ? "border-blue-500" : "border-white/20"}`
@@ -87,7 +87,7 @@ function OptionRow({
       </span>
 
       {!multi && !selected && (
-        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
       )}
     </motion.button>
   );
@@ -150,7 +150,7 @@ export default function QuestionCard({
         </div>
 
         {/* Question text */}
-        <h2 className="text-[1.55rem] md:text-3xl font-bold text-white leading-[1.25] tracking-tight mb-2">
+        <h2 className="text-[1.55rem] md:text-3xl font-bold text-white leading-tight tracking-tight mb-2">
           {question.question}
         </h2>
 
@@ -213,7 +213,7 @@ export default function QuestionCard({
               text-sm font-semibold transition-all duration-200
               ${selectedOptions.length > 0 && !disabled && !isLoading
                 ? "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_28px_rgba(59,130,246,0.35)] hover:shadow-[0_0_36px_rgba(59,130,246,0.45)]"
-                : "bg-white/[0.03] text-gray-600 cursor-not-allowed border border-white/[0.06]"
+                : "bg-white/3 text-gray-600 cursor-not-allowed border border-white/6"
               }
             `}
           >
@@ -248,7 +248,7 @@ export default function QuestionCard({
               }}
               placeholder="Type your answer…"
               disabled={isLoading || disabled}
-              className="w-full bg-white/[0.03] border border-white/[0.10] rounded-2xl px-5 py-4 pr-14 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-blue-500/60 focus:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-white/3 border border-white/10 rounded-2xl px-5 py-4 pr-14 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-blue-500/60 focus:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={() => textAnswer.trim() && !disabled && !isLoading && onAnswer(textAnswer.trim())}

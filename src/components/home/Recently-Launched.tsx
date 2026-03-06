@@ -93,7 +93,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
         <div className="group relative flex flex-col w-full h-[430px] bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_40px_rgba(59,130,246,0.13)]">
 
           {/* ── image ── */}
-          <div className="relative h-[200px] flex-shrink-0 overflow-hidden">
+          <div className="relative h-[200px] shrink-0 overflow-hidden">
             {/* car name badge */}
             <div className="absolute top-4 left-4 z-10">
               <span className="px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full leading-none">
@@ -113,7 +113,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               fill
               className="object-contain transition duration-500 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#0f0f0f] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-10 bg-linear-to-t from-[#0f0f0f] to-transparent" />
           </div>
 
           {/* ── body ── */}
@@ -121,7 +121,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
 
             {/* launch date */}
             <div className="flex items-center gap-2 text-gray-500 text-xs">
-              <CalendarCheck className="w-3.5 h-3.5 flex-shrink-0 text-blue-500" />
+              <CalendarCheck className="w-3.5 h-3.5 shrink-0 text-blue-500" />
               <span>Launched: <span className="text-gray-400">{car.date}</span></span>
             </div>
 
@@ -132,8 +132,8 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
             <div className="flex flex-col gap-0 rounded-xl border border-white/[0.07] overflow-hidden">
 
               {/* price row */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
-                <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600/15 border border-blue-500/20 flex-shrink-0">
+              <div className="flex items-center gap-3 px-4 py-3 bg-white/2 border-b border-white/6">
+                <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600/15 border border-blue-500/20 shrink-0">
                   <IndianRupee className="w-3.5 h-3.5 text-blue-400" />
                 </span>
                 <div className="flex flex-col leading-tight">
@@ -147,8 +147,8 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               {/* fuel + seating row — side by side */}
               <div className="flex">
                 {/* fuel */}
-                <div className="flex items-center gap-3 px-4 py-3 flex-1 border-r border-white/[0.06]">
-                  <span className={`flex items-center justify-center w-7 h-7 rounded-lg border flex-shrink-0 ${fuel.pill}`}>
+                <div className="flex items-center gap-3 px-4 py-3 flex-1 border-r border-white/6">
+                  <span className={`flex items-center justify-center w-7 h-7 rounded-lg border shrink-0 ${fuel.pill}`}>
                     <Fuel className="w-3.5 h-3.5" />
                   </span>
                   <div className="flex flex-col leading-tight">
@@ -159,7 +159,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
 
                 {/* seating */}
                 <div className="flex items-center gap-3 px-4 py-3 flex-1">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex-shrink-0">
+                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/5 border border-white/10 shrink-0">
                     <Users className="w-3.5 h-3.5 text-gray-400" />
                   </span>
                   <div className="flex flex-col leading-tight">

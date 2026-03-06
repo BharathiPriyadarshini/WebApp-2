@@ -37,7 +37,7 @@ const metricDefs = [
 /* ─── animated bar ────────────────────────────────────────────── */
 function Bar({ pct, side, inView, delay }: { pct: number; side: "A" | "B"; inView: boolean; delay: number }) {
   return (
-    <div className="relative h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+    <div className="relative h-1.5 w-full rounded-full bg-white/6 overflow-hidden">
       <motion.div
         className={`absolute top-0 h-full rounded-full ${side === "A" ? "left-0 bg-white/50" : "left-0 bg-blue-500"}`}
         initial={{ width: 0 }}
@@ -79,7 +79,7 @@ function CarDropdown({
         </div>
         <ChevronDown
           size={14}
-          className={`text-gray-500 mt-3 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`text-gray-500 mt-3 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -98,7 +98,7 @@ function CarDropdown({
                 <button
                   key={car.id}
                   onClick={() => { onChange(car); setOpen(false); }}
-                  className={`w-full text-left px-4 py-3 transition-colors hover:bg-white/[0.06] border-b border-white/[0.04] last:border-0 ${selected.id === car.id ? "bg-white/[0.04]" : ""}`}
+                  className={`w-full text-left px-4 py-3 transition-colors hover:bg-white/6 border-b border-white/4 last:border-0 ${selected.id === car.id ? "bg-white/4" : ""}`}
                 >
                   <div className="text-white text-sm font-semibold leading-tight">{car.name}</div>
                   <div className="text-gray-500 text-[11px] mt-0.5">{car.sub}</div>
@@ -155,7 +155,7 @@ export default function SmartComparison() {
             className="text-4xl md:text-6xl font-bold text-white leading-[1.05] tracking-tight"
           >
             Smart<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/30">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-white to-white/30">
               Comparison
             </span>
           </motion.h2>
@@ -178,13 +178,13 @@ export default function SmartComparison() {
           className="relative rounded-2xl md:rounded-3xl border border-white/10 bg-[#0a0a0a] overflow-hidden"
         >
           {/* glow */}
-          <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-blue-600/[0.06] blur-3xl" />
+          <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-blue-600/6 blur-3xl" />
 
           {/* ── car header strip ── */}
-          <div className="grid grid-cols-[1fr_auto_1fr] border-b border-white/[0.08]">
+          <div className="grid grid-cols-[1fr_auto_1fr] border-b border-white/8">
 
             {/* Car A */}
-            <div className="px-4 md:px-8 py-5 md:py-6 border-r border-white/[0.08]">
+            <div className="px-4 md:px-8 py-5 md:py-6 border-r border-white/8">
               <CarDropdown side="A" selected={carA} onChange={setCarA} exclude={carB.id} />
             </div>
 
@@ -194,7 +194,7 @@ export default function SmartComparison() {
             </div>
 
             {/* Car B */}
-            <div className="px-4 md:px-8 py-5 md:py-6 border-l border-white/[0.08]">
+            <div className="px-4 md:px-8 py-5 md:py-6 border-l border-white/8">
               <CarDropdown side="B" selected={carB} onChange={setCarB} exclude={carA.id} />
             </div>
 
@@ -203,7 +203,7 @@ export default function SmartComparison() {
           {/* ── metrics — desktop: 3-col grid, mobile: stacked cards ── */}
 
           {/* DESKTOP */}
-          <div className="hidden md:block divide-y divide-white/[0.05]">
+          <div className="hidden md:block divide-y divide-white/5">
             {metricDefs.map((m, i) => {
               const Icon   = m.icon;
               const mA     = (carA.metrics as any)[m.key];
@@ -223,8 +223,8 @@ export default function SmartComparison() {
                   </div>
 
                   {/* Centre label */}
-                  <div className="flex flex-col items-center gap-1.5 px-4 py-5 border-x border-white/[0.05]">
-                    <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                  <div className="flex flex-col items-center gap-1.5 px-4 py-5 border-x border-white/5">
+                    <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/4 border border-white/8">
                       <Icon size={15} className="text-gray-400" strokeWidth={1.5} />
                     </div>
                     <span className="text-white text-xs font-semibold text-center leading-tight">{m.label}</span>
@@ -246,7 +246,7 @@ export default function SmartComparison() {
           </div>
 
           {/* MOBILE — stacked metric cards */}
-          <div className="md:hidden divide-y divide-white/[0.05]">
+          <div className="md:hidden divide-y divide-white/5">
             {metricDefs.map((m, i) => {
               const Icon   = m.icon;
               const mA     = (carA.metrics as any)[m.key];
@@ -257,7 +257,7 @@ export default function SmartComparison() {
                 <div key={m.key} className="px-4 py-4">
                   {/* metric label row */}
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/4 border border-white/8">
                       <Icon size={12} className="text-gray-400" strokeWidth={1.5} />
                     </div>
                     <span className="text-white text-xs font-semibold">{m.label}</span>
@@ -293,14 +293,14 @@ export default function SmartComparison() {
           </div>
 
           {/* ── bottom CTA strip ── */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 md:px-8 py-5 md:py-7 border-t border-white/[0.08] bg-white/[0.015]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 md:px-8 py-5 md:py-7 border-t border-white/8 bg-white/1.5">
 
             {/* feature pills — hide on very small screens, show from sm */}
             <div className="hidden sm:flex flex-wrap gap-2">
               {["Deep Technical Breakdown", "Reliability Scores", "TCO Analysis"].map((f) => (
                 <span
                   key={f}
-                  className="px-3 py-1.5 rounded-full text-[11px] font-medium text-gray-400 border border-white/[0.08] bg-white/[0.03]"
+                  className="px-3 py-1.5 rounded-full text-[11px] font-medium text-gray-400 border border-white/8 bg-white/3"
                 >
                   {f}
                 </span>

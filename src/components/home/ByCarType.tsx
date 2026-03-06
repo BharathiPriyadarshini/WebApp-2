@@ -50,7 +50,7 @@ export default function ByCarType() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.07, duration: 0.35 }}
                 viewport={{ once: true }}
-                className="flex-shrink-0"
+                className="shrink-0"
               >
                 <Link href={type.href}>
                   {/* fixed size — always 120×148, never shrinks or grows */}
