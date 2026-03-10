@@ -2,6 +2,8 @@
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import {
     ShieldCheck,
     Gauge,
@@ -196,6 +198,10 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
 
     const [compareTarget, setCompareTarget] = useState<CompareCarData>(COMPARE_CATALOGUE[0]);
 
+    const compareHref = `/compare?carA=${encodeURIComponent(
+        primaryMetrics.id,
+    )}&carB=${encodeURIComponent(compareTarget.id)}`;
+
     function getWinner(key: string) {
         const def  = METRIC_DEFS.find((d) => d.key === key)!;
         const pctP = (primaryMetrics.metrics as any)[key].pct;
@@ -228,15 +234,15 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="relative rounded-2xl border border-white/10 bg-[#0a0a0a] overflow-hidden"
+                className="relative rounded-2xl border border-border bg-card dark:bg-[#0a0a0a] overflow-hidden"
             >
                 {/* glow */}
                 <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 rounded-full bg-blue-600/8 blur-3xl" />
 
                 {/* ── Header strip ── */}
-                <div className="grid grid-cols-[1fr_auto_1fr] border-b border-white/8">
+                <div className="grid grid-cols-[1fr_auto_1fr] border-b border-border">
                     {/* Primary car */}
-                    <div className="px-4 md:px-6 py-5 border-r border-white/8">
+                    <div className="px-4 md:px-6 py-5 border-r border-border">
                         <div className="flex flex-col gap-0.5">
                             <span className="text-[10px] uppercase tracking-[0.25em] font-semibold text-blue-400">
                                 This Car
@@ -257,13 +263,13 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
 
                     {/* VS */}
                     <div className="flex items-center justify-center px-3 md:px-6 py-5">
-                        <span className="text-[11px] font-black tracking-[0.2em] text-gray-700 uppercase">
+                        <span className="text-[11px] font-black tracking-[0.2em] text-muted-foreground uppercase">
                             vs
                         </span>
                     </div>
 
                     {/* Compare car */}
-                    <div className="px-4 md:px-6 py-5 border-l border-white/8">
+                    <div className="px-4 md:px-6 py-5 border-l border-border">
                         <CarDropdown
                             selected={compareTarget}
                             onChange={setCompareTarget}
@@ -275,7 +281,7 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                 </div>
 
                 {/* ── Score summary ── */}
-                <div className="grid grid-cols-3 border-b border-white/8 divide-x divide-white/8">
+                <div className="grid grid-cols-3 border-b border-border divide-x divide-border">
                     <div className="flex flex-col items-center justify-center py-4 gap-1">
                         <span className="text-2xl font-black text-blue-400">{primaryWins}</span>
                         <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Wins</span>
@@ -290,16 +296,16 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                         <span className="text-xs text-gray-500 mt-1">categories</span>
                     </div>
                     <div className="flex flex-col items-center justify-center py-4 gap-1">
-                        <span className="text-2xl font-black text-white/60">{compareWins}</span>
-                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Wins</span>
-                        <span className="text-[11px] text-gray-400 font-medium truncate max-w-[90%] text-center">
+                        <span className="text-2xl font-black text-foreground/60 dark:text-white/60">{compareWins}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Wins</span>
+                        <span className="text-[11px] text-muted-foreground font-medium truncate max-w-[90%] text-center">
                             {compareTarget.name.split(" ").slice(-1)[0]}
                         </span>
                     </div>
                 </div>
 
                 {/* ── Metrics — desktop ── */}
-                <div className="hidden md:block divide-y divide-white/5">
+                <div className="hidden md:block divide-y divide-border">
                     {METRIC_DEFS.map((m, i) => {
                         const Icon    = m.icon;
                         const mP      = (primaryMetrics.metrics as any)[m.key] as CarMetric;
@@ -312,7 +318,7 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                                 <div className="px-6 py-5 flex flex-col gap-2">
                                     <span
                                         className={`text-sm font-semibold ${
-                                            winner === "primary" ? "text-white" : "text-gray-400"
+                                            winner === "primary" ? "text-foreground dark:text-white" : "text-muted-foreground"
                                         }`}
                                     >
                                         {mP.value}
@@ -331,14 +337,14 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                                 </div>
 
                                 {/* Centre label */}
-                                <div className="flex flex-col items-center gap-1.5 px-4 py-5 border-x border-white/5">
-                                    <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/4 border border-white/8">
-                                        <Icon size={15} className="text-gray-400" strokeWidth={1.5} />
+                                <div className="flex flex-col items-center gap-1.5 px-4 py-5 border-x border-border">
+                                    <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-foreground/5 border border-border">
+                                        <Icon size={15} className="text-muted-foreground" strokeWidth={1.5} />
                                     </div>
-                                    <span className="text-white text-xs font-semibold text-center leading-tight">
+                                    <span className="text-card-foreground text-xs font-semibold text-center leading-tight">
                                         {m.label}
                                     </span>
-                                    <span className="text-gray-600 text-[10px] text-center leading-tight">
+                                    <span className="text-muted-foreground text-[10px] text-center leading-tight">
                                         {m.sublabel}
                                     </span>
                                 </div>
@@ -347,7 +353,7 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                                 <div className="px-6 py-5 flex flex-col gap-2">
                                     <span
                                         className={`text-sm font-semibold ${
-                                            winner === "compare" ? "text-white" : "text-gray-400"
+                                            winner === "compare" ? "text-foreground dark:text-white" : "text-muted-foreground"
                                         }`}
                                     >
                                         {mC.value}
@@ -370,7 +376,7 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                 </div>
 
                 {/* ── Metrics — mobile ── */}
-                <div className="md:hidden divide-y divide-white/5">
+                <div className="md:hidden divide-y divide-border">
                     {METRIC_DEFS.map((m, i) => {
                         const Icon   = m.icon;
                         const mP     = (primaryMetrics.metrics as any)[m.key] as CarMetric;
@@ -380,11 +386,11 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                         return (
                             <div key={m.key} className="px-4 py-4">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/4 border border-white/8">
-                                        <Icon size={12} className="text-gray-400" strokeWidth={1.5} />
+                                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-foreground/5 border border-border">
+                                        <Icon size={12} className="text-muted-foreground" strokeWidth={1.5} />
                                     </div>
-                                    <span className="text-white text-xs font-semibold">{m.label}</span>
-                                    <span className="text-gray-600 text-[10px]">· {m.sublabel}</span>
+                                    <span className="text-card-foreground text-xs font-semibold">{m.label}</span>
+                                    <span className="text-muted-foreground text-[10px]">· {m.sublabel}</span>
                                 </div>
 
                                 {/* Primary */}
@@ -395,7 +401,7 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                                         </span>
                                         <span
                                             className={`text-xs font-semibold ${
-                                                winner === "primary" ? "text-white" : "text-gray-400"
+                                                winner === "primary" ? "text-foreground dark:text-white" : "text-muted-foreground"
                                             }`}
                                         >
                                             {mP.value}
@@ -417,12 +423,12 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                                 {/* Compare */}
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="text-[11px] text-gray-400 font-medium">
+                                        <span className="text-[11px] text-muted-foreground font-medium">
                                             {compareTarget.name}
                                         </span>
                                         <span
                                             className={`text-xs font-semibold ${
-                                                winner === "compare" ? "text-white" : "text-gray-400"
+                                                winner === "compare" ? "text-foreground dark:text-white" : "text-muted-foreground"
                                             }`}
                                         >
                                             {mC.value}
@@ -446,17 +452,24 @@ export function CompareCars({ primaryCar }: CompareCarsProps) {
                 </div>
 
                 {/* ── Bottom note ── */}
-                <div className="flex flex-wrap items-center gap-2 px-4 md:px-6 py-4 border-t border-white/8 bg-white/[0.015]">
+                <div className="flex flex-wrap items-center gap-2 px-4 md:px-6 py-4 border-t border-border bg-foreground/5">
                     {["NCAP Data", "AI Safety Score", "TCO Analysis", "Ownership Cost"].map((tag) => (
                         <span
                             key={tag}
-                            className="px-3 py-1.5 rounded-full text-[11px] font-medium text-gray-500 border border-white/8 bg-white/3"
+                            className="px-3 py-1.5 rounded-full text-[11px] font-medium text-muted-foreground border border-border bg-foreground/5"
                         >
                             {tag}
                         </span>
                     ))}
                 </div>
             </motion.div>
+
+            <Link href={compareHref} className="w-full sm:w-auto">
+                <div className="mt-4 group flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-white text-black text-sm font-bold transition-all duration-200 hover:bg-white/90 hover:gap-4 whitespace-nowrap w-full sm:w-auto">
+                    View Details
+                    <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                </div>
+            </Link>
         </div>
     );
 }

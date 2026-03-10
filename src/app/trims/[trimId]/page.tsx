@@ -3,96 +3,27 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { InsightBadge, type InsightType } from "@/components/car/InsightBadge";
-import { RiInsightsTab } from "@/components/car/RiInsightsTab";
-import { ThreeDImageRing } from "@/components/ui/3d-image-ring";
-import { CompareCars } from "@/components/car/CompareCars";
-import {
-    ArrowLeft,
-    ArrowRight,
-    Heart,
-    Share2,
-    Star,
-    Zap,
-    Gauge,
-    Timer,
-    ChevronDown,
-    CheckCircle2,
-    TrendingUp,
-    Shield,
-    Wifi,
-    Car as CarIcon,
-    Armchair,
-    Lightbulb,
-    X,
-    AlertTriangle,
-    ChevronRight,
-} from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Star, ChevronDown, ChevronRight, TrendingUp } from 'lucide-react';
 
+import { ThreeDImageRing }  from "@/components/ui/3d-image-ring";
+import { RiInsightsTab }    from "@/components/car/details/RiInsightsTab";
+import { CompareCars }      from "@/components/car/CompareCars";
+import { Details }          from "@/components/car/details/Details";
+import { Features }         from "@/components/car/details/Features";
+import { Design, EXTERIOR_IMAGES, INTERIOR_IMAGES } from "@/components/car/details/Design";
+import { Button }           from "@/components/ui/Button";
+import { Card }             from "@/components/ui/card";
+import FixedBackButton from "@/components/layout/FixedBackButton";
 import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    CartesianGrid,
-    BarChart,
-    Bar
+    LineChart, Line, XAxis, YAxis, Tooltip,
+    ResponsiveContainer, CartesianGrid, BarChart, Bar,
 } from "recharts";
 
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/card";
-
 import carsData from "@/data/cars.json";
-import { Car as BaseCar } from "@/components/car/CarCard";
+import type { EnrichedCar } from "./types";
+import type { InsightType } from "@/components/car/InsightBadge";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-
-export interface InsightData {
-    overallRating: number;
-    recommendationPercent: number;
-    mostMentioned: string;
-    topAdvantage: string;
-    ownershipConfidence: {
-        level: 'Low' | 'Moderate' | 'High';
-        description: string;
-    };
-    categoryRatings: {
-        label: string;
-        score: number;
-        subLabel?: string;
-    }[];
-    userFeedback: {
-        positives: string[];
-        negatives: string[];
-    };
-}
-
-export interface SafetyRatingData {
-    globalNcap: { adult: number; child: number };
-    bharatNcap: { status: string; adult: number; child: number };
-}
-
-export interface EnrichedCar extends BaseCar {
-    horsepower: number;
-    torque: string;
-    acceleration: string;
-    transmission?: string;
-    colors: string[];
-    description: string;
-    safetyRatings: SafetyRatingData;
-    features: string[];
-    insights: { type: InsightType; label: string }[];
-    riInsights: InsightData;
-    gallery: {
-        exterior: string[];
-        interior: string[];
-    };
-}
-
-// ── Variants mock data ─────────────────────────────────────────────────────
+// ── Static data ────────────────────────────────────────────────────────────
 const VARIANTS = [
     { name: 'Base',         priceLabel: '₹ 11.99 L', transmission: 'Manual',    fuel: 'Petrol'        },
     { name: 'Smart',        priceLabel: '₹ 13.49 L', transmission: 'Manual',    fuel: 'Petrol'        },
@@ -102,384 +33,35 @@ const VARIANTS = [
     { name: 'Luxury',       priceLabel: '₹ 19.49 L', transmission: 'Automatic', fuel: 'Diesel'        },
 ];
 
-// ── Gallery image data with titles ────────────────────────────────────────
-const EXTERIOR_IMAGES = [
-    { src: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=800&q=80", title: "Front Quarter View" },
-    { src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80", title: "Side Profile"      },
-    { src: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=800&q=80", title: "Rear View"          },
-    { src: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=80", title: "Dynamic Angle"      },
-];
-
-const INTERIOR_IMAGES = [
-    { src: "https://images.unsplash.com/photo-1519648023493-d82b5f8d7b8a?auto=format&fit=crop&w=800&q=80", title: "Dashboard Overview" },
-    { src: "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=800&q=80", title: "Centre Console"      },
-    { src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80", title: "Driver's Cockpit"   },
-    { src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80", title: "Rear Cabin"          },
-];
-
 const SALES_DATA = [
-    { month: "Jan", sales: 980  },
-    { month: "Feb", sales: 1120 },
-    { month: "Mar", sales: 1450 },
-    { month: "Apr", sales: 1280 },
-    { month: "May", sales: 1620 },
-    { month: "Jun", sales: 1890 },
-    { month: "Jul", sales: 2100 },
-    { month: "Aug", sales: 1950 },
-    { month: "Sep", sales: 2240 },
-    { month: "Oct", sales: 2080 },
-    { month: "Nov", sales: 2350 },
-    { month: "Dec", sales: 2600 },
+    { month: "Jan", sales: 980  }, { month: "Feb", sales: 1120 },
+    { month: "Mar", sales: 1450 }, { month: "Apr", sales: 1280 },
+    { month: "May", sales: 1620 }, { month: "Jun", sales: 1890 },
+    { month: "Jul", sales: 2100 }, { month: "Aug", sales: 1950 },
+    { month: "Sep", sales: 2240 }, { month: "Oct", sales: 2080 },
+    { month: "Nov", sales: 2350 }, { month: "Dec", sales: 2600 },
 ];
 
-// ── Feature categories ────────────────────────────────────────────────────
-const FEATURE_CATEGORIES = [
-    {
-        id: 'safety',
-        label: 'Safety & Security',
-        icon: Shield,
-        features: [
-            { name: '6 Airbags (Front, Side & Curtain)',     available: true  },
-            { name: 'Electronic Stability Control (ESC)',    available: true  },
-            { name: 'Hill Start Assist',                     available: true  },
-            { name: 'Anti-lock Braking System (ABS)',        available: true  },
-            { name: 'ISOFIX Child Seat Anchors',             available: true  },
-            { name: 'Tyre Pressure Monitoring System',       available: true  },
-            { name: 'Auto-dimming IRVM',                     available: false },
-            { name: 'Blind Spot Detection',                  available: false },
-        ],
-    },
-    {
-        id: 'adas',
-        label: 'ADAS & Driver Assistance',
-        icon: CarIcon,
-        features: [
-            { name: 'ADAS Level 2 Suite',                    available: true  },
-            { name: 'Autonomous Emergency Braking',          available: true  },
-            { name: 'Lane Departure Warning',                available: true  },
-            { name: 'Adaptive Cruise Control',               available: true  },
-            { name: '360° Surround View Camera',             available: true  },
-            { name: 'Rear Cross Traffic Alert',              available: true  },
-            { name: 'Auto High Beam',                        available: false },
-            { name: 'Traffic Sign Recognition',              available: false },
-        ],
-    },
-    {
-        id: 'infotainment',
-        label: 'Infotainment & Connectivity',
-        icon: Wifi,
-        features: [
-            { name: '10.25" HD Touchscreen',                 available: true  },
-            { name: 'Wireless Android Auto & Apple CarPlay', available: true  },
-            { name: 'Connected Car Tech (OTA Updates)',      available: true  },
-            { name: 'Premium 8-Speaker Sound System',        available: true  },
-            { name: 'Digital Instrument Cluster',            available: true  },
-            { name: 'In-Car Wi-Fi Hotspot',                  available: true  },
-            { name: 'Head-Up Display (HUD)',                 available: false },
-            { name: 'Rear Seat Entertainment System',        available: false },
-        ],
-    },
-    {
-        id: 'comfort',
-        label: 'Comfort & Convenience',
-        icon: Armchair,
-        features: [
-            { name: 'Ventilated Front Seats',                available: true  },
-            { name: 'Panoramic Sunroof',                     available: true  },
-            { name: 'Electric Adjustable Driver Seat',       available: true  },
-            { name: 'Auto Climate Control (Dual Zone)',      available: true  },
-            { name: 'Keyless Entry & Push Button Start',     available: true  },
-            { name: 'Wireless Phone Charging',               available: true  },
-            { name: 'Rear Seat Recline & Armrest',           available: true  },
-            { name: 'Power Folding ORVMs',                   available: false },
-        ],
-    },
-    {
-        id: 'exterior',
-        label: 'Exterior & Lighting',
-        icon: Lightbulb,
-        features: [
-            { name: 'Full LED Headlamps with DRL',           available: true  },
-            { name: 'LED Tail Lamps',                        available: true  },
-            { name: 'Rain-sensing Wipers',                   available: true  },
-            { name: '17" Dual Tone Alloy Wheels',            available: true  },
-            { name: 'Shark Fin Antenna',                     available: true  },
-            { name: 'Roof Rails',                            available: false },
-            { name: 'Power Tailgate',                        available: false },
-            { name: 'Chrome Exterior Accents',               available: false },
-        ],
-    },
+const NAV_TABS = [
+    { id: 'details',   label: 'Details'   },
+    { id: 'features',  label: 'Features'  },
+    { id: 'ri-sights', label: 'Ri-Sights' },
+    { id: 'design',    label: 'Design'    },
+    { id: 'compare',   label: 'Compare'   },
+    { id: 'sales',     label: 'Sales'     },
 ];
 
-// ── Star rating renderer ───────────────────────────────────────────────────
-function StarRating({ filled, total = 5 }: { filled: number; total?: number }) {
-    return (
-        <div className="flex items-center gap-0.5">
-            {Array.from({ length: total }).map((_, i) => (
-                <Star
-                    key={i}
-                    className={`h-4 w-4 ${
-                        i < filled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'
-                    }`}
-                />
-            ))}
-        </div>
-    );
-}
-
-// ── Revised Safety Ratings component ──────────────────────────────────────
-function SafetyRatingsRevised({ data }: { data: SafetyRatingData }) {
-    return (
-        <div className="space-y-4">
-            <h3 className="text-base font-semibold text-foreground">Safety Ratings</h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Global NCAP */}
-                <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                            <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-foreground">Global NCAP</p>
-                            <p className="text-xs text-muted-foreground">Safety Crash Test</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Adult Occupant</p>
-                                <StarRating filled={data.globalNcap.adult} />
-                            </div>
-                            <div className="text-right">
-                                <span className="text-2xl font-black text-foreground">{data.globalNcap.adult}</span>
-                                <span className="text-sm text-muted-foreground font-medium">/5</span>
-                            </div>
-                        </div>
-
-                        <div className="h-px bg-border" />
-
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Child Occupant</p>
-                                <StarRating filled={data.globalNcap.child} />
-                            </div>
-                            <div className="text-right">
-                                <span className="text-2xl font-black text-foreground">{data.globalNcap.child}</span>
-                                <span className="text-sm text-muted-foreground font-medium">/5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bharat NCAP */}
-                <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
-                            <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-foreground">Bharat NCAP</p>
-                            <p className="text-xs text-muted-foreground">Indian Safety Standard</p>
-                        </div>
-                    </div>
-
-                    {data.bharatNcap.status === 'Not Tested' ? (
-                        <div className="flex flex-col items-center justify-center py-4 gap-2 rounded-xl bg-muted/30 border border-dashed border-border">
-                            <AlertTriangle className="h-5 w-5 text-amber-500" />
-                            <p className="text-sm font-semibold text-foreground">Not Tested</p>
-                            <p className="text-xs text-muted-foreground text-center">
-                                This vehicle hasn't been submitted for Bharat NCAP testing yet.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Adult Occupant</p>
-                                    <StarRating filled={data.bharatNcap.adult} />
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-2xl font-black text-foreground">{data.bharatNcap.adult}</span>
-                                    <span className="text-sm text-muted-foreground font-medium">/5</span>
-                                </div>
-                            </div>
-
-                            <div className="h-px bg-border" />
-
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Child Occupant</p>
-                                    <StarRating filled={data.bharatNcap.child} />
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-2xl font-black text-foreground">{data.bharatNcap.child}</span>
-                                    <span className="text-sm text-muted-foreground font-medium">/5</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ── Feature components ────────────────────────────────────────────────────
-function FeatureRow({ name, available }: { name: string; available: boolean }) {
-    return (
-        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/20 transition-colors">
-            <span className={`text-sm font-normal ${available ? 'text-foreground' : 'text-muted-foreground/55'}`}>
-                {name}
-            </span>
-            {available ? (
-                <span className="text-sm font-medium text-green-600 dark:text-green-500 shrink-0 ml-4">Yes</span>
-            ) : (
-                <span className="text-sm text-muted-foreground/35 shrink-0 ml-4">—</span>
-            )}
-        </div>
-    );
-}
-
-function FeatureAccordion({
-    category,
-    isOpen,
-    onToggle,
-}: {
-    category: typeof FEATURE_CATEGORIES[0];
-    isOpen: boolean;
-    onToggle: () => void;
-}) {
-    const Icon           = category.icon;
-    const availableCount = category.features.filter(f => f.available).length;
-    const totalCount     = category.features.length;
-    const pct            = Math.round((availableCount / totalCount) * 100);
-
-    return (
-        <div className="rounded-xl border border-border overflow-hidden">
-            <button
-                onClick={onToggle}
-                className="w-full flex items-center justify-between px-4 py-3.5 bg-card hover:bg-muted/40 transition-colors"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon className="h-4 w-4 text-foreground" />
-                    </div>
-                    <div className="text-left">
-                        <p className="font-semibold text-foreground text-sm">{category.label}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{availableCount}/{totalCount} included</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="hidden sm:flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                            <div
-                                className="h-full rounded-full bg-blue-500 transition-all duration-500"
-                                style={{ width: `${pct}%` }}
-                            />
-                        </div>
-                        <span className="text-xs text-muted-foreground font-medium w-8 text-right">{pct}%</span>
-                    </div>
-                    <ChevronDown
-                        className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                    />
-                </div>
-            </button>
-
-            <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                }`}
-            >
-                <div className="bg-card border-t border-border py-1">
-                    {category.features.map((feature) => (
-                        <FeatureRow key={feature.name} name={feature.name} available={feature.available} />
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ── Gallery Lightbox ───────────────────────────────────────────────────────
-function GalleryLightbox({
-    images,
-    initialIndex,
-    onClose,
-}: {
-    images: { src: string; title: string }[];
-    initialIndex: number;
-    onClose: () => void;
-}) {
-    const [current, setCurrent] = useState(initialIndex);
-
-    const prev = useCallback(() => setCurrent(i => (i - 1 + images.length) % images.length), [images.length]);
-    const next = useCallback(() => setCurrent(i => (i + 1) % images.length), [images.length]);
-
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowLeft')  prev();
-            if (e.key === 'ArrowRight') next();
-            if (e.key === 'Escape')     onClose();
-        };
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, [prev, next, onClose]);
-
-    return (
-        <div className="fixed inset-0 z-50 bg-black/92 flex flex-col items-center justify-center backdrop-blur-sm" onClick={onClose}>
-            <button className="absolute top-5 right-5 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10" onClick={onClose}>
-                <X className="h-5 w-5 text-white" />
-            </button>
-            <p className="absolute top-5 left-1/2 -translate-x-1/2 text-white/50 text-xs font-medium tracking-widest uppercase select-none">
-                {current + 1} / {images.length}
-            </p>
-            <div className="relative w-full max-w-4xl px-16" style={{ height: '65vh' }} onClick={(e) => e.stopPropagation()}>
-                <Image
-                    src={images[current].src} alt={images[current].title} fill
-                    className="object-contain" unoptimized
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/alt.png"; }}
-                />
-            </div>
-            <p className="mt-5 text-white font-semibold text-base tracking-wide select-none">
-                {images[current].title}
-            </p>
-            <button className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors" onClick={(e) => { e.stopPropagation(); prev(); }}>
-                <ArrowLeft className="h-5 w-5 text-white" />
-            </button>
-            <button className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors" onClick={(e) => { e.stopPropagation(); next(); }}>
-                <ArrowRight className="h-5 w-5 text-white" />
-            </button>
-            <div className="absolute bottom-6 flex items-center gap-2">
-                {images.map((_, i) => (
-                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? 'w-5 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/60'}`}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-}
-
-// ── Variants Dropdown ──────────────────────────────────────────────────────
+// ── Variants dropdown ──────────────────────────────────────────────────────
 function VariantsDropdown({
-    isOpen,
-    onClose,
-    currentVariant,
-    onSelect,
+    isOpen, onClose, currentVariant, onSelect,
 }: {
-    isOpen: boolean;
-    onClose: () => void;
-    currentVariant: string;
-    onSelect: (name: string) => void;
+    isOpen: boolean; onClose: () => void;
+    currentVariant: string; onSelect: (name: string) => void;
 }) {
     if (!isOpen) return null;
     return (
         <>
-            {/* Backdrop */}
             <div className="fixed inset-0 z-40" onClick={onClose} />
-            {/* Panel */}
             <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-72 rounded-2xl border border-white/15 bg-[#0F172A]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-white/10">
                     <p className="text-white/50 text-[10px] uppercase tracking-widest font-semibold">Select Variant</p>
@@ -488,14 +70,10 @@ function VariantsDropdown({
                     <button
                         key={v.name}
                         onClick={() => { onSelect(v.name); onClose(); }}
-                        className={`w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/6 transition-colors border-b border-white/5 last:border-0 ${
-                            currentVariant === v.name ? 'bg-white/6' : ''
-                        }`}
+                        className={`w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/6 transition-colors border-b border-white/5 last:border-0 ${currentVariant === v.name ? 'bg-white/6' : ''}`}
                     >
                         <div className="text-left">
-                            <p className={`text-sm font-semibold ${currentVariant === v.name ? 'text-blue-400' : 'text-white'}`}>
-                                {v.name}
-                            </p>
+                            <p className={`text-sm font-semibold ${currentVariant === v.name ? 'text-blue-400' : 'text-white'}`}>{v.name}</p>
                             <p className="text-xs text-white/40 mt-0.5">{v.transmission} · {v.fuel}</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -509,137 +87,102 @@ function VariantsDropdown({
     );
 }
 
-// ── NAV TABS ───────────────────────────────────────────────────────────────
-const NAV_TABS = [
-    { id: 'details',  label: 'Details'   },
-    { id: 'features', label: 'Features'  },
-    { id: 'ri-sights',label: 'Ri-Sights' },
-    { id: 'design',   label: 'Design'    },
-    { id: 'compare',  label: 'Compare'   },
-    { id: 'sales',    label: 'Sales'     },
-];
-
 // ── Page ───────────────────────────────────────────────────────────────────
-
 export default function CarDetailsPage({ params }: { params: Promise<{ trimId: string }> }) {
     const router         = useRouter();
     const resolvedParams = use(params);
     const id             = Number(resolvedParams.trimId);
 
-    const [car,              setCar]              = useState<EnrichedCar | null>(null);
-    const [selectedColor,    setSelectedColor]    = useState<string>('');
-    const [activeSection,    setActiveSection]    = useState('details');
-    const [activeGalleryTab, setActiveGalleryTab] = useState<'exterior' | 'interior'>('exterior');
-    const [lightbox,         setLightbox]         = useState<{ index: number; tab: 'exterior' | 'interior' } | null>(null);
-    const [openCategory,     setOpenCategory]     = useState<string | null>('safety');
-    const [variantOpen,      setVariantOpen]      = useState(false);
-    const [selectedVariant,  setSelectedVariant]  = useState('Premium Plus');
+    const [car,             setCar]             = useState<EnrichedCar | null>(null);
+    const [activeSection,   setActiveSection]   = useState('details');
+    const [variantOpen,     setVariantOpen]     = useState(false);
+    const [selectedVariant, setSelectedVariant] = useState('Premium Plus');
 
-    // Refs for sections — used for reliable scroll
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+    const registerRef = (sectionId: string) => (el: HTMLElement | null) => {
+        sectionRefs.current[sectionId] = el;
+    };
 
-    const toggleCategory = (id: string) => setOpenCategory(prev => prev === id ? null : id);
-    const collapseAll    = () => setOpenCategory(null);
+    // ── NAV_OFFSET must equal: top-nav (56px) + sticky-bar height (48px) + sticky top offset (24px for top-6) + 8px breathing room
+    // If you change `top-6` on the sticky nav → update this number: top-0=112, top-4=128, top-6=136, top-8=144, top-12=160
+    const NAV_OFFSET = 136;
 
-    // ── Fixed scroll-to-section ───────────────────────────────────────────
     const scrollToSection = useCallback((sectionId: string) => {
         const el = sectionRefs.current[sectionId] ?? document.getElementById(sectionId);
         if (!el) return;
-        const navHeight = 56 + 48; // top sticky nav (56px) + section nav (48px)
-        const top = el.getBoundingClientRect().top + window.scrollY - navHeight - 8;
+        const top = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
         window.scrollTo({ top, behavior: 'smooth' });
         setActiveSection(sectionId);
     }, []);
 
-    // ── Active-section tracker via IntersectionObserver ──────────────────
     useEffect(() => {
         if (!car) return;
         const observer = new IntersectionObserver(
             (entries) => {
-                // Pick the topmost visible section
                 const visible = entries
                     .filter(e => e.isIntersecting)
                     .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-                if (visible.length > 0) {
-                    setActiveSection(visible[0].target.id);
-                }
+                if (visible.length > 0) setActiveSection(visible[0].target.id);
             },
-            { rootMargin: '-104px 0px -50% 0px', threshold: 0 }
+            { rootMargin: '-136px 0px -50% 0px', threshold: 0 }
         );
-
-        NAV_TABS.forEach(({ id }) => {
-            const el = document.getElementById(id);
+        NAV_TABS.forEach(({ id: tid }) => {
+            const el = document.getElementById(tid);
             if (el) observer.observe(el);
         });
-
         return () => observer.disconnect();
     }, [car]);
 
     useEffect(() => {
-        const foundCar = carsData.find(c => c.id === id);
-        if (foundCar) {
-            const positiveInsights = [
-                'Advanced safety package (6 airbags, ADAS Level 2, 4‑wheel disc brakes)',
-                'Improved interior design and materials',
-            ];
-            const neutralInsights  = ['Neutral: No idea about servicing and maintenance'];
-            const negativeInsights = ['Customer service at authorised dealerships'];
-            const getRandom = (arr: string[], count: number) =>
-                [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+        const found = carsData.find(c => c.id === id);
+        if (!found) return;
+        const getRandom = (arr: string[], n: number) =>
+            [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
 
-            const enriched: EnrichedCar = {
-                ...foundCar,
-                horsepower: 110 + Math.floor(Math.random() * 200),
-                torque: `${150 + Math.floor(Math.random() * 300)} Nm`,
-                acceleration: `${(4 + Math.random() * 6).toFixed(1)}s`,
-                colors: ['#FFFFFF', '#1F2937', '#DC2626', '#2563EB', '#D97706'],
-                description: `${foundCar.brand} ${foundCar.model} with automatic transmission in premium finish. This luxury vehicle redefines versatility with refined performance and cutting-edge technology. Experience the perfect blend of comfort and power.`,
-                safetyRatings: {
-                    globalNcap: { adult: foundCar.rating >= 4.5 ? 5 : 4, child: foundCar.rating >= 4.5 ? 5 : 3 },
-                    bharatNcap: { status: Math.random() > 0.3 ? "Not Tested" : "Tested", adult: 5, child: 4 },
-                },
-                features: ["360° Camera", "Ventilated Seats", "ADAS Level 2", "Panoramic Sunroof", "Connected Car Tech"],
-                insights: [
-                    ...getRandom(positiveInsights, 2).map(label => ({ type: 'positive' as InsightType, label })),
-                    ...getRandom(neutralInsights,  1).map(label => ({ type: 'neutral'  as InsightType, label })),
-                    ...getRandom(negativeInsights, 1).map(label => ({ type: 'negative' as InsightType, label })),
+        setCar({
+            ...found,
+            horsepower:   110 + Math.floor(Math.random() * 200),
+            torque:       `${150 + Math.floor(Math.random() * 300)} Nm`,
+            acceleration: `${(4 + Math.random() * 6).toFixed(1)}s`,
+            colors:       ['#FFFFFF', '#1F2937', '#DC2626', '#2563EB', '#D97706'],
+            description:  `${found.brand} ${found.model} with automatic transmission in premium finish. This luxury vehicle redefines versatility with refined performance and cutting-edge technology.`,
+            safetyRatings: {
+                globalNcap: { adult: found.rating >= 4.5 ? 5 : 4, child: found.rating >= 4.5 ? 5 : 3 },
+                bharatNcap: { status: Math.random() > 0.3 ? 'Not Tested' : 'Tested', adult: 5, child: 4 },
+            },
+            features: ['360° Camera', 'Ventilated Seats', 'ADAS Level 2', 'Panoramic Sunroof', 'Connected Car Tech'],
+            insights: [
+                ...getRandom(['Advanced safety package (6 airbags, ADAS Level 2)', 'Improved interior design and materials'], 2)
+                    .map(label => ({ type: 'positive' as InsightType, label })),
+                ...getRandom(['Neutral: No idea about servicing and maintenance'], 1)
+                    .map(label => ({ type: 'neutral' as InsightType, label })),
+                ...getRandom(['Customer service at authorised dealerships'], 1)
+                    .map(label => ({ type: 'negative' as InsightType, label })),
+            ],
+            riInsights: {
+                overallRating: Number((3 + Math.random() * 2).toFixed(1)),
+                recommendationPercent: 70 + Math.floor(Math.random() * 25),
+                mostMentioned: ['Mileage', 'Comfort', 'Power', 'Style'][Math.floor(Math.random() * 4)],
+                topAdvantage:  ['Fuel Efficiency', 'Ride Quality', 'Safety', 'Resale Value'][Math.floor(Math.random() * 4)],
+                ownershipConfidence: { level: Math.random() > 0.5 ? 'Moderate' : 'High', description: 'Driven by Service and Reliability Feedback' },
+                categoryRatings: [
+                    { label: 'Build Quality & Safety',  subLabel: 'Build Quality & Paint Issues',    score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                    { label: 'Features & Tech',         subLabel: 'Missing basic features',          score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                    { label: 'After Sales Service',     subLabel: 'Need improvements - High Impact', score: Number((2   + Math.random() * 2.5).toFixed(1)) },
+                    { label: 'Engine Reliability',      subLabel: 'Mixed long term feedback',        score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                    { label: 'Performance',             subLabel: 'Below segment expectations',      score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                    { label: 'Comfort & Interiors',     subLabel: 'Spacious and Comfortable',        score: Number((4   + Math.random()).toFixed(1))        },
                 ],
-                riInsights: {
-                    overallRating: Number((3 + Math.random() * 2).toFixed(1)),
-                    recommendationPercent: 70 + Math.floor(Math.random() * 25),
-                    mostMentioned: ['Mileage','Comfort','Power','Style'][Math.floor(Math.random() * 4)],
-                    topAdvantage: ['Fuel Efficiency','Ride Quality','Safety','Resale Value'][Math.floor(Math.random() * 4)],
-                    ownershipConfidence: {
-                        level: Math.random() > 0.5 ? 'Moderate' : 'High',
-                        description: 'Driven by Service and Reliability Feedback',
-                    },
-                    categoryRatings: [
-                        { label: 'Build Quality & Safety',  subLabel: 'Build Quality & Paint Issues',    score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                        { label: 'Features & Tech',         subLabel: 'Missing basic features',          score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                        { label: 'After Sales Service',     subLabel: 'Need improvements - High Impact', score: Number((2   + Math.random() * 2.5).toFixed(1)) },
-                        { label: 'Engine Reliability',      subLabel: 'Mixed long term feedback',        score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                        { label: 'Performance',             subLabel: 'Below segment expectations',      score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                        { label: 'Comfort & Interiors',     subLabel: 'Spacious and Comfortable',        score: Number((4   + Math.random()).toFixed(1))        },
-                    ],
-                    userFeedback: {
-                        positives: [
-                            'Great mileage in city traffic', 'Excellent build quality', 'Very comfortable for long drives',
-                            'Mileage is fantastic!', 'Smooth and powerful engine performance', 'Low maintenance costs',
-                        ],
-                        negatives: [
-                            'Engine noise at high speeds', 'Infotainment system lags sometimes', 'Suspension is a bit stiff',
-                            'AC cooling could be more effective in peak summer',
-                        ],
-                    },
+                userFeedback: {
+                    positives: ['Great mileage in city traffic', 'Excellent build quality', 'Very comfortable for long drives', 'Low maintenance costs'],
+                    negatives: ['Engine noise at high speeds', 'Infotainment system lags sometimes', 'Suspension is a bit stiff'],
                 },
-                gallery: {
-                    exterior: EXTERIOR_IMAGES.map(i => i.src),
-                    interior: INTERIOR_IMAGES.map(i => i.src),
-                },
-            };
-            setCar(enriched);
-            setSelectedColor('#FFFFFF');
-        }
+            },
+            gallery: {
+                exterior: EXTERIOR_IMAGES.map(i => i.src),
+                interior: INTERIOR_IMAGES.map(i => i.src),
+            },
+        });
     }, [id]);
 
     if (!car) {
@@ -650,20 +193,14 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
         );
     }
 
-    const ringImages           = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
-    const currentGalleryImages = activeGalleryTab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES;
-
-    // Helper to register section refs
-    const registerRef = (id: string) => (el: HTMLElement | null) => {
-        sectionRefs.current[id] = el;
-    };
+    const ringImages = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground pb-24">
 
-            {/* ── 1. Top Nav ── */}
+            {/* Top nav */}
             <nav className="absolute top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-6 bg-transparent pointer-events-none">
-                <div className="flex items-center gap-4 pointer-events-auto">
+                <div className="pointer-events-auto">
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-white/10 text-white rounded-full">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
@@ -678,19 +215,17 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </nav>
 
-            {/* ── 2. Hero ── */}
+            {/* Hero */}
             <section className="pt-14 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '500px' }}>
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1E293B_0%,#0F172A_60%,#020617_100%)] z-0" />
-                <div
-                    className="absolute inset-0 z-0 opacity-[0.04]"
-                    style={{
-                        backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-                        backgroundSize: '40px 40px',
-                    }}
-                />
+                <div className="absolute inset-0 z-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
                 <div className="relative z-10 container mx-auto px-4 flex flex-col items-center">
 
-                    {/* Car name + variant selector */}
+    {/* Back Button */}
+    <div className="absolute left-4 top-12">
+        <FixedBackButton fallbackHref="/trims" />
+    </div>
                     <div className="mt-5 flex flex-col items-center gap-1 relative">
                         <h1 className="text-2xl font-bold text-white leading-tight tracking-tight">
                             {car.brand} {car.model}
@@ -702,17 +237,12 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             <span>{selectedVariant}</span>
                             <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${variantOpen ? 'rotate-180' : ''}`} />
                         </button>
-
-                        {/* Variants dropdown */}
                         <VariantsDropdown
-                            isOpen={variantOpen}
-                            onClose={() => setVariantOpen(false)}
-                            currentVariant={selectedVariant}
-                            onSelect={setSelectedVariant}
+                            isOpen={variantOpen} onClose={() => setVariantOpen(false)}
+                            currentVariant={selectedVariant} onSelect={setSelectedVariant}
                         />
                     </div>
 
-                    {/* Rating badge + drag hint */}
                     <div className="mt-16 mb-4 flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 px-4 py-1.5 rounded-full">
                             <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
@@ -721,7 +251,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                         <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Drag to Explore</span>
                     </div>
 
-                    {/* 3D ring — images now show title below each image */}
                     <div className="w-full" style={{ height: '340px', position: 'relative' }}>
                         <ThreeDImageRing
                             images={ringImages}
@@ -731,31 +260,22 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                             mobileScaleFactor={0.75} inertiaPower={0.7} inertiaTimeConstant={350}
                             inertiaVelocityMultiplier={18}
                             containerClassName="rounded-xl" imageClassName="rounded-xl shadow-2xl"
-                            // Pass label per image via data attribute if ThreeDImageRing supports it;
-                            // otherwise we overlay labels below the ring container
                         />
                     </div>
 
-                    {/* Image labels row — shown beneath the ring for context */}
-                    <div className="mt-1 flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full px-2">
-                        {[...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].slice(0, 8).map((img, i) => (
-                            <span
-                                key={i}
-                                className="shrink-0 text-white/30 text-[10px] font-medium px-2 py-0.5 rounded-full border border-white/10 bg-white/5 whitespace-nowrap"
-                            >
-                                {img.title}
-                            </span>
-                        ))}
-                    </div>
 
-                    <p className="mt-2 text-white/30 text-[11px] tracking-widest uppercase font-medium select-none">
-                        ← Drag to rotate →
-                    </p>
                 </div>
             </section>
 
-            {/* ── 3. Sticky Section Nav ── */}
-            <div className="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">
+            {/* ─────────────────────────────────────────────────────────────────
+                STICKY SECTION NAV
+                ▸ To move it DOWN: increase the `top-N` value (e.g. top-4, top-8, top-12)
+                ▸ The `NAV_OFFSET` constant below must stay in sync with the total
+                  sticky height so scrollToSection lands in the right place:
+                    NAV_OFFSET = top-nav height (56px) + this bar's height (48px) + top offset
+                ───────────────────────────────────────────────────────────────── */}
+            {/* Change `top-6` (24px) here AND update NAV_OFFSET below to match */}
+            <div className="sticky top-20 z-40 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">
                 <div className="container mx-auto px-4 max-w-5xl">
                     <div className="flex items-center justify-center gap-6 overflow-x-auto no-scrollbar">
                         {NAV_TABS.map(({ id: tabId, label }) => {
@@ -771,9 +291,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                                     }`}
                                 >
                                     {label}
-                                    {isActive && (
-                                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
-                                    )}
+                                    {isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />}
                                 </button>
                             );
                         })}
@@ -781,172 +299,30 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 </div>
             </div>
 
-            {/* ── 4. Content sections ── */}
+            {/* Content */}
             <div className="container mx-auto px-4 max-w-5xl space-y-24 pb-32 pt-12">
+                {/* <div>
+                    <FixedBackButton fallbackHref="/trims" />
+                </div> */}
 
-                {/* ── Details ── */}
-                <section id="details" ref={registerRef('details')} className="scroll-mt-28 space-y-8">
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{car.description}</p>
+                <Details  car={car} sectionRef={registerRef('details')}  />
+                <Features car={car} sectionRef={registerRef('features')} />
 
-                    {/* Spec Cards */}
-                    <div className="flex justify-center gap-4 flex-wrap">
-                        {[
-                            { label: 'Horsepower', value: `${car.horsepower} HP`, icon: Zap,   sub: 'Max Power'    },
-                            { label: 'Torque',     value: car.torque,             icon: Gauge, sub: 'Peak Torque'  },
-                            { label: '0–60 mph',   value: car.acceleration,       icon: Timer, sub: 'Acceleration' },
-                        ].map((spec) => (
-                            <div
-                                key={spec.label}
-                                className="flex flex-col items-center justify-center text-center gap-2
-                                           bg-card border border-border rounded-2xl w-44 aspect-square p-4
-                                           shadow-sm hover:shadow-md transition-shadow"
-                            >
-                                <div className="h-8 w-8 bg-muted rounded-xl flex items-center justify-center">
-                                    <spec.icon className="h-6 w-6 text-foreground" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-bold text-foreground leading-tight">{spec.value}</p>
-                                    <p className="text-[11px] text-muted-foreground mt-1 font-medium">{spec.sub}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Insights */}
-                    <div className="flex flex-wrap gap-3 justify-center mt-4">
-                        {car.insights.map((insight, index) => (
-                            <InsightBadge key={index} type={insight.type} label={insight.label} />
-                        ))}
-                    </div>
-
-                    {/* ── Revised Safety Ratings ── */}
-                    <SafetyRatingsRevised data={car.safetyRatings} />
-                </section>
-
-                {/* ── Features ── */}
-                <section id="features" ref={registerRef('features')} className="scroll-mt-28 space-y-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-2xl font-bold text-foreground">Features & Equipment</h2>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                {FEATURE_CATEGORIES.reduce((acc, c) => acc + c.features.filter(f => f.available).length, 0)} features across {FEATURE_CATEGORIES.length} categories
-                            </p>
-                        </div>
-                        <button onClick={collapseAll} className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline">
-                            Collapse all
-                        </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        {car.features.map(f => (
-                            <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
-                                <CheckCircle2 className="h-3 w-3" />
-                                {f}
-                            </span>
-                        ))}
-                    </div>
-
-                    <div className="space-y-2">
-                        {FEATURE_CATEGORIES.map((category) => (
-                            <FeatureAccordion
-                                key={category.id}
-                                category={category}
-                                isOpen={openCategory === category.id}
-                                onToggle={() => toggleCategory(category.id)}
-                            />
-                        ))}
-                    </div>
-                </section>
-
-                {/* ── Ri-Sights ── */}
                 <section id="ri-sights" ref={registerRef('ri-sights')} className="scroll-mt-28">
                     {car.riInsights && <RiInsightsTab data={car.riInsights} />}
                 </section>
 
-                {/* ── Design / Gallery ── */}
-                <section id="design" ref={registerRef('design')} className="scroll-mt-28 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-foreground">Gallery</h2>
-                        <div className="flex items-center gap-1 bg-muted rounded-xl p-1">
-                            {(['exterior', 'interior'] as const).map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveGalleryTab(tab)}
-                                    className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
-                                        activeGalleryTab === tab
-                                            ? 'bg-card shadow text-foreground'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                    }`}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                <Design car={car} sectionRef={registerRef('design')} />
 
-                    {/* Color picker moved here from hero */}
-                    <div>
-                        <p className="text-sm font-semibold text-foreground mb-3">Colour Options</p>
-                        <div className="flex items-center gap-3">
-                            {car.colors.map((color) => (
-                                <button
-                                    key={color}
-                                    onClick={() => setSelectedColor(color)}
-                                    className={`h-9 w-9 rounded-full border-2 transition-all ${
-                                        selectedColor === color
-                                            ? 'border-blue-500 scale-110 shadow-md'
-                                            : 'border-border hover:scale-105'
-                                    }`}
-                                    style={{ backgroundColor: color }}
-                                    aria-label={`Select color ${color}`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Gallery grid with titles */}
-                    <div className="grid grid-cols-2 gap-4">
-                        {currentGalleryImages.map((img, i) => (
-                            <div
-                                key={i}
-                                className={`relative rounded-2xl overflow-hidden cursor-pointer group ${i === 0 ? 'col-span-2 h-72' : 'h-52'}`}
-                                onClick={() => setLightbox({ index: i, tab: activeGalleryTab })}
-                            >
-                                <Image
-                                    src={img.src} alt={img.title} fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                    unoptimized
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/alt.png"; }}
-                                />
-                                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-                                {/* Always-visible title at bottom */}
-                                <div className="absolute bottom-3 left-3">
-                                    <span className="text-white text-xs font-semibold bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-sm">
-                                        {img.title}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* ── Compare ── */}
                 <section id="compare" ref={registerRef('compare')} className="scroll-mt-28">
-                    <CompareCars
-                        primaryCar={{
-                            id:           car.id,
-                            brand:        car.brand,
-                            model:        car.model,
-                            priceLabel:   car.priceLabel,
-                            rating:       car.rating,
-                            horsepower:   car.horsepower,
-                            torque:       car.torque,
-                            acceleration: car.acceleration,
-                        }}
-                    />
+                    <CompareCars primaryCar={{
+                        id: car.id, brand: car.brand, model: car.model,
+                        priceLabel: car.priceLabel, rating: car.rating,
+                        horsepower: car.horsepower, torque: car.torque, acceleration: car.acceleration,
+                    }} />
                 </section>
 
-                {/* ── Sales ── */}
+                {/* Sales */}
                 <section id="sales" ref={registerRef('sales')} className="scroll-mt-28 space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-foreground">Sales Trend</h2>
@@ -1010,29 +386,19 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
 
             </div>
 
-            {/* ── Sticky Bottom CTA ── */}
+            {/* Bottom CTA */}
             <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 md:px-8 z-40 pb-6">
                 <div className="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4">
                     <div>
                         <p className="text-xs text-gray-500 uppercase font-bold tracking-wide">Price Starts From</p>
                         <p className="text-3xl font-bold text-foreground mt-1">{car.priceLabel}</p>
                     </div>
-                    <div className="flex items-center gap-3 w-full md:w-auto">
-                        <Button size="lg" className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 rounded-xl h-12 font-semibold shadow-l shadow-blue-200 dark:shadow-none">
-                            Book Now
-                        </Button>
-                    </div>
+                    <Button size="lg" className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 rounded-xl h-12 font-semibold">
+                        Book Now
+                    </Button>
                 </div>
             </div>
 
-            {/* ── Gallery Lightbox ── */}
-            {lightbox && (
-                <GalleryLightbox
-                    images={lightbox.tab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES}
-                    initialIndex={lightbox.index}
-                    onClose={() => setLightbox(null)}
-                />
-            )}
         </div>
     );
 }
