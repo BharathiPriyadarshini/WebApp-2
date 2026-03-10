@@ -42,7 +42,12 @@ export default function NavbarWrapper() {
       {/* Desktop */}
       <NavBody>
         <Link href="/" className="font-bold text-foreground dark:text-white text-lg">
-          Rimello
+          <img
+        src="https://media.rimello.ai/images/logo.svg"
+        alt="/alt.png"
+        width={120}
+        height={90}
+      />
         </Link>
 
         <div className="flex gap-6 items-center">
@@ -78,7 +83,12 @@ export default function NavbarWrapper() {
       <MobileNav>
         <MobileNavHeader>
           <Link href="/" className="font-bold text-foreground dark:text-white">
-            Rimello
+           <img
+        src="https://media.rimello.ai/images/logo.svg"
+        alt="/alt.png"
+        width={120}
+        height={90}
+      />
           </Link>
 
           <div className="flex items-center gap-3">
