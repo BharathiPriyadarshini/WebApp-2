@@ -2,16 +2,9 @@
 
 "use client";
 
-import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, type ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import {
   IconBoxAlignRightFilled,
@@ -21,37 +14,13 @@ import {
   IconTableColumn,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
-import { Carousel, Card as CarouselCard } from "@/components/ui/apple-cards-carousel";
+// import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
+// import { Carousel, Card as CarouselCard } from "@/components/ui/apple-cards-carousel";
 import { Timeline } from "@/components/ui/timeline";
 import { LayoutTextFlip } from "@/components/ui/layout-text-flip";
 import { GetStartedModal } from "@/components/ui/get-started-modal";
 import FeaturesSectionDemo1 from "@/components/ui/features-section-demo-2";
 import FeaturesSectionDemo2 from "@/components/ui/features-section-demo-3";
-
-// ─────────────────────────────────────────────
-// REUSABLE HELPERS (About hero)
-// ─────────────────────────────────────────────
-function InfoCard({ title, desc }: { title: string; desc: string }) {
-  return (
-    <Card className="bg-white/5 border border-white/10 rounded-2xl hover:border-blue-500/40 transition">
-      <CardContent className="p-8 text-left">
-        <CardTitle className="text-lg mb-4">{title}</CardTitle>
-        <CardDescription className="text-gray-400 text-sm">{desc}</CardDescription>
-        <div className="mt-6 text-blue-400 text-sm cursor-pointer">Learn more →</div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function FeatureItem({ title, desc }: { title: string; desc: string }) {
-  return (
-    <div>
-      <h4 className="font-medium text-white">{title}</h4>
-      <p className="text-gray-400 text-sm mt-1">{desc}</p>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────
 // MISSION — BENTO SKELETONS
@@ -82,7 +51,7 @@ const SkeletonTwo = () => {
   return (
     <motion.div initial="initial" animate="animate" whileHover="hover" className="flex flex-1 w-full h-full min-h-24 bg-dot-white/[0.1] flex-col space-y-2">
       {Array(6).fill(0).map((_, i) => (
-        <motion.div key={i} variants={variants} style={{ maxWidth: `${Math.random() * (100 - 40) + 40}%` }} className="flex rounded-full border border-white/20 p-2 items-center bg-neutral-900 h-4" />
+        <motion.div key={i} variants={variants} style={{ maxWidth: `${40 + (i * 11) % 60}%` }} className="flex rounded-full border border-white/20 p-2 items-center bg-neutral-900 h-4" />
       ))}
     </motion.div>
   );
@@ -165,7 +134,7 @@ const SkeletonSeven = () => {
   return (
     <motion.div initial="initial" animate="animate" whileHover="hover" className="flex flex-1 w-full h-full min-h-24 bg-dot-white/[0.1] flex-col space-y-2">
       {Array(6).fill(0).map((_, i) => (
-        <motion.div key={i} variants={variants} style={{ maxWidth: `${Math.random() * (100 - 40) + 40}%` }} className="flex rounded-full border border-white/20 p-2 items-center bg-neutral-900 h-4" />
+        <motion.div key={i} variants={variants} style={{ maxWidth: `${40 + (i * 13) % 60}%` }} className="flex rounded-full border border-white/20 p-2 items-center bg-neutral-900 h-4" />
       ))}
     </motion.div>
   );
@@ -177,9 +146,17 @@ const SkeletonEight = () => (
   </div>
 );
 
-const bentoItems = [
+type BentoItem = {
+  title: ReactNode;
+  description: ReactNode;
+  header: ReactNode;
+  icon: ReactNode;
+  className?: string;
+};
+
+const bentoItems: BentoItem[] = [
   { title: <h3>Lifestyle & Usage Pattern</h3>, description: <h4 className="text-neutral-400!">Helps understand how, where, and why you drive, so the car matches your real-world routine.</h4>, header: <SkeletonOne />, icon: <IconClipboardCopy className="h-4 w-4 text-neutral-400" /> },
-  { title: <h3>Budget & Financial Comfort</h3>, description: <h4 className="text-neutral-400!">Rimello aligns suggestions with what you're comfortable investing now and long-term.</h4>, header: <SkeletonTwo />, icon: <IconSignature className="h-4 w-4 text-neutral-400" /> },
+  { title: <h3>Budget & Financial Comfort</h3>, description: <h4 className="text-neutral-400!">Rimello aligns suggestions with what you&apos;re comfortable investing now and long-term.</h4>, header: <SkeletonTwo />, icon: <IconSignature className="h-4 w-4 text-neutral-400" /> },
   { title: <h3>Fuel Preference & Efficiency</h3>, description: <h4 className="text-neutral-400!">Analyses the most suitable fuel type based on running, environmental goals, and cost.</h4>, header: <SkeletonThree />, icon: <IconFileBroken className="h-4 w-4 text-neutral-400" /> },
   { title: <h3>Space & Seating Needs</h3>, description: <h4 className="text-neutral-400!">Ensures the car fits your family, lifestyle, and cargo requirements.</h4>, className: "md:col-span-2", header: <SkeletonFour />, icon: <IconTableColumn className="h-4 w-4 text-neutral-400" /> },
   { title: <h3>Performance & Driving Feel</h3>, description: <h4 className="text-neutral-400!">Matches your driving personality — calm, sporty, off-road, or luxury.</h4>, header: <SkeletonFive />, icon: <IconBoxAlignRightFilled className="h-4 w-4 text-neutral-400" /> },
@@ -188,27 +165,7 @@ const bentoItems = [
   { title: <h3>Features & Technology</h3>, description: <h4 className="text-neutral-400!">Identifies the modern conveniences and safety elements you consider essential.</h4>, header: <SkeletonSix />, icon: <IconClipboardCopy className="h-4 w-4 text-neutral-400" /> },
 ];
 
-// ─────────────────────────────────────────────
-// COMPARISON DATA
-// ─────────────────────────────────────────────
-const tooltipItems = [
-  { id: 1, name: "Performance", designation: "Modern, Fast, Modular", image: "/icons/performance.svg" },
-  { id: 2, name: "Safety ratings", designation: "Reliable, Protective, Advanced", image: "/icons/safety.svg" },
-  { id: 3, name: "Features", designation: "Innovative, Convenient, Smart", image: "/icons/features.svg" },
-  { id: 4, name: "Comfort", designation: "Plush, Smooth, Ergonomic", image: "/icons/comfort.svg" },
-  { id: 5, name: "Technology", designation: "Cutting-edge, Intuitive, Connected", image: "/icons/technology.svg" },
-  { id: 6, name: "Real-world mileage", designation: "Efficient, Economical, Enduring", image: "/icons/mileage.svg" },
-  { id: 7, name: "Service cost", designation: "Affordable, Predictable, Hassle-free", image: "/icons/service-cost.svg" },
-  { id: 8, name: "Resale value", designation: "Strong, Appreciating, Trusted", image: "/icons/resale-value.svg" },
-];
 
-const carouselCards = [
-  { title: "Kia Sonet-GTX+", description: "The Kia Sonet is a stylish and compact SUV known for its bold design, premium interiors, and modern features. It offers a spacious cabin with a touchscreen infotainment system, wireless connectivity, and advanced comfort features like ventilated seats. With multiple petrol and diesel engine options, along with manual, iMT, and automatic transmissions, the Sonet delivers a smooth and efficient drive. Safety features such as multiple airbags, ABS, ESC, and hill-start assist make it a reliable choice for daily city use and long trips.", src: "https://media.rimello.ai/images/Comparison/1.png", features: ["Turbocharged 1.0L engine", "7-speed DCT transmission", "360° camera system", "6 airbags standard"] },
-  { title: "TATA Nexon-Fearless Plus S", description: "The Tata Nexon is a compact SUV with a bold and sporty design, featuring a distinctive front grille, LED headlamps, and a coupe-like roofline. Its premium cabin offers touchscreen infotainment, connected car features, and comfortable seating. Available with petrol and diesel engines paired with manual or automatic transmissions, the Nexon delivers a refined and fun driving experience. Safety is a key focus with multiple airbags, ABS with EBD, electronic stability control, and a 5-star Global NCAP rating, making it a reliable choice for families and city commuters.", src: "https://media.rimello.ai/images/Comparison/2.png", features: ["Basic infotainment system", "Limited safety features", "Outdated design", "No modern tech"] },
-  { title: "Maruti Suzuki Brezza-ZXi+ AT", description: "The Maruti Suzuki Brezza is a popular compact SUV that combines sleek design with practicality. It features a bold front grille, stylish LED lighting, and a spacious, well-equipped cabin with touchscreen infotainment and smart connectivity options. Powered by an efficient petrol engine with manual or automatic transmissions, the Brezza offers smooth city driving and good fuel efficiency. Safety features like dual airbags, ABS with EBD, and rear parking sensors enhance confidence on the road, making it a dependable choice for urban and weekend drives.", src: "https://media.rimello.ai/images/Comparison/5.png", features: ["High-performance engine", "Advanced suspension", "Sport mode available", "Quick acceleration"] },
-  { title: "Hyundai Creta-SX Premium", description: "The Hyundai Creta is a premium compact SUV known for its elegant design, high-quality interiors, and advanced technology. It offers a feature-rich cabin with touchscreen infotainment, connected car services, wireless phone integration, and a comfortable seating layout. Available with multiple petrol and diesel engines along with manual and automatic transmissions, the Creta delivers a refined and powerful driving experience. With safety features like multiple airbags, ABS, electronic stability control, and rear parking assistance, it is a reliable and stylish choice for families and city commuters.", src: "https://media.rimello.ai/images/Comparison/4.png", features: ["Adaptive cruise control", "Lane keep assist", "Blind spot monitoring", "Automatic emergency braking"] },
-  { title: "MG Hector-Savvy Pro", description: "The MG Hector is a mid-size SUV that stands out for its bold design, spacious cabin, and cutting-edge technology. It features a large touchscreen infotainment system, connected car features, and premium interiors for a comfortable ride. With petrol and diesel engine options, paired with manual or automatic transmissions, the Hector offers smooth performance on highways and city roads. Safety is a priority with multiple airbags, ABS with EBD, electronic stability control, and hill-start assist. Its combination of space, features, and style makes it an attractive choice for families and tech-savvy buyers.", src: "https://media.rimello.ai/images/Comparison/3.png", features: ["Adaptive cruise control", "Lane keep assist", "Blind spot monitoring", "Automatic emergency braking"] },
-];
 
 // ─────────────────────────────────────────────
 // PERFECT MATCH TIMELINE DATA
@@ -265,10 +222,9 @@ const timelineData = [
 // ─────────────────────────────────────────────
 export default function AboutPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const FeaturesSection = FeaturesSectionDemo2 as any;
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
 
       {/* ================= HERO (unchanged) ================= */}
       <section className="relative px-6 pt-28 pb-20 max-w-7xl mx-auto text-center">
@@ -281,21 +237,21 @@ export default function AboutPage() {
           <span className="text-blue-500">move.</span>
         </h1>
 
-        <p className="mt-6 text-gray-400 max-w-2xl mx-auto">
-          Rimello is a pioneering AI-powered automotive ecosystem. We combine deep neural networks with expert human analysis to deliver the world's most intelligent car buying experience.
+        <p className="mt-6 text-muted-foreground max-w-2xl mx-auto">
+          Rimello is a pioneering AI-powered automotive ecosystem. We combine deep neural networks with expert human analysis to deliver the world&apos;s most intelligent car buying experience.
         </p>
 
         <div className="mt-8 flex justify-center gap-4 flex-wrap">
           <Button className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 font-medium">
             Explore Technology
           </Button>
-          <Button variant="outline" className="px-6 py-3 rounded-full border-white/20 hover:bg-white/5 font-medium">
+          <Button variant="outline" className="px-6 py-3 rounded-full border-border hover:bg-foreground/5 font-medium">
             Watch Manifesto
           </Button>
         </div>
 
-        <div className="mt-16 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-          <div className="h-64 md:h-[420px] bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center text-gray-500">
+        <div className="mt-16 rounded-2xl overflow-hidden border border-border shadow-2xl">
+          <div className="h-64 md:h-[420px] bg-linear-to-br from-muted to-secondary flex items-center justify-center text-muted-foreground">
             Hero Image
           </div>
         </div>
@@ -303,15 +259,15 @@ export default function AboutPage() {
 
       {/* ================= MISSION ================= */}
       <div id="mission">
-        <div className="font-Montserrat-Medium py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-black text-white min-h-screen">
+        <div className="py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-background text-foreground min-h-screen">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h1 className="tracking-tight">
+            <h1 className="tracking-tight text-4xl font-bold md:text-5xl lg:text-6xl leading-tight ">
               Built Around One Mission — Suggesting the Right Car
             </h1>
-            <h2 className="mt-4 text-neutral-300">
+            <h2 className="mt-6 text-muted-foreground text-xl md:text-2xl">
               The Most Intelligent Car Recommendation Engine
             </h2>
-            <p className="mt-4 text-neutral-400">
+            <p className="mt-4 text-muted-foreground/80 text-lg md:text-xl">
               Rimello uses advanced AI to understand who you are as a driver, then matches you with the ideal car from across brands, segments, and budgets.
             </p>
           </div>
@@ -324,47 +280,29 @@ export default function AboutPage() {
                 description={item.description}
                 header={item.header}
                 icon={item.icon}
-                className={`[&>p:text-lg] text-white ${(item as any).className ?? ""}`}
+                className={`[&>p:text-lg] text-white ${item.className ?? ""}`}
               />
             ))}
           </BentoGrid>
         </div>
       </div>
 
-      {/* ================= COMPARISON ================= */}
-      <section id="compare" className="relative w-full bg-black py-16 md:py-20 lg:py-24 flex items-center justify-center">
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 md:px-6 lg:px-8 flex flex-col items-center text-center">
-          <h1 className="bg-linear-to-b from-white to-gray-400 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl font-bold">
-            Smart Car Comparison
-          </h1>
-          <p className="mt-3 max-w-xl text-neutral-300 text-sm sm:text-base">
-            See the difference before you decide.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <AnimatedTooltip items={tooltipItems} />
-          </div>
-
-          <div className="w-full mt-16 max-w-5xl">
-            <Carousel
-              items={carouselCards.map((card, i) => (
-                <CarouselCard
-                  key={i}
-                  index={i}
-                  card={{ title: card.title, features: card.features, src: card.src, content: card.description }}
-                  layout
-                />
-              ))}
-            />
-          </div>
-        </div>
-      </section>
-
+     
       {/* ================= PERFECT MATCH ================= */}
-      <section id="perfect-match" className="w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-black text-white">
+      <section id="perfect-match" className="relative w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background via-background to-background dark:from-black dark:via-neutral-950 dark:to-black">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.06),transparent_60%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_60%)]" />
         <div className="text-center mb-20 px-4">
-          <h1>How Rimello Finds Your Perfect Match</h1>
-          <p className="mt-4 text-neutral-400 text-lg max-w-2xl mx-auto">
+          <p className="text-sm tracking-widest text-blue-500 uppercase mb-4">
+            Recommendation Engine
+          </p>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+            How{" "}
+            <span className="bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+              Rimello
+            </span>{" "}
+            Finds Your Perfect Match
+          </h1>
+          <p className="mt-6 text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
             A clean and modern timeline powered by Aceternity UI — showing exactly how Rimello recommends the perfect car for you.
           </p>
         </div>
@@ -374,27 +312,52 @@ export default function AboutPage() {
       </section>
 
       {/* ================= DIFFERENT ================= */}
-      <section id="different" className="w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-black">
+      <section id="different" className="relative w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background via-background to-background dark:from-black dark:via-neutral-950 dark:to-black">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.06),transparent_60%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_60%)]" />
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-6xl font-bold text-center mb-12 text-white">
-            What Makes Rimello Different
-          </h1>
+          <div className="text-center mb-12">
+            <p className="text-sm tracking-widest text-blue-500 uppercase mb-4">
+              Product Advantage
+            </p>
+            <h1 className="text-6xl font-bold text-foreground">
+              What Makes{" "}
+              <span className="bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                Rimello
+              </span>{" "}
+              Different
+            </h1>
+          </div>
           <FeaturesSectionDemo1 />
         </div>
       </section>
 
       {/* ================= OWNERSHIP ================= */}
-      <section id="ownership" className="w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-black">
+      <section id="ownership" className="relative w-full py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background via-background to-background dark:from-black dark:via-neutral-950 dark:to-black">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.06),transparent_60%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_60%)]" />
         <div className="max-w-7xl mx-auto">
-          <FeaturesSection />
+          <div className="text-center mb-12">
+            <p className="text-sm tracking-widest text-blue-500 uppercase mb-4">
+              Ownership Intelligence
+            </p>
+          </div>
+          <FeaturesSectionDemo2 />
         </div>
       </section>
 
       {/* ================= PROMISE ================= */}
-      <section className="font-Montserrat-Medium py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-black text-white flex flex-col items-center justify-center">
+      <section className="relative font-Montserrat-Medium py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background via-background to-background dark:from-black dark:via-neutral-950 dark:to-black flex flex-col items-center justify-center">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.06),transparent_60%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_60%)]" />
         <div className="max-w-3xl text-center mb-12">
+          <p className="text-sm tracking-widest text-blue-500 uppercase mb-4">
+            Our Promise
+          </p>
           <h1 className="tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl flex flex-wrap justify-center items-center gap-2 mb-10">
-            <span className="mb-4">Rimello makes car buying & Owning</span>
+            <span className="mb-4">
+              <span className="bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                Rimello
+              </span>{" "}
+              makes car buying & Owning
+            </span>
             <LayoutTextFlip
               text=""
               words={['smarter', 'easier', 'objective', 'stress-free']}

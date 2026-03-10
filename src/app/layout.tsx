@@ -1,10 +1,10 @@
 "use client"
 import localFont from "next/font/local";
 import "./globals.css";
-import type { Metadata } from "next";
 import NavbarWrapper from "@/components/layout/NavbarWrapper";
 import AuthModal from "@/components/auth/AuthModal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ThemeProvider from "@/components/ThemeProvider";
 
 const queryClient = new QueryClient()
 
@@ -116,18 +116,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${urbanist.variable} font-sans bg-black text-white antialiased`}>
-        <QueryClientProvider client={queryClient}>
-          <>
-        <NavbarWrapper />
-        <AuthModal />
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${urbanist.variable} font-sans bg-background text-foreground antialiased transition-colors duration-300`}
+      >
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <NavbarWrapper />
+            <AuthModal />
 
-        <main className="pt-32 min-h-screen">
-          {children}
-        </main>
-          </>
-        </QueryClientProvider>
+            <main className="pt-32 min-h-screen">{children}</main>
+          </QueryClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
