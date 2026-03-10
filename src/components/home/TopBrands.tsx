@@ -24,12 +24,12 @@ export default function TopBrands() {
   const { topBrands, loadingTop } = useBrands();
 
   return (
-    <section className="py-20 bg-black">
+    <section className="py-20 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
             POPULAR BRANDS
           </h2>
 
@@ -47,7 +47,7 @@ export default function TopBrands() {
             ? Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="min-w-[120px] h-32 bg-[#111] rounded-xl animate-pulse"
+                  className="min-w-[120px] h-32 bg-muted rounded-xl animate-pulse"
                 />
               ))
             : topBrands.map((brand, index) => (
@@ -64,7 +64,7 @@ export default function TopBrands() {
                     href={`/brands?brand=${brand._id}`}
                     className="group block"
                   >
-                    <Card className="bg-[#111] border border-white/10 rounded-xl px-0 py-6 text-center hover:bg-[#1a1a1a] hover:border-white/20 transition-all duration-300">
+                    <Card className="bg-card border border-border rounded-xl px-0 py-6 text-center hover:bg-muted hover:border-foreground/20 transition-all duration-300">
                       
                       {/* Inner wrapper controls spacing */}
                       <div className="flex flex-col items-center justify-center leading-none">
@@ -72,7 +72,7 @@ export default function TopBrands() {
                         {/* Logo */}
                         <div className="w-12 h-12  flex items-center justify-center rounded-full group-hover:scale-110 transition">
                           {brand.logo ? (
-                            <span className="text-white/40 text-sm uppercase leading-none">
+                            <span className="text-muted-foreground text-sm uppercase leading-none">
                               {brand.name.slice(0, 2)}
                             </span>
                           ) : (
@@ -87,7 +87,7 @@ export default function TopBrands() {
                         </div>
 
                         {/* Brand Name */}
-                        <p className="text-sm pb-2 leading-none mt-0 text-gray-300 group-hover:text-white transition capitalize">
+                        <p className="text-sm pb-2 leading-none mt-0 text-muted-foreground group-hover:text-foreground dark:group-hover:text-white transition capitalize">
                           {brand.name}
                         </p>
 

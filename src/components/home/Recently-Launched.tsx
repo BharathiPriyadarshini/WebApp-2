@@ -90,7 +90,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
     >
       <Link href={car.link}>
         {/* fixed height card */}
-        <div className="group relative flex flex-col w-full h-[430px] bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_40px_rgba(59,130,246,0.13)]">
+        <div className="group relative flex flex-col w-full h-[430px] bg-card dark:bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-border transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_40px_rgba(59,130,246,0.13)]">
 
           {/* ── image ── */}
           <div className="relative h-[200px] shrink-0 overflow-hidden">
@@ -102,7 +102,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
             </div>
             {/* category */}
             <div className="absolute top-4 right-4 z-10">
-              <span className="px-3 py-1 text-xs font-medium bg-black/60 backdrop-blur-sm text-gray-300 rounded-full border border-white/10 leading-none">
+              <span className="px-3 py-1 text-xs font-medium bg-background/70 backdrop-blur-sm text-muted-foreground rounded-full border border-border leading-none">
                 {car.category}
               </span>
             </div>
@@ -113,33 +113,35 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               fill
               className="object-contain transition duration-500 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 inset-x-0 h-10 bg-linear-to-t from-[#0f0f0f] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-10 bg-linear-to-t from-card dark:from-[#0f0f0f] to-transparent" />
           </div>
 
           {/* ── body ── */}
           <div className="flex flex-col flex-1 px-5 py-4 gap-3">
 
             {/* launch date */}
-            <div className="flex items-center gap-2 text-gray-500 text-xs">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs">
               <CalendarCheck className="w-3.5 h-3.5 shrink-0 text-blue-500" />
-              <span>Launched: <span className="text-gray-400">{car.date}</span></span>
+              <span>
+                Launched: <span className="text-muted-foreground/80">{car.date}</span>
+              </span>
             </div>
 
             {/* divider */}
-            <div className="h-px bg-white/[0.07]" />
+            <div className="h-px bg-border" />
 
             {/* ── spec block — displayed differently: horizontal pill strip ── */}
-            <div className="flex flex-col gap-0 rounded-xl border border-white/[0.07] overflow-hidden">
+            <div className="flex flex-col gap-0 rounded-xl border border-border overflow-hidden">
 
               {/* price row */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-white/2 border-b border-white/6">
+              <div className="flex items-center gap-3 px-4 py-3 bg-foreground/5 border-b border-border">
                 <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600/15 border border-blue-500/20 shrink-0">
                   <IndianRupee className="w-3.5 h-3.5 text-blue-400" />
                 </span>
                 <div className="flex flex-col leading-tight">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-600 font-medium">Price Range</span>
-                  <span className="text-sm text-white font-semibold">
-                    {from} <span className="text-gray-500 font-normal text-xs">to</span> {to}
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Price Range</span>
+                  <span className="text-sm text-card-foreground font-semibold">
+                    {from} <span className="text-muted-foreground font-normal text-xs">to</span> {to}
                   </span>
                 </div>
               </div>
@@ -147,24 +149,24 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               {/* fuel + seating row — side by side */}
               <div className="flex">
                 {/* fuel */}
-                <div className="flex items-center gap-3 px-4 py-3 flex-1 border-r border-white/6">
+                <div className="flex items-center gap-3 px-4 py-3 flex-1 border-r border-border">
                   <span className={`flex items-center justify-center w-7 h-7 rounded-lg border shrink-0 ${fuel.pill}`}>
                     <Fuel className="w-3.5 h-3.5" />
                   </span>
                   <div className="flex flex-col leading-tight">
-                    <span className="text-[10px] uppercase tracking-widest text-gray-600 font-medium">Fuel</span>
-                    <span className="text-sm text-white font-semibold">{car.fuelType}</span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Fuel</span>
+                    <span className="text-sm text-card-foreground font-semibold">{car.fuelType}</span>
                   </div>
                 </div>
 
                 {/* seating */}
                 <div className="flex items-center gap-3 px-4 py-3 flex-1">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/5 border border-white/10 shrink-0">
-                    <Users className="w-3.5 h-3.5 text-gray-400" />
+                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-foreground/5 border border-border shrink-0">
+                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
                   </span>
                   <div className="flex flex-col leading-tight">
-                    <span className="text-[10px] uppercase tracking-widest text-gray-600 font-medium">Seats</span>
-                    <span className="text-sm text-white font-semibold">{car.seating}</span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Seats</span>
+                    <span className="text-sm text-card-foreground font-semibold">{car.seating}</span>
                   </div>
                 </div>
               </div>
@@ -187,7 +189,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
 
 export default function RecentlyLaunched() {
   return (
-    <section className="py-24 bg-black">
+    <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* header */}
@@ -196,10 +198,10 @@ export default function RecentlyLaunched() {
             <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3">
               Fresh Off The Line
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
               Recently Launched Cars
             </h2>
-            <p className="text-gray-500 mt-2 max-w-xl text-sm leading-relaxed">
+            <p className="text-muted-foreground mt-2 max-w-xl text-sm leading-relaxed">
               Stay ahead with the recently launched models. Explore specs, features, and launch timelines to choose your perfect ride.
             </p>
           </div>

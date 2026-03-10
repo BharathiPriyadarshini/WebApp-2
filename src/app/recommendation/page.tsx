@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, SlidersHorizontal, RotateCcw, Sparkles, X, Star } from "lucide-react";
+import { SlidersHorizontal, RotateCcw, Sparkles, X, Star } from "lucide-react";
 import SmartCarCard, { SmartRecommendationResult } from "@/components/questions/SmartCarCard";
+import FixedBackButton from "@/components/layout/FixedBackButton";
 
 /* ════════════════════════════════════════
    MOCK DATA — remove when API is wired up
@@ -191,13 +192,7 @@ export default function RecommendationsPage() {
 
       {/* Sticky top bar */}
       <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
+        <div className="w-[72px]" />
         <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
         <button
           onClick={() => { localStorage.removeItem("rimello_answers"); router.push("/explore"); }}
@@ -209,6 +204,7 @@ export default function RecommendationsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <FixedBackButton fallbackHref="/" />
 
         {/* Hero */}
         <div className="mb-10">

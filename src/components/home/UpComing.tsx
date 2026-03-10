@@ -80,13 +80,13 @@ const cars: CarItem[] = [
 function FuelTypes({ types }: { types: string[] }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <Fuel className="w-4 h-4 text-gray-500 shrink-0" />
+      <Fuel className="w-4 h-4 text-muted-foreground shrink-0" />
       <span className="flex items-center gap-1.5">
         {types.map((t, i) => (
           <span key={t} className="flex items-center gap-1.5">
             <span className={`font-medium ${fuelColor[t]}`}>{t}</span>
             {i < types.length - 1 && (
-              <span className="text-gray-600 text-xs">•</span>
+              <span className="text-muted-foreground/70 text-xs">•</span>
             )}
           </span>
         ))}
@@ -109,7 +109,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
     >
       <Link href={car.link}>
         {/* no fixed height — card shrinks to content */}
-        <div className="group relative flex flex-col w-full bg-[#111] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_40px_rgba(59,130,246,0.14)]">
+        <div className="group relative flex flex-col w-full bg-card dark:bg-[#111] rounded-2xl overflow-hidden cursor-pointer border border-border transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_40px_rgba(59,130,246,0.14)]">
 
           {/* image */}
           <div className="relative h-[190px] shrink-0 overflow-hidden">
@@ -119,7 +119,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               </span>
             </div>
             <div className="absolute top-4 right-4 z-10">
-              <span className="px-3 py-1 text-xs font-medium bg-black/60 backdrop-blur-sm text-gray-300 rounded-full border border-white/10">
+              <span className="px-3 py-1 text-xs font-medium bg-background/70 backdrop-blur-sm text-muted-foreground rounded-full border border-border">
                 {car.category}
               </span>
             </div>
@@ -129,26 +129,26 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
               fill
               className="object-contain transition duration-500 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 inset-x-0 h-10 bg-linear-to-t from-[#111] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-10 bg-linear-to-t from-card dark:from-[#111] to-transparent" />
           </div>
 
           {/* body */}
           <div className="flex flex-col px-5 py-4 gap-2.5">
 
             {/* date */}
-            <div className="flex items-center gap-2 text-gray-500 text-xs">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs">
               <Clock className="w-3.5 h-3.5 shrink-0" />
               <span>{car.date}</span>
             </div>
 
-            <div className="h-px bg-white/[0.07]" />
+            <div className="h-px bg-border" />
 
             {/* price */}
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <IndianRupee className="w-4 h-4 shrink-0" />
               <span>
-                From <span className="text-white font-medium">{from}</span>
-                {" "}to <span className="text-white font-medium">{to}</span>
+                From <span className="text-card-foreground font-medium">{from}</span>
+                {" "}to <span className="text-card-foreground font-medium">{to}</span>
               </span>
             </div>
 
@@ -157,7 +157,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
 
             {/* seating + know more on same row — no dead space below */}
             <div className="flex items-center justify-between pt-0.5">
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Users className="w-4 h-4 shrink-0" />
                 <span>{car.seating} Seater</span>
               </div>
@@ -176,7 +176,7 @@ function CarCard({ car, index }: { car: CarItem; index: number }) {
 /* ── main export ── */
 export default function UpcomingCars() {
   return (
-    <section className="py-24 bg-black">
+    <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
@@ -184,10 +184,10 @@ export default function UpcomingCars() {
             <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3">
               Coming Soon
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
               Upcoming Cars
             </h2>
-            <p className="text-gray-500 mt-2 max-w-xl text-sm leading-relaxed">
+            <p className="text-muted-foreground mt-2 max-w-xl text-sm leading-relaxed">
               Stay ahead with the latest upcoming cars. Explore specs,
               features, and launch timelines to choose your perfect ride.
             </p>

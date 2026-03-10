@@ -45,15 +45,15 @@ const mockPosts: BlogPost[] = [
 
 export default function News() {
     return (
-        <section className="py-24 bg-black">
+        <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header */}
                 <div className="flex items-end justify-between mb-12">
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-bold text-white">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
                             News to help Choose your Next car
                         </h2>
-                        <p className="text-gray-400 mt-2">
+                        <p className="text-muted-foreground mt-2">
                             Insights, updates and industry trends from Rimello
                         </p>
                     </div>
@@ -79,7 +79,7 @@ export default function News() {
                             viewport={{ once: true }}
                         >
                             <Link href={post.link}>
-                                <Card className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
+                                <Card className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
                                     {/* Image */}
                                     <div className="relative h-56 w-full overflow-hidden">
                                         <Image
@@ -98,8 +98,8 @@ export default function News() {
                                     {/* Content */}
                                     <CardContent className="p-6 flex flex-col justify-between h-[190px]">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white">{post.title}</h3>
-                                            <p className="text-gray-400 text-sm mt-2">{post.date}</p>
+                                            <h3 className="text-lg font-semibold text-card-foreground">{post.title}</h3>
+                                            <p className="text-muted-foreground text-sm mt-2">{post.date}</p>
                                         </div>
                                         <div className="mt-4 flex items-center text-blue-500 font-medium">
                                             Read More <ChevronRight size={16} className="ml-1" />
@@ -123,7 +123,7 @@ export default function News() {
                             viewport={{ once: true }}
                         >
                             <Link href={post.link}>
-                                <Card className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
+                                <Card className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
                                     <div className="relative h-56 w-full overflow-hidden">
                                         <Image
                                             src={post.image}
@@ -139,8 +139,8 @@ export default function News() {
                                     </div>
                                     <CardContent className="p-6 flex flex-col justify-between h-[190px]">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white">{post.title}</h3>
-                                            <p className="text-gray-400 text-sm mt-2">{post.date}</p>
+                                            <h3 className="text-lg font-semibold text-card-foreground">{post.title}</h3>
+                                            <p className="text-muted-foreground text-sm mt-2">{post.date}</p>
                                         </div>
                                         <div className="mt-4 flex items-center text-blue-500 font-medium">
                                             Read More <ChevronRight size={16} className="ml-1" />

@@ -26,7 +26,7 @@ const types = [
 
 export default function ByCarType() {
   return (
-    <section className="py-20 bg-black">
+    <section className="py-20 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* heading */}
@@ -34,7 +34,7 @@ export default function ByCarType() {
           {/* <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3">
             Browse By Type
           </p> */}
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
             Find By Body Type
           </h2>
         </div>
@@ -54,27 +54,27 @@ export default function ByCarType() {
               >
                 <Link href={type.href}>
                   {/* fixed size — always 120×148, never shrinks or grows */}
-                  <div className="group relative w-[120px] h-[148px] flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-white/10 bg-[#0f0f0f] cursor-pointer transition-all duration-300 hover:border-white/30 hover:bg-[#161616]">
+                  <div className="group relative w-[120px] h-[148px] flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border bg-card dark:bg-[#0f0f0f] cursor-pointer transition-all duration-300 hover:border-foreground/30 hover:bg-muted">
 
                     {/* icon — no coloured bg, just the stroke */}
                     <Icon
                       size={28}
                       strokeWidth={1.4}
-                      className="text-gray-400 transition-colors duration-300 group-hover:text-white"
+                      className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground dark:group-hover:text-white"
                     />
 
                     {/* name */}
-                    <span className="text-white text-sm font-semibold leading-none text-center">
+                    <span className="text-card-foreground text-sm font-semibold leading-none text-center">
                       {type.name}
                     </span>
 
                     {/* description */}
-                    <span className="text-gray-600 text-[10px] text-center leading-tight px-3 group-hover:text-gray-400 transition-colors duration-200">
+                    <span className="text-muted-foreground/80 text-[10px] text-center leading-tight px-3 group-hover:text-muted-foreground transition-colors duration-200">
                       {type.description}
                     </span>
 
                     {/* bottom accent line */}
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 rounded-full bg-white/40 group-hover:w-8 transition-all duration-300" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 rounded-full bg-foreground/40 dark:bg-white/40 group-hover:w-8 transition-all duration-300" />
 
                   </div>
                 </Link>

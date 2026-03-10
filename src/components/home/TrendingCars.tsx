@@ -34,18 +34,18 @@ const defaultRank = { border: "hover:border-blue-500/40", glow: "hover:shadow-[0
 
 export default function TrendingCars() {
   return (
-    <section className="py-24 bg-black">
+    <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* header */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
           <div>
             <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3 flex items-center gap-2">
-              <Flame size={12} className="text-orange-400" />
+              {/* <Flame size={12} className="text-orange-400" /> */}
               What&apos;s Hot Right Now
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">Trending Cars</h2>
-            <p className="text-gray-500 mt-2 text-sm max-w-md leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white leading-tight">Trending Cars</h2>
+            <p className="text-muted-foreground mt-2 text-sm max-w-md leading-relaxed">
               Most searched and recently launched vehicles in your region.
             </p>
           </div>
@@ -68,10 +68,10 @@ export default function TrendingCars() {
                 viewport={{ once: true }}
               >
                 <Link href={`/cars/${car.id}`}>
-                  <div className={`group relative flex flex-col w-full h-[400px] bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300 ${rank.border} ${rank.glow}`}>
+                  <div className={`group relative flex flex-col w-full h-[400px] bg-card dark:bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-border transition-all duration-300 ${rank.border} ${rank.glow}`}>
 
                     {/* image */}
-                    <div className="relative h-[200px] shrink-0 overflow-hidden bg-[#141414]">
+                    <div className="relative h-[200px] shrink-0 overflow-hidden bg-muted dark:bg-[#141414]">
 
                       <div className="absolute top-3 left-3 z-10">
                         <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${rank.badge}`}>
@@ -94,20 +94,20 @@ export default function TrendingCars() {
                         fill
                         className="object-contain transition duration-500 group-hover:scale-105 p-2"
                       />
-                      <div className="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-[#0f0f0f] to-transparent" />
+                      <div className="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-card dark:from-[#0f0f0f] to-transparent" />
                     </div>
 
                     {/* body */}
                     <div className="flex flex-col flex-1 px-5 py-4 gap-2.5">
 
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-semibold">{car.brand}</p>
-                        <h3 className="text-white font-bold text-lg leading-tight mt-0.5">{car.model}</h3>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">{car.brand}</p>
+                        <h3 className="text-card-foreground font-bold text-lg leading-tight mt-0.5">{car.model}</h3>
                       </div>
 
                       {/* search trend bar */}
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1 rounded-full bg-white/6 overflow-hidden">
+                        <div className="flex-1 h-1 rounded-full bg-foreground/10 dark:bg-white/6 overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-blue-500"
                             initial={{ width: 0 }}
@@ -116,25 +116,25 @@ export default function TrendingCars() {
                             viewport={{ once: true }}
                           />
                         </div>
-                        <span className="text-gray-600 text-[10px] tabular-nums">{car.searchPct}%</span>
+                        <span className="text-muted-foreground text-[10px] tabular-nums">{car.searchPct}%</span>
                       </div>
 
-                      <div className="h-px bg-white/6" />
+                      <div className="h-px bg-border" />
 
                       {/* price + rating */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <IndianRupee size={13} className="text-gray-500 shrink-0" />
-                          <span className="text-white font-bold text-base">
+                          <IndianRupee size={13} className="text-muted-foreground shrink-0" />
+                          <span className="text-card-foreground font-bold text-base">
                             {(car.price / 100000).toFixed(1)} L
                           </span>
-                          <span className="text-gray-600 text-xs">onwards</span>
+                          <span className="text-muted-foreground/80 text-xs">onwards</span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/4 border border-white/8">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-foreground/5 border border-border">
                           <Star size={11} className="text-amber-400 fill-amber-400" />
-                          <span className="text-white text-xs font-semibold">{car.rating}</span>
-                          <span className="text-gray-600 text-[10px]">({car.reviews.toLocaleString()})</span>
+                          <span className="text-card-foreground text-xs font-semibold">{car.rating}</span>
+                          <span className="text-muted-foreground text-[10px]">({car.reviews.toLocaleString()})</span>
                         </div>
                       </div>
 

@@ -1,276 +1,328 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Check, Send } from "lucide-react";
-
-/* ── Types ── */
-export interface QuestionOption {
-  key: string;
-  value?: string;
-}
+import { Check, ArrowRight } from "lucide-react";
 
 export interface QuestionData {
   id: string;
   question: string;
   context?: string;
-  answerType: "single_choice" | "multi_choice" | "option" | "text";
-  options?: (string | QuestionOption)[];
+  answerType: "single_choice" | "multi_choice";
+  options: string[];
   isFinal?: boolean;
 }
 
-interface QuestionCardProps {
+interface Props {
   question: QuestionData;
-  onAnswer: (answer: string | number | (string | number)[]) => void;
-  isLoading?: boolean;
-  disabled?: boolean;
-  selectedAnswer?: string | number | (string | number)[];
-  orderLabel?: string;
+  onAnswer: (answer: string | string[]) => void;
+  orderLabel: string;
 }
 
-/* ── Option row ── */
+/* ---------------- TYPEWRITER ---------------- */
+
+function useTypewriter(text: string, speed = 20) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  const ref = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    setDisplayed("");
+    setDone(false);
+
+    let i = 0;
+
+    ref.current = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+
+      if (i >= text.length) {
+        clearInterval(ref.current!);
+        setDone(true);
+      }
+    }, speed);
+
+    return () => clearInterval(ref.current!);
+  }, [text, speed]);
+
+  return { displayed, done };
+}
+
+/* ---------------- OPTION ROW ---------------- */
+
 function OptionRow({
   label,
   selected,
-  multi,
-  disabled,
-  onClick,
+  onSelect,
+  reveal,
   index,
 }: {
   label: string;
   selected: boolean;
-  multi: boolean;
-  disabled?: boolean;
-  onClick: () => void;
+  onSelect: () => void;
+  reveal: boolean;
   index: number;
 }) {
   return (
     <motion.button
-      initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.055, duration: 0.25, ease: "easeOut" }}
-      onClick={onClick}
-      disabled={disabled}
-      whileTap={{ scale: 0.985 }}
-      className={`
-        group relative w-full flex items-center gap-4 px-5 py-4 rounded-2xl border
-        text-left transition-all duration-200 overflow-hidden
-        ${selected
-          ? "bg-blue-600/10 border-blue-500/70 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-          : disabled
-          ? "bg-white/2 border-white/5 opacity-50 cursor-not-allowed"
-          : "bg-white/3 border-white/8 hover:bg-blue-600/5 hover:border-blue-500/30 cursor-pointer"
-        }
-      `}
+      initial={{ opacity: 0, x: -8 }}
+      animate={reveal ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
+      transition={{
+        delay: index * 0.06,
+        duration: 0.35,
+        ease: [0.4, 0, 0.2, 1],
+      }}
+      whileHover={{ x: 2 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={onSelect}
+      className="group relative w-full flex items-center gap-3 py-3.5 border-b border-white/6 last:border-0 text-left"
     >
-      {/* Shimmer on selected */}
-      {selected && (
-        <span className="absolute inset-0 bg-linear-to-r from-transparent via-blue-500/5 to-transparent pointer-events-none" />
-      )}
+      {/* label */}
 
-      {/* Indicator */}
       <span
-        className={`
-          shrink-0 flex items-center justify-center transition-all duration-200
-          ${multi
-            ? `w-5 h-5 rounded-[5px] border-2 ${selected ? "bg-blue-500 border-blue-500" : "border-white/20"}`
-            : `w-5 h-5 rounded-full border-2 ${selected ? "border-blue-500" : "border-white/20"}`
-          }
-        `}
+        className={`flex-1 text-sm transition-colors duration-200 ${
+          selected
+            ? "text-white"
+            : "text-gray-500 group-hover:text-gray-300"
+        }`}
       >
-        {selected && multi  && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-        {selected && !multi && <span className="w-2.5 h-2.5 rounded-full bg-blue-500 block" />}
-      </span>
-
-      <span className={`text-sm font-medium leading-snug flex-1 ${selected ? "text-white" : "text-gray-300 group-hover:text-white transition-colors"}`}>
         {label}
       </span>
 
-      {!multi && !selected && (
-        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
+      {/* check or arrow */}
+
+      <span className="w-5 h-5 flex items-center justify-center">
+
+        <AnimatePresence mode="wait">
+          {selected ? (
+            <motion.span
+              key="check"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
+              <Check className="w-3.5 h-3.5 text-blue-400" strokeWidth={2.5} />
+            </motion.span>
+          ) : (
+            <ArrowRight className="w-3 h-3 text-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          )}
+        </AnimatePresence>
+
+      </span>
+
+      {selected && (
+        <motion.div
+          layoutId="selected-line"
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(59,130,246,0.8), transparent)",
+          }}
+        />
       )}
     </motion.button>
   );
 }
 
-/* ── Main Card ── */
+/* ---------------- MAIN CARD ---------------- */
+
 export default function QuestionCard({
   question,
   onAnswer,
-  isLoading,
-  disabled = false,
-  selectedAnswer,
   orderLabel,
-}: QuestionCardProps) {
-  const [textAnswer, setTextAnswer]       = useState("");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+}: Props) {
+  const isMulti = question.answerType === "multi_choice";
 
-  // Sync multi-choice from external selectedAnswer
+  const [selected, setSelected] = useState<string[]>([]);
+  const [optionsVisible, setOptionsVisible] = useState(false);
+
+  const { displayed, done } = useTypewriter(question.question, 20);
+
   useEffect(() => {
-    if (question.answerType === "multi_choice") {
-      if (Array.isArray(selectedAnswer)) {
-        setSelectedOptions(selectedAnswer.map(String));
-      } else if (selectedAnswer) {
-        setSelectedOptions([String(selectedAnswer)]);
-      } else {
-        setSelectedOptions([]);
-      }
+    setSelected([]);
+    setOptionsVisible(false);
+  }, [question.id]);
+
+  useEffect(() => {
+    if (done) {
+      const t = setTimeout(() => setOptionsVisible(true), 150);
+      return () => clearTimeout(t);
     }
-  }, [question.id, selectedAnswer, question.answerType]);
+  }, [done]);
 
-  const getLabel = (opt: string | QuestionOption) =>
-    typeof opt === "string" ? opt : (opt.value || opt.key);
+  const toggle = (opt: string) => {
+    if (!isMulti) {
+      onAnswer(opt);
+      return;
+    }
 
-  const toggleOption = (label: string) => {
-    if (disabled) return;
-    setSelectedOptions((prev) =>
-      prev.includes(label) ? prev.filter((o) => o !== label) : [...prev, label]
+    setSelected((prev) =>
+      prev.includes(opt)
+        ? prev.filter((o) => o !== opt)
+        : [...prev, opt]
     );
   };
 
-  const isSingleOrOption =
-    question.answerType === "single_choice" || question.answerType === "option";
-
   return (
-    <div className="w-full">
-      {/* Header */}
-      <div className="mb-7">
-        {/* Step badge */}
-        <div className="flex items-center gap-2.5 mb-4">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600 text-white text-[11px] font-bold shadow-[0_0_14px_rgba(59,130,246,0.4)]">
-            {orderLabel ?? question.id.replace(/\D/g, "") ?? "?"}
-          </span>
-          <span className="text-[11px] text-gray-500 uppercase tracking-[0.12em]">
-            {question.answerType === "multi_choice"
-              ? "Select all that apply"
-              : question.answerType === "text"
-              ? "Type your answer"
-              : "Choose one"}
-          </span>
-        </div>
+    <div className="relative">
 
-        {/* Question text */}
-        <h2 className="text-[1.55rem] md:text-3xl font-bold text-white leading-tight tracking-tight mb-2">
-          {question.question}
-        </h2>
+      {/* ---------- OUTER GLOW ---------- */}
 
-        {question.context && (
-          <p className="text-sm text-gray-500 leading-relaxed mt-2">
-            {question.context}
-          </p>
-        )}
-      </div>
+      <motion.div
+        className="absolute -inset-12 rounded-[40px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(59,130,246,0.55) 0%, rgba(59,130,246,0.35) 25%, rgba(59,130,246,0.18) 45%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+        animate={{
+          opacity: [0.65, 1, 0.65],
+          scale: [1, 1.08, 1],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
 
-      {/* Divider */}
-      <div className="h-px bg-white/[0.07] mb-6" />
+      {/* ---------- INNER GLOW ---------- */}
 
-      {/* ── Single / Option ── */}
-      {isSingleOrOption && question.options && (
-        <div className="flex flex-col gap-2.5">
-          {question.options.map((opt, i) => {
-            const label = getLabel(opt);
-            return (
-              <OptionRow
-                key={label}
-                label={label}
-                selected={selectedAnswer === label}
-                multi={false}
-                disabled={isLoading || disabled}
-                onClick={() => !disabled && !isLoading && onAnswer(label)}
-                index={i}
-              />
-            );
-          })}
-        </div>
-      )}
+      <motion.div
+        className="absolute -inset-4 rounded-3xl pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(59,130,246,0.5) 0%, rgba(59,130,246,0.25) 40%, transparent 65%)",
+          filter: "blur(30px)",
+        }}
+        animate={{ opacity: [0.7, 1, 0.7] }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
 
-      {/* ── Multi choice ── */}
-      {question.answerType === "multi_choice" && question.options && (
-        <div className="flex flex-col gap-2.5">
-          {question.options.map((opt, i) => {
-            const label = getLabel(opt);
-            return (
-              <OptionRow
-                key={label}
-                label={label}
-                selected={selectedOptions.includes(label)}
-                multi
-                disabled={isLoading || disabled}
-                onClick={() => toggleOption(label)}
-                index={i}
-              />
-            );
-          })}
+      {/* ---------- CARD ---------- */}
 
-          <motion.button
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: (question.options.length) * 0.055 + 0.1 }}
-            onClick={() => selectedOptions.length > 0 && !disabled && !isLoading && onAnswer(selectedOptions)}
-            disabled={selectedOptions.length === 0 || isLoading || disabled}
-            className={`
-              mt-1.5 flex items-center justify-center gap-2 w-full py-4 rounded-2xl
-              text-sm font-semibold transition-all duration-200
-              ${selectedOptions.length > 0 && !disabled && !isLoading
-                ? "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_28px_rgba(59,130,246,0.35)] hover:shadow-[0_0_36px_rgba(59,130,246,0.45)]"
-                : "bg-white/3 text-gray-600 cursor-not-allowed border border-white/6"
-              }
-            `}
-          >
-            {isLoading ? (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                Confirm{selectedOptions.length > 0 ? ` (${selectedOptions.length} selected)` : ""}
-                <ChevronRight className="w-4 h-4" />
-              </>
-            )}
-          </motion.button>
-        </div>
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.45,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: "rgba(10,10,12,0.95)",
+          boxShadow:
+            "0 0 0 1px rgba(255,255,255,0.05), 0 12px 35px rgba(0,0,0,0.7)",
+        }}
+      >
+        <div className="p-7 space-y-7">
 
-      {/* ── Text ── */}
-      {question.answerType === "text" && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="relative">
-            <input
-              type="text"
-              value={
-                disabled && selectedAnswer !== undefined
-                  ? String(selectedAnswer)
-                  : textAnswer
-              }
-              onChange={(e) => setTextAnswer(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && textAnswer.trim() && !disabled && !isLoading) {
-                  onAnswer(textAnswer.trim());
-                }
-              }}
-              placeholder="Type your answer…"
-              disabled={isLoading || disabled}
-              className="w-full bg-white/3 border border-white/10 rounded-2xl px-5 py-4 pr-14 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-blue-500/60 focus:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <button
-              onClick={() => textAnswer.trim() && !disabled && !isLoading && onAnswer(textAnswer.trim())}
-              disabled={!textAnswer.trim() || isLoading || disabled}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-[0_0_14px_rgba(59,130,246,0.4)]"
-            >
-              {isLoading
-                ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                : <Send className="w-3.5 h-3.5 text-white" />
-              }
-            </button>
+          {/* HEADER */}
+
+          <div className="space-y-3">
+
+            <div className="flex items-center gap-3">
+
+              <span className="text-[10px] tracking-[0.3em] uppercase text-blue-400/60 font-medium">
+                Question {orderLabel}
+              </span>
+
+              <div className="flex-1 h-px bg-white/6" />
+
+              {isMulti && (
+                <span className="text-[10px] uppercase tracking-[0.2em] text-white/20">
+                  Multi-select
+                </span>
+              )}
+
+            </div>
+
+            {/* QUESTION */}
+
+            <h2 className="text-2xl font-semibold text-white leading-snug tracking-tight min-h-10">
+              {displayed}
+
+              {!done && (
+                <motion.span
+                  className="inline-block w-[2px] h-5 bg-blue-400 ml-1 align-middle"
+                  animate={{ opacity: [1, 0] }}
+                  transition={{
+                    duration: 0.55,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              )}
+            </h2>
+
+            <AnimatePresence>
+              {done && question.context && (
+                <motion.p
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-white/20 leading-relaxed"
+                >
+                  {question.context}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
           </div>
 
-          {/* Recorded indicator */}
-          {selectedAnswer !== undefined && disabled && (
-            <div className="flex items-center gap-2 mt-3 text-xs text-blue-400">
-              <Check className="w-3.5 h-3.5" />
-              Answer recorded
-            </div>
-          )}
-        </motion.div>
-      )}
+          {/* OPTIONS */}
+
+          <div>
+            {question.options.map((opt, i) => (
+              <OptionRow
+                key={opt}
+                label={opt}
+                selected={selected.includes(opt)}
+                onSelect={() => toggle(opt)}
+                reveal={optionsVisible}
+                index={i}
+              />
+            ))}
+          </div>
+
+          {/* MULTI SELECT BUTTON */}
+
+          <AnimatePresence>
+            {isMulti && selected.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+              >
+                <button
+                  onClick={() => onAnswer(selected)}
+                  className="flex items-center gap-2 text-sm font-medium text-white/60 hover:text-white transition-colors"
+                >
+                  Continue with {selected.length} choice
+                  {selected.length > 1 ? "s" : ""}
+
+                  <motion.span
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{
+                      duration: 1.4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -102,15 +102,15 @@ export default function ExpertReviewTabs() {
   };
 
   return (
-    <section className="py-24 bg-black">
+    <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground dark:text-white">
               Know More To Choose Better
             </h2>
-            <p className="text-gray-400 mt-2">
+            <p className="text-muted-foreground mt-2">
               Insights, videos, and expert tips to help you choose the perfect car
             </p>
           </div>
@@ -123,7 +123,7 @@ export default function ExpertReviewTabs() {
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   activeTab === i
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70"
                 }`}
               >
                 {tab}
@@ -143,7 +143,7 @@ export default function ExpertReviewTabs() {
               viewport={{ once: true }}
             >
               <Link href={item.link}>
-                <Card className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
+                <Card className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
                   <div className="relative h-56 w-full overflow-hidden">
                     <Image
                       src={item.image}
@@ -159,8 +159,8 @@ export default function ExpertReviewTabs() {
                   </div>
                   <CardContent className="p-6 flex flex-col justify-between h-[190px]">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                      <p className="text-gray-400 text-sm mt-2">{item.summary}</p>
+                      <h3 className="text-lg font-semibold text-card-foreground">{item.title}</h3>
+                      <p className="text-muted-foreground text-sm mt-2">{item.summary}</p>
                       {item.rating !== undefined && (
                         <div className="mt-2 flex items-center">
                           <span className="text-yellow-400 font-bold mr-2">
@@ -170,11 +170,11 @@ export default function ExpertReviewTabs() {
                               </span>
                             ))}
                           </span>
-                          <span className="text-gray-300 text-sm">{item.rating.toFixed(1)}</span>
+                          <span className="text-muted-foreground text-sm">{item.rating.toFixed(1)}</span>
                         </div>
                       )}
                       {item.reviewer && (
-                        <p className="text-gray-500 text-xs mt-2">{item.reviewer}</p>
+                        <p className="text-muted-foreground/80 text-xs mt-2">{item.reviewer}</p>
                       )}
                     </div>
                     <div className="mt-4 flex items-center text-blue-500 font-medium">
@@ -199,7 +199,7 @@ export default function ExpertReviewTabs() {
               viewport={{ once: true }}
             >
               <Link href={item.link}>
-                <Card className="group bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
+                <Card className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 cursor-pointer h-[450px]">
                   <div className="relative h-56 w-full overflow-hidden">
                     <Image
                       src={item.image}
@@ -215,8 +215,8 @@ export default function ExpertReviewTabs() {
                   </div>
                   <CardContent className="p-6 flex flex-col justify-between h-[190px]">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                      <p className="text-gray-400 text-sm mt-2">{item.summary}</p>
+                      <h3 className="text-lg font-semibold text-card-foreground">{item.title}</h3>
+                      <p className="text-muted-foreground text-sm mt-2">{item.summary}</p>
                       {item.rating !== undefined && (
                         <div className="mt-2 flex items-center">
                           <span className="text-yellow-400 font-bold mr-2">
@@ -226,11 +226,11 @@ export default function ExpertReviewTabs() {
                               </span>
                             ))}
                           </span>
-                          <span className="text-gray-300 text-sm">{item.rating.toFixed(1)}</span>
+                          <span className="text-muted-foreground text-sm">{item.rating.toFixed(1)}</span>
                         </div>
                       )}
                       {item.reviewer && (
-                        <p className="text-gray-500 text-xs mt-2">{item.reviewer}</p>
+                        <p className="text-muted-foreground/80 text-xs mt-2">{item.reviewer}</p>
                       )}
                     </div>
                     <div className="mt-4 flex items-center text-blue-500 font-medium">

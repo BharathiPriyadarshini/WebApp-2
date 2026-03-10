@@ -682,21 +682,26 @@ function SpecRow({
 
 /* ─── feature row ── */
 function FeatureRow({ label, valA, valB, alt }: { label: string; valA: boolean; valB: boolean; alt: boolean }) {
-  const Cell = ({ v }: { v: boolean }) => (
+  const cell = (v: boolean) => (
     <div className="flex items-center justify-center">
-      {v
-        ? <span className="w-6 h-6 rounded-full bg-emerald-500/15 flex items-center justify-center"><Check size={12} className="text-emerald-400" /></span>
-        : <span className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center"><Minus size={12} className="text-gray-700" /></span>
-      }
+      {v ? (
+        <span className="w-6 h-6 rounded-full bg-emerald-500/15 flex items-center justify-center">
+          <Check size={12} className="text-emerald-400" />
+        </span>
+      ) : (
+        <span className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
+          <Minus size={12} className="text-gray-700" />
+        </span>
+      )}
     </div>
   );
   return (
     <div className={`grid grid-cols-[1fr_180px_1fr] ${alt ? "bg-white/1.5" : ""}`}>
-      <div className="px-6 py-3 flex items-center justify-start"><Cell v={valA} /></div>
+      <div className="px-6 py-3 flex items-center justify-start">{cell(valA)}</div>
       <div className="px-4 py-3 flex items-center justify-center border-x border-white/5">
         <span className="text-gray-600 text-xs">{label}</span>
       </div>
-      <div className="px-6 py-3 flex items-center justify-start"><Cell v={valB} /></div>
+      <div className="px-6 py-3 flex items-center justify-start">{cell(valB)}</div>
     </div>
   );
 }
@@ -704,9 +709,20 @@ function FeatureRow({ label, valA, valB, alt }: { label: string; valA: boolean; 
 /* ═══════════════════════════════════════════════════════════════
    PAGE
 ═══════════════════════════════════════════════════════════════ */
-export default function ComparePage() {
-  const [carA, setCarA] = useState<Car | null>(carDatabase[0]);
-  const [carB, setCarB] = useState<Car | null>(carDatabase[1]);
+export default function ComparePage({
+  searchParams,
+}: {
+  searchParams?: { carA?: string; carB?: string };
+}) {
+  const initialCarA =
+    carDatabase.find((c) => String(c.id) === (searchParams?.carA ?? "")) ??
+    carDatabase[0];
+  const initialCarB =
+    carDatabase.find((c) => String(c.id) === (searchParams?.carB ?? "")) ??
+    carDatabase[1];
+
+  const [carA, setCarA] = useState<Car | null>(initialCarA);
+  const [carB, setCarB] = useState<Car | null>(initialCarB);
   const scoreRef = useRef<HTMLDivElement>(null);
   const scoreInView = useInView(scoreRef, { once: true, margin: "-60px" });
 
@@ -724,7 +740,7 @@ export default function ComparePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background dark:bg-black text-foreground dark:text-white">
 
       {/* ── background atmosphere ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">

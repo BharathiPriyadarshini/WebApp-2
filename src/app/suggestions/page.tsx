@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
 import ProgressBar from "@/components/questions/ProgressBar";
 import QuestionCard, { QuestionData } from "@/components/questions/QuestionCard";
+import FixedBackButton from "@/components/layout/FixedBackButton";
 
 /* ════════════════════════════════════════
    MOCK DATA — remove when API is wired up
@@ -99,25 +99,20 @@ export default function SuggestionsPage() {
   };
 
   return (
-    <section className="min-h-screen bg-black flex flex-col">
+    <section className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300">
 
       {/* Sticky top bar */}
-      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/6">
-        <button
-          onClick={goBack}
-          className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
+      <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="w-[72px]" />
         <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
-        <span className="text-xs text-gray-600 tabular-nums">
-          {qIndex + 1}<span className="text-gray-700"> / {total}</span>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {qIndex + 1}<span className="text-muted-foreground/70"> / {total}</span>
         </span>
       </div>
 
       {/* Progress bar */}
       <div className="px-6 pt-6 pb-2 max-w-lg mx-auto w-full">
+        <FixedBackButton fallbackHref="/" />
         <ProgressBar current={qIndex + 1} total={total} />
       </div>
 
@@ -146,7 +141,7 @@ export default function SuggestionsPage() {
 
       {/* Footer */}
       <div className="py-6 text-center">
-        <p className="text-[11px] text-gray-700 tracking-wide">
+        <p className="text-[11px] text-muted-foreground/70 tracking-wide">
           Your answers are used only to find your ideal vehicle
         </p>
       </div>

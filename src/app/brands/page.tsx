@@ -13,6 +13,7 @@ import { useBrands } from "@/hooks/useBrands";
 import { useModels } from "@/hooks/useModels";
 import { getModels } from "@/services/model.service";
 import { Suspense } from "react";
+import FixedBackButton from "@/components/layout/FixedBackButton";
 
 interface ModelWithMock {
   _id: string;
@@ -93,13 +94,16 @@ function BrandsPageContent() {
     (brand) => brand._id === selectedBrand
   );
 
-  const models: ModelWithMock[] = rawModels.map((model) => ({
-    ...model,
-    fuelTypes: model.fuelTypes || ["Petrol", "Diesel"],
-    seatingCapacity: model.seatingCapacity || 5,
-    minPrice: model.minPrice || 1200000,
-    maxPrice: model.maxPrice || 1500000,
-  }));
+  const models: ModelWithMock[] = rawModels.map((model) => {
+    const m = model as unknown as Partial<ModelWithMock>;
+    return {
+      ...(model as unknown as ModelWithMock),
+      fuelTypes: m.fuelTypes ?? ["Petrol", "Diesel"],
+      seatingCapacity: m.seatingCapacity ?? 5,
+      minPrice: m.minPrice ?? 1200000,
+      maxPrice: m.maxPrice ?? 1500000,
+    };
+  });
 
   useEffect(() => {
     if (!observerRef.current) return;
@@ -127,16 +131,16 @@ function BrandsPageContent() {
   return (
     <div className="bg-black text-white min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col lg:flex-row gap-10">
+        <div className="lg:hidden">
+          <FixedBackButton />
+        </div>
 
         {/* LEFT SIDEBAR */}
         <aside className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/10 pb-6 lg:pb-0 lg:pr-6 space-y-8">
-
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-400 hover:text-white"
-          >
-            <ChevronLeft className="w-5 h-5" /> Back
-          </button>
+          <div className="hidden lg:block">
+            <FixedBackButton />
+          </div>
+          <div className="h-8" />
 
           <h2 className="text-gray-400 text-sm uppercase font-semibold">
             Select Brand

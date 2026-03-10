@@ -72,7 +72,7 @@ function StarRating({ rating }: { rating: number }) {
           }`}
         />
       ))}
-      <span className="ml-1 text-[11px] text-gray-400">{rating}.0</span>
+      <span className="ml-1 text-[11px] text-muted-foreground">{rating}.0</span>
     </div>
   );
 }
@@ -81,12 +81,14 @@ function StarRating({ rating }: { rating: number }) {
 function FuelTypes({ types }: { types: string[] }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <Fuel className="w-4 h-4 text-gray-500 shrink-0" />
+      <Fuel className="w-4 h-4 text-muted-foreground shrink-0" />
       <span className="flex items-center gap-1.5">
         {types.map((t, i) => (
           <span key={t} className="flex items-center gap-1.5">
             <span className={`font-medium ${fuelColor[t]}`}>{t}</span>
-            {i < types.length - 1 && <span className="text-gray-600 text-xs">•</span>}
+            {i < types.length - 1 && (
+              <span className="text-muted-foreground/70 text-xs">•</span>
+            )}
           </span>
         ))}
       </span>
@@ -111,7 +113,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
     >
       <Link href={car.link}>
         {/* no fixed height — card shrinks to content */}
-        <div className="group relative flex flex-col w-full bg-[#111] rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_32px_rgba(59,130,246,0.12)]">
+        <div className="group relative flex flex-col w-full bg-card rounded-2xl overflow-hidden border border-border transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_8px_32px_rgba(59,130,246,0.12)]">
 
           {/* image */}
           <div className="relative h-[170px] shrink-0 overflow-hidden">
@@ -126,7 +128,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
               fill
               className="object-contain transition duration-500 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 inset-x-0 h-8 bg-linear-to-t from-[#111] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-8 bg-linear-to-t from-card to-transparent" />
           </div>
 
           {/* body */}
@@ -134,18 +136,20 @@ function CarCard({ car, index }: { car: Car; index: number }) {
 
             {/* category + stars */}
             <div className="flex items-center justify-between">
-              <span className="text-white font-semibold text-sm leading-none">{car.category}</span>
+              <span className="text-card-foreground font-semibold text-sm leading-none">
+                {car.category}
+              </span>
               <StarRating rating={car.rating} />
             </div>
 
-            <div className="h-px bg-white/[0.07]" />
+            <div className="h-px bg-border" />
 
             {/* price */}
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <IndianRupee className="w-4 h-4 shrink-0" />
               <span>
-                From <span className="text-white font-medium">{from}</span>
-                {" "}to <span className="text-white font-medium">{to}</span>
+                From <span className="text-card-foreground font-medium">{from}</span>
+                {" "}to <span className="text-card-foreground font-medium">{to}</span>
               </span>
             </div>
 
@@ -154,7 +158,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
 
             {/* seating + know more on same row — no dead space below */}
             <div className="flex items-center justify-between pt-0.5">
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Users className="w-4 h-4 shrink-0" />
                 <span>{car.seating} Seater</span>
               </div>
@@ -173,7 +177,7 @@ function CarCard({ car, index }: { car: Car; index: number }) {
 /* ── section heading ── */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3">
+    <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
       <span className="inline-block w-1 h-7 rounded-full bg-blue-500" />
       {children}
     </h2>
@@ -188,7 +192,7 @@ function PillTab({ active, onClick, children }: { active: boolean; onClick: () =
       className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
         active
           ? "bg-blue-600 text-white shadow-[0_0_14px_rgba(59,130,246,0.45)]"
-          : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
+          : "bg-muted text-muted-foreground hover:bg-muted/70 border border-border"
       }`}
     >
       {children}
@@ -210,13 +214,13 @@ export default function ByBudget() {
   );
 
   return (
-    <section className="py-24 bg-black">
+    <section className="py-24 bg-background dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="mb-16">
           <p className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold mb-3">Explore Our Lineup</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">Popular Cars By Budget</h1>
-          <p className="text-gray-500 mt-4 max-w-2xl text-sm leading-relaxed">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">Popular Cars By Budget</h1>
+          <p className="text-muted-foreground mt-4 max-w-2xl text-sm leading-relaxed">
             Explore cars categorized by budget and type. Find the perfect car that fits your style and wallet.
           </p>
         </div>
@@ -239,7 +243,7 @@ export default function ByBudget() {
         {/* ABOVE 10 LAKH */}
         <SectionHeading>Cars Above 10 Lakh</SectionHeading>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
-          <div className="flex gap-6 border-b border-white/10">
+          <div className="flex gap-6 border-b border-border">
             {above10Budgets.map((budget) => (
               <button
                 key={budget}
@@ -247,7 +251,7 @@ export default function ByBudget() {
                 className={`pb-3 text-sm font-semibold transition-all ${
                   activeAboveBudget === budget
                     ? "border-b-2 border-blue-500 text-blue-500"
-                    : "text-gray-500 hover:text-gray-300"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {budget}

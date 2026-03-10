@@ -73,9 +73,9 @@ export default function ProfilePage() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* CAR CARD */}
                 <Card className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden py-0">
-                  <div className="relative h-48 bg-black">
+                  <div className="relative h-48">
                     <Image
-                      src="/alt.png"
+                      src="/006.png"
                       alt="Ferrari"
                       fill
                       className="object-cover"
@@ -117,9 +117,9 @@ export default function ProfilePage() {
 
                 {/* SECOND CAR */}
                 <Card className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden py-0">
-                  <div className="relative h-48 bg-black">
+                  <div className="relative h-48">
                     <Image
-                      src="/alt.png"
+                      src="/006.png"
                       alt="Porsche"
                       fill
                       className="object-cover"
