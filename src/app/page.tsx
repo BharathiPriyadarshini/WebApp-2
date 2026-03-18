@@ -6,7 +6,7 @@ import TopBrands from "@/components/home/TopBrands";
 import HotPicks from "@/components/home/TrendingCars";
 import SmartComparison from "@/components/home/SmartComparison";
 import ByCarType from "@/components/home/ByCarType";
-import News from "@/components/home/News";
+import News from "@/components/home/news";
 import ExpertReview from "@/components/home/ExperRreview";
 import UpcomingCars from "@/components/home/UpComing";
 import ByBudget from "@/components/home/ByBudget"; 

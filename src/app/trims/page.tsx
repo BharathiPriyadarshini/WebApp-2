@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/Badge";
+import { VehicleCard } from "@/components/car/VehicleCard";
+import { useTrimsSearch } from "@/hooks/trims/trims.hook";
 
 /* ---------------------------------- */
 /* Brand Mapping (Fix brandId issue)  */
@@ -27,56 +29,12 @@ const brandMap: Record<string, string> = {
   "693869fe2955c01e5bd23c9e": "Mercedes",
 };
 
-/* ---------------------------------- */
-/* Mock Vehicles                      */
-/* ---------------------------------- */
-const mockVehicles = [
-  {
-    id: 1,
-    brand: "Kia",
-    model: "EV5",
-    name: "Kia EV5 GT-Line",
-    price: 65000,
-    fuelType: "Electric",
-    transmission: "Automatic",
-    seating: "5",
-    bodyType: "SUV",
-    horsepower: 310,
-    createdAt: 5,
-  },
-  {
-    id: 2,
-    brand: "Kia",
-    model: "EV5",
-    name: "Kia EV5 Standard",
-    price: 52000,
-    fuelType: "Electric",
-    transmission: "Automatic",
-    seating: "5",
-    bodyType: "SUV",
-    horsepower: 210,
-    createdAt: 3,
-  },
-  {
-    id: 3,
-    brand: "BMW",
-    model: "iX",
-    name: "BMW iX M60",
-    price: 105000,
-    fuelType: "Electric",
-    transmission: "Automatic",
-    seating: "5",
-    bodyType: "SUV",
-    horsepower: 610,
-    createdAt: 10,
-  },
-];
-
 function TrimsPageContent() {
   const params = useSearchParams();
   const router = useRouter();
   const brandId = params.get("brand");
   const model = params.get("model");
+  const modelId = params.get("modelId");
 
   const brandName = brandId ? brandMap[brandId] || brandId : "All Brands";
 
@@ -86,36 +44,26 @@ function TrimsPageContent() {
   const [transmission, setTransmission] = useState<string | null>(null);
   const [bodyType, setBodyType] = useState<string | null>(null);
 
-  const filteredVehicles = useMemo(() => {
-    let vehicles = mockVehicles.filter((vehicle) => {
-      const matchBrand =
-        brandName === "All Brands" || vehicle.brand === brandName;
-      const matchModel = model ? vehicle.model === model : true;
-      const matchSearch = vehicle.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchFuel = fuelType ? vehicle.fuelType === fuelType : true;
-      const matchTransmission = transmission
-        ? vehicle.transmission === transmission
-        : true;
-      const matchBody = bodyType ? vehicle.bodyType === bodyType : true;
+  // Parse filters into API request format
+  const queryParams = useMemo(() => {
+    return {
+      page: 1,
+      limit: 20,
+      search: search || undefined,
+      brandIds: brandId ? [brandId] : undefined,
+      modelIds: modelId ? [modelId] : undefined,
+      fuelTypes: fuelType ? [fuelType.toLowerCase()] : undefined,
+      bodyTypes: bodyType ? [bodyType.toLowerCase()] : undefined,
+      transmission: transmission ? [transmission.toLowerCase()] : undefined,
+      sort: sort === "newest" ? "createdAt" : undefined,
+      isJustLaunched: sort === "newest" ? true : undefined,
+    };
+  }, [search, brandId, modelId, fuelType, bodyType, transmission, sort]);
 
-      return (
-        matchBrand &&
-        matchModel &&
-        matchSearch &&
-        matchFuel &&
-        matchTransmission &&
-        matchBody
-      );
-    });
+  // Fetch trims via API
+  const { data, isLoading, error } = useTrimsSearch(queryParams);
 
-    if (sort === "newest") {
-      vehicles.sort((a, b) => b.createdAt - a.createdAt);
-    }
-
-    return vehicles;
-  }, [search, fuelType, transmission, bodyType, sort, brandName, model]);
+  const vehicles = data?.results || [];
 
   return (
     <div className="bg-black text-white min-h-screen relative">
@@ -138,7 +86,7 @@ function TrimsPageContent() {
             {brandName} {model} Trims
           </p>
           <p className="text-gray-500 text-sm mt-1">
-            {filteredVehicles.length} vehicles matching your preferences
+            {isLoading ? "Loading vehicles..." : `${data?.total || 0} vehicles matching your preferences`}
           </p>
         </div>
 
@@ -192,87 +140,46 @@ function TrimsPageContent() {
 
           {/* Vehicle Cards */}
           <div className="flex-1 order-1 lg:order-2">
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {filteredVehicles.map((vehicle) => (
-                <Card
-                  key={vehicle.id}
-                  className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/40 transition duration-300 py-0 relative"
-                >
-                  {/* Badge */}
-                  <Badge className="absolute top-4 left-4 bg-blue-600 text-white border-transparent z-10">
-                    {vehicle.model}
-                  </Badge>
+            {error ? (
+              <div className="text-center p-10 bg-[#111] rounded-2xl border border-red-500/20">
+                <p className="text-red-400">Failed to load trims. Please try again later.</p>
+              </div>
+            ) : isLoading ? (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {[1, 2, 3].map((skeleton) => (
+                  <Card key={skeleton} className="bg-[#111] border border-white/10 rounded-2xl h-[350px] animate-pulse" />
+                ))}
+              </div>
+            ) : vehicles.length === 0 ? (
+              <div className="text-center p-10 bg-[#111] rounded-2xl border border-white/10">
+                <p className="text-gray-400">No vehicles found matching your criteria.</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {vehicles.map((vehicle) => (
+                  <VehicleCard key={vehicle.trimId || vehicle._id} vehicle={vehicle} />
+                ))}
 
-                  {/* Favorite Icon */}
-                  <Heart
-                    size={18}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition cursor-pointer z-10"
-                  />
-
-                  {/* Full Width Image */}
-                  <div className="">
-                    <Image
-                      src="/006.png"
-                      alt={vehicle.name}
-                      width={800}
-                      height={500}
-                      className="object-cover object-right"
-                      priority
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "/alt.png";
-                      }}
+                {/* AI Card */}
+                <Card className="border border-dashed border-white/20 rounded-2xl bg-transparent">
+                  <CardContent className="flex flex-col items-center justify-center p-10 h-full text-center">
+                    <SlidersHorizontal
+                      size={28}
+                      className="text-blue-500 mb-4"
                     />
-                  </div>
-
-                  {/* Content */}
-                  <CardContent className="p-4 pt-2">
-                    <h3 className="text-lg font-semibold">{vehicle.name}</h3>
-
-                    <p className="text-gray-400 mt-1 flex items-center gap-1">
-                      <IndianRupee size={14} />
-                      {vehicle.price.toLocaleString()}
+                    <h3 className="text-lg font-semibold">
+                      Not seeing the perfect fit?
+                    </h3>
+                    <p className="text-gray-400 mt-3 text-sm">
+                      Let our AI build a custom configuration.
                     </p>
-
-                    <div className="flex items-center gap-6 mt-2 text-sm text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Gauge size={16} />
-                        {vehicle.horsepower} HP
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Settings size={16} />
-                        {vehicle.transmission}
-                      </div>
-                    </div>
-
-                    <Button
-                      asChild
-                      className="mt-3 w-full bg-white text-black font-semibold hover:scale-105 hover:bg-white/90 transition"
-                    >
-                      <Link href={`/trims/${vehicle.id}`}>View Details</Link>
+                    <Button className="mt-6 bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-500 transition">
+                      Start AI Configuration
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-
-              {/* AI Card */}
-              <Card className="border border-dashed border-white/20 rounded-2xl bg-transparent">
-                <CardContent className="flex flex-col items-center justify-center p-10 text-center">
-                  <SlidersHorizontal
-                    size={28}
-                    className="text-blue-500 mb-4"
-                  />
-                  <h3 className="text-lg font-semibold">
-                    Not seeing the perfect fit?
-                  </h3>
-                  <p className="text-gray-400 mt-3 text-sm">
-                    Let our AI build a custom configuration.
-                  </p>
-                  <Button className="mt-6 bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-500 transition">
-                    Start AI Configuration
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

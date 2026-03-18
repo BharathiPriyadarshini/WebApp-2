@@ -19,7 +19,7 @@ import {
     ResponsiveContainer, CartesianGrid, BarChart, Bar,
 } from "recharts";
 
-import carsData from "@/data/cars.json";
+import { useTrimById, useVehicleImagesByModel } from "@/hooks/trims/trims.hook";
 import type { EnrichedCar } from "./types";
 import type { InsightType } from "@/components/car/InsightBadge";
 
@@ -91,7 +91,12 @@ function VariantsDropdown({
 export default function CarDetailsPage({ params }: { params: Promise<{ trimId: string }> }) {
     const router         = useRouter();
     const resolvedParams = use(params);
-    const id             = Number(resolvedParams.trimId);
+    const trimId         = resolvedParams.trimId;
+
+    const { data: trimData, isLoading: isTrimLoading, error: trimError } = useTrimById(trimId);
+    
+    // Fetch all images for this model to populate the Design tab/Gallery
+    const { data: modelImagesData } = useVehicleImagesByModel(trimData?.modelId);
 
     const [car,             setCar]             = useState<EnrichedCar | null>(null);
     const [activeSection,   setActiveSection]   = useState('details');
@@ -104,7 +109,6 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     };
 
     // ── NAV_OFFSET must equal: top-nav (56px) + sticky-bar height (48px) + sticky top offset (24px for top-6) + 8px breathing room
-    // If you change `top-6` on the sticky nav → update this number: top-0=112, top-4=128, top-6=136, top-8=144, top-12=160
     const NAV_OFFSET = 136;
 
     const scrollToSection = useCallback((sectionId: string) => {
@@ -134,20 +138,65 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     }, [car]);
 
     useEffect(() => {
-        const found = carsData.find(c => c.id === id);
-        if (!found) return;
+        if (!trimData) return;
+        
         const getRandom = (arr: string[], n: number) =>
             [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
 
+        const price = typeof trimData.price === 'number' 
+            ? trimData.price 
+            : (trimData.price as any)?.exShowroom ?? 0;
+            
+        const priceLabel = price > 0 
+            ? `₹ ${(price / 100000).toFixed(2)} L` 
+            : "Ask for Price";
+
+        // Advanced Categorization Logic
+        const apiImages = (modelImagesData as any)?.results || [];
+        const sortedApiImages = [...apiImages].sort((a: any, b: any) => (a.order || 99) - (b.order || 99));
+        
+        const interiorKeywords = ['interior', 'dashboard', 'seat', 'cabin', 'screen', 'display', 'head rest', 'headrest', 'brake', 'accelerator', 'gear', 'steering', 'console', 'infotainment'];
+        const heroKeywords = ['front', 'quarter', 'main', 'external', 'profile', 'three quarter', 'full car', 'side view'];
+        const detailKeywords = ['wheel', 'rim', 'tire', 'headlight', 'taillight', 'handle', 'logo', 'badge', 'grille', 'mirror', 'lamp', 'exhaust'];
+
+        const classify = (img: any) => {
+            const label = (img.label || '').toLowerCase();
+            const alt = (img.altText || '').toLowerCase();
+            const text = `${label} ${alt}`;
+            
+            if (interiorKeywords.some(k => text.includes(k))) return 'interior';
+            if (detailKeywords.some(k => text.includes(k))) return 'exterior-detail';
+            if (heroKeywords.some(k => text.includes(k))) return 'exterior-hero';
+            return 'exterior-unknown';
+        };
+
+        const interiorFromApi = sortedApiImages.filter(img => classify(img) === 'interior').map(img => img.url);
+        const heroFromApi     = sortedApiImages.filter(img => classify(img) === 'exterior-hero').map(img => img.url);
+        const unknownFromApi  = sortedApiImages.filter(img => classify(img) === 'exterior-unknown').map(img => img.url);
+        const detailFromApi   = sortedApiImages.filter(img => classify(img) === 'exterior-detail').map(img => img.url);
+
+        const exteriorFromApi = [...heroFromApi, ...unknownFromApi, ...detailFromApi];
+
         setCar({
-            ...found,
+            id: trimData._id as any,
+            brand: trimData.brand?.name || "Premium",
+            model: trimData.model?.name || "Car",
+            price: price,
+            priceLabel: priceLabel,
+            rating: trimData.rating || 4.5,
+            image: exteriorFromApi[0] || interiorFromApi[0] || trimData.vehicleImages?.[0] || "/006.png",
+            bodyType: trimData.model?.bodyType || "SUV",
+            fuel: trimData.specifications?.fuelType || "Petrol",
+            mileage: "18.5 kmpl",
+            seating: 5,
+            useCase: ["City", "Family"],
             horsepower:   110 + Math.floor(Math.random() * 200),
             torque:       `${150 + Math.floor(Math.random() * 300)} Nm`,
             acceleration: `${(4 + Math.random() * 6).toFixed(1)}s`,
             colors:       ['#FFFFFF', '#1F2937', '#DC2626', '#2563EB', '#D97706'],
-            description:  `${found.brand} ${found.model} with automatic transmission in premium finish. This luxury vehicle redefines versatility with refined performance and cutting-edge technology.`,
+            description:  trimData.description || `${trimData.brand?.name} ${trimData.model?.name} with automatic transmission in premium finish. This luxury vehicle redefines versatility with refined performance and cutting-edge technology.`,
             safetyRatings: {
-                globalNcap: { adult: found.rating >= 4.5 ? 5 : 4, child: found.rating >= 4.5 ? 5 : 3 },
+                globalNcap: { adult: (trimData.rating || 4) >= 4.5 ? 5 : 4, child: (trimData.rating || 4) >= 4.5 ? 5 : 3 },
                 bharatNcap: { status: Math.random() > 0.3 ? 'Not Tested' : 'Tested', adult: 5, child: 4 },
             },
             features: ['360° Camera', 'Ventilated Seats', 'ADAS Level 2', 'Panoramic Sunroof', 'Connected Car Tech'],
@@ -179,21 +228,37 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 },
             },
             gallery: {
-                exterior: EXTERIOR_IMAGES.map(i => i.src),
-                interior: INTERIOR_IMAGES.map(i => i.src),
+                exterior: exteriorFromApi.length > 0 ? exteriorFromApi : EXTERIOR_IMAGES.map(i => i.src),
+                interior: interiorFromApi.length > 0 ? interiorFromApi : INTERIOR_IMAGES.map(i => i.src),
             },
         });
-    }, [id]);
+    }, [trimData, modelImagesData]);
 
-    if (!car) {
+    if (isTrimLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                Loading luxurious experience...
+            <div className="min-h-screen flex items-center justify-center bg-[#0F172A] text-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-lg font-medium animate-pulse">Loading luxurious experience...</p>
+                </div>
             </div>
         );
     }
 
-    const ringImages = [...EXTERIOR_IMAGES, ...INTERIOR_IMAGES].map(i => i.src).slice(0, 8);
+    if (trimError || !car) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0F172A] text-white">
+                <div className="text-center">
+                    <p className="text-xl font-bold text-red-100">Loading luxurious experience...</p>
+                    <Button onClick={() => router.back()} className="mt-4 bg-white text-black">
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    const ringImages = [...car.gallery.exterior, ...car.gallery.interior].slice(0, 8);
 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground pb-24">
