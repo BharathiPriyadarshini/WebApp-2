@@ -246,9 +246,9 @@ function ScanningChip({
                 animate={
                   isScanning
                     ? {
-                        opacity: [1, 0.3, 1, 0.5, 1],
-                        filter: ["blur(0px)", "blur(2px)", "blur(0px)"],
-                      }
+                      opacity: [1, 0.3, 1, 0.5, 1],
+                      filter: ["blur(0px)", "blur(2px)", "blur(0px)"],
+                    }
                     : { opacity: 1, filter: "blur(0px)" }
                 }
                 transition={{ duration: 0.35, repeat: isScanning ? Infinity : 0 }}
@@ -342,11 +342,11 @@ function Starfield() {
     const s = i + 1;
     return {
       id: i,
-      x: rand(s * 13.13) * 100,
-      y: rand(s * 91.7) * 100,
-      size: rand(s * 7.77) * 1.5 + 0.5,
-      delay: rand(s * 3.33) * 4,
-      duration: 3 + rand(s * 5.55) * 3,
+      x: Number((rand(s * 13.13) * 100).toFixed(3)),
+      y: Number((rand(s * 91.7) * 100).toFixed(3)),
+      size: Number((rand(s * 7.77) * 1.5 + 0.5).toFixed(3)),
+      delay: Number((rand(s * 3.33) * 4).toFixed(3)),
+      duration: Number((3 + rand(s * 5.55) * 3).toFixed(3)),
     };
   });
   return (
@@ -415,7 +415,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center bg-background dark:bg-black overflow-hidden px-8 md:px-16 lg:px-24 transition-colors duration-300">
+    <section className="relative min-h-screen flex items-center bg-black  overflow-hidden px-8 md:px-16 lg:px-24 transition-colors duration-300">
       {/* ── background ── */}
       <Starfield />
       <div className="absolute -left-32 top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#001f4a] blur-[120px] opacity-60 pointer-events-none" />
@@ -505,8 +505,8 @@ export default function HeroSection() {
               {/* corner accents */}
               {["top-0 left-0 border-t border-l", "top-0 right-0 border-t border-r",
                 "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r"].map((cls, i) => (
-                <div key={i} className={`absolute w-5 h-5 border-[#00aaff] z-10 ${cls}`} />
-              ))}
+                  <div key={i} className={`absolute w-5 h-5 border-[#00aaff] z-10 ${cls}`} />
+                ))}
 
               {/* car image area */}
               <div className="relative h-64 md:h-80 flex items-center justify-center p-6">
@@ -520,7 +520,7 @@ export default function HeroSection() {
                 <CenterCrosshair active={Object.keys(chipStates).length > 0} />
 
                 {/* car image */}
-                <motion.img
+                {/* <motion.img
                   src="/006.png"
                   alt="Featured vehicle"
                   animate={{ y: [0, -8, 0] }}
@@ -529,7 +529,7 @@ export default function HeroSection() {
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "/alt.png";
                   }}
-                />
+                /> */}
 
                 {/* fallback SVG */}
                 <motion.div
@@ -573,7 +573,7 @@ export default function HeroSection() {
                   {allLocked ? `${CHIPS.length}/${CHIPS.length} PARAMETERS LOCKED` : "DEEP SCAN ACTIVE"}
                 </span>
               </div>
-            <span className="text-[9px] font-mono text-foreground/40 dark:text-white/20 tracking-widest">
+              <span className="text-[9px] font-mono text-foreground/40 dark:text-white/20 tracking-widest">
                 RIMELLO·AI·v4.2
               </span>
             </motion.div>

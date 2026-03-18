@@ -14,14 +14,14 @@ import {
 } from "lucide-react";
 
 const types = [
-  { name: "SUV",         description: "Bold & commanding",  icon: Truck,    href: "/cars?type=suv"         },
-  { name: "Sedan",       description: "Sleek & refined",    icon: Car,      href: "/cars?type=sedan"       },
-  { name: "Hatchback",   description: "Compact & agile",    icon: Wind,     href: "/cars?type=hatchback"   },
-  { name: "Electric",    description: "Zero emissions",     icon: Zap,      href: "/cars?type=electric"    },
-  { name: "Luxury",      description: "Premium comfort",    icon: Crown,    href: "/cars?type=luxury"      },
-  { name: "MUV",         description: "Space for all",      icon: Bus,      href: "/cars?type=muv"         },
-  { name: "Coupe",       description: "Open-air thrill",    icon: Bike,     href: "/cars?type=coupe"       },
-  { name: "Convertible", description: "Born to cruise",     icon: Armchair, href: "/cars?type=convertible" },
+  { name: "SUV", description: "Bold & commanding", icon: Truck, href: "/trims?bodyType=SUV" },
+  { name: "Sedan", description: "Sleek & refined", icon: Car, href: "/trims?bodyType=Sedan" },
+  { name: "Hatchback", description: "Compact & agile", icon: Wind, href: "/trims?bodyType=Hatchback" },
+  { name: "Electric", description: "Zero emissions", icon: Zap, href: "/trims" },
+  { name: "Luxury", description: "Premium comfort", icon: Crown, href: "/trims" },
+  { name: "MUV", description: "Space for all", icon: Bus, href: "/trims" },
+  { name: "Coupe", description: "Open-air thrill", icon: Bike, href: "/trims?bodyType=Coupe" },
+  { name: "Convertible", description: "Born to cruise", icon: Armchair, href: "/trims" },
 ];
 
 export default function ByCarType() {

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ChevronRight, IndianRupee, Fuel, Users, Star } from "lucide-react";
 
 interface Car {
-  id: number;
+  id: string;
   name: string;
   category: string;
   budget: string;
@@ -20,10 +20,10 @@ interface Car {
 }
 
 const fuelColor: Record<string, string> = {
-  Petrol:   "text-amber-400",
-  Diesel:   "text-sky-400",
+  Petrol: "text-amber-400",
+  Diesel: "text-sky-400",
   Electric: "text-emerald-400",
-  CNG:      "text-violet-400",
+  CNG: "text-violet-400",
 };
 
 const allCars: Car[] = [
