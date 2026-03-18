@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ChevronRight, IndianRupee, Fuel, Users, Star } from "lucide-react";
 
 interface Car {
-  id: string;
+  id: number;
   name: string;
   category: string;
   budget: string;
