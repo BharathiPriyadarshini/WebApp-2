@@ -193,9 +193,9 @@ export default function RecommendationsPage() {
       {/* Sticky top bar */}
       <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/90 backdrop-blur-md border-b border-white/6">
         <div className="w-[72px]" />
-        <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
+        {/* <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span> */}
         <button
-          onClick={() => { localStorage.removeItem("rimello_answers"); router.push("/explore"); }}
+          onClick={() => { localStorage.removeItem("rimello_answers"); router.push("/suggestions"); }}
           className="flex items-center gap-1.5 text-gray-500 hover:text-white transition-colors text-sm"
         >
           <RotateCcw className="w-3.5 h-3.5" />

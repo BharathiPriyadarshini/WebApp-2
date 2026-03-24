@@ -104,7 +104,7 @@ export default function SuggestionsPage() {
       {/* Sticky top bar */}
       <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="w-[72px]" />
-        <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span>
+        {/* <span className="text-blue-500 text-xs tracking-[0.3em] uppercase font-semibold">rimello</span> */}
         <span className="text-xs text-muted-foreground tabular-nums">
           {qIndex + 1}<span className="text-muted-foreground/70"> / {total}</span>
         </span>

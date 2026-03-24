@@ -20,10 +20,10 @@ interface Car {
 }
 
 const fuelColor: Record<string, string> = {
-  Petrol:   "text-amber-400",
-  Diesel:   "text-sky-400",
+  Petrol: "text-amber-400",
+  Diesel: "text-sky-400",
   Electric: "text-emerald-400",
-  CNG:      "text-violet-400",
+  CNG: "text-violet-400",
 };
 
 const allCars: Car[] = [

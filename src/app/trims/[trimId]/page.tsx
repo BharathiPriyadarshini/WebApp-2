@@ -5,14 +5,14 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Heart, Share2, Star, ChevronDown, ChevronRight, TrendingUp } from 'lucide-react';
 
-import { ThreeDImageRing }  from "@/components/ui/3d-image-ring";
-import { RiInsightsTab }    from "@/components/car/details/RiInsightsTab";
-import { CompareCars }      from "@/components/car/CompareCars";
-import { Details }          from "@/components/car/details/Details";
-import { Features }         from "@/components/car/details/Features";
+import { ThreeDImageRing } from "@/components/ui/3d-image-ring";
+import { RiInsightsTab } from "@/components/car/details/RiInsightsTab";
+import { CompareCars } from "@/components/car/CompareCars";
+import { Details } from "@/components/car/details/Details";
+import { Features } from "@/components/car/details/Features";
 import { Design, EXTERIOR_IMAGES, INTERIOR_IMAGES } from "@/components/car/details/Design";
-import { Button }           from "@/components/ui/Button";
-import { Card }             from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/card";
 import FixedBackButton from "@/components/layout/FixedBackButton";
 import {
     LineChart, Line, XAxis, YAxis, Tooltip,
@@ -25,16 +25,16 @@ import type { InsightType } from "@/components/car/InsightBadge";
 
 // ── Static data ────────────────────────────────────────────────────────────
 const VARIANTS = [
-    { name: 'Base',         priceLabel: '₹ 11.99 L', transmission: 'Manual',    fuel: 'Petrol'        },
-    { name: 'Smart',        priceLabel: '₹ 13.49 L', transmission: 'Manual',    fuel: 'Petrol'        },
-    { name: 'Smart+',       priceLabel: '₹ 14.99 L', transmission: 'Automatic', fuel: 'Petrol'        },
-    { name: 'Premium',      priceLabel: '₹ 16.49 L', transmission: 'Automatic', fuel: 'Petrol/Diesel' },
-    { name: 'Premium Plus', priceLabel: '₹ 17.99 L', transmission: 'Automatic', fuel: 'Diesel'        },
-    { name: 'Luxury',       priceLabel: '₹ 19.49 L', transmission: 'Automatic', fuel: 'Diesel'        },
+    { name: 'Base', priceLabel: '₹ 11.99 L', transmission: 'Manual', fuel: 'Petrol' },
+    { name: 'Smart', priceLabel: '₹ 13.49 L', transmission: 'Manual', fuel: 'Petrol' },
+    { name: 'Smart+', priceLabel: '₹ 14.99 L', transmission: 'Automatic', fuel: 'Petrol' },
+    { name: 'Premium', priceLabel: '₹ 16.49 L', transmission: 'Automatic', fuel: 'Petrol/Diesel' },
+    { name: 'Premium Plus', priceLabel: '₹ 17.99 L', transmission: 'Automatic', fuel: 'Diesel' },
+    { name: 'Luxury', priceLabel: '₹ 19.49 L', transmission: 'Automatic', fuel: 'Diesel' },
 ];
 
 const SALES_DATA = [
-    { month: "Jan", sales: 980  }, { month: "Feb", sales: 1120 },
+    { month: "Jan", sales: 980 }, { month: "Feb", sales: 1120 },
     { month: "Mar", sales: 1450 }, { month: "Apr", sales: 1280 },
     { month: "May", sales: 1620 }, { month: "Jun", sales: 1890 },
     { month: "Jul", sales: 2100 }, { month: "Aug", sales: 1950 },
@@ -43,12 +43,24 @@ const SALES_DATA = [
 ];
 
 const NAV_TABS = [
-    { id: 'details',   label: 'Details'   },
-    { id: 'features',  label: 'Features'  },
+    { id: 'details', label: 'Details' },
+    { id: 'features', label: 'Features' },
     { id: 'ri-sights', label: 'Ri-Sights' },
-    { id: 'design',    label: 'Design'    },
-    { id: 'compare',   label: 'Compare'   },
-    { id: 'sales',     label: 'Sales'     },
+    { id: 'design', label: 'Design' },
+    { id: 'compare', label: 'Compare' },
+    { id: 'sales', label: 'Sales' },
+];
+
+// ── Ring image labels ──────────────────────────────────────────────────────
+const RING_LABELS = [
+    'Front View',
+    'Side View',
+    'Rear View',
+    'Quarter',
+    'Dashboard',
+    'Cabin',
+    'Seats',
+    'Trunk',
 ];
 
 // ── Variants dropdown ──────────────────────────────────────────────────────
@@ -195,6 +207,8 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
             acceleration: `${(4 + Math.random() * 6).toFixed(1)}s`,
             colors:       ['#FFFFFF', '#1F2937', '#DC2626', '#2563EB', '#D97706'],
             description:  trimData.description || `${trimData.brand?.name} ${trimData.model?.name} with automatic transmission in premium finish. This luxury vehicle redefines versatility with refined performance and cutting-edge technology.`,
+            transmission: found?.specifications?.engineAndTransmission?.transmission || 'Auto',
+            colors: ['#FFFFFF', '#1F2937', '#DC2626', '#2563EB', '#D97706'],  
             safetyRatings: {
                 globalNcap: { adult: (trimData.rating || 4) >= 4.5 ? 5 : 4, child: (trimData.rating || 4) >= 4.5 ? 5 : 3 },
                 bharatNcap: { status: Math.random() > 0.3 ? 'Not Tested' : 'Tested', adult: 5, child: 4 },
@@ -212,15 +226,15 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                 overallRating: Number((3 + Math.random() * 2).toFixed(1)),
                 recommendationPercent: 70 + Math.floor(Math.random() * 25),
                 mostMentioned: ['Mileage', 'Comfort', 'Power', 'Style'][Math.floor(Math.random() * 4)],
-                topAdvantage:  ['Fuel Efficiency', 'Ride Quality', 'Safety', 'Resale Value'][Math.floor(Math.random() * 4)],
+                        topAdvantage: ['Fuel Efficiency', 'Ride Quality', 'Safety', 'Resale Value'][Math.floor(Math.random() * 4)],
                 ownershipConfidence: { level: Math.random() > 0.5 ? 'Moderate' : 'High', description: 'Driven by Service and Reliability Feedback' },
                 categoryRatings: [
-                    { label: 'Build Quality & Safety',  subLabel: 'Build Quality & Paint Issues',    score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                    { label: 'Features & Tech',         subLabel: 'Missing basic features',          score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                    { label: 'After Sales Service',     subLabel: 'Need improvements - High Impact', score: Number((2   + Math.random() * 2.5).toFixed(1)) },
-                    { label: 'Engine Reliability',      subLabel: 'Mixed long term feedback',        score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                    { label: 'Performance',             subLabel: 'Below segment expectations',      score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
-                    { label: 'Comfort & Interiors',     subLabel: 'Spacious and Comfortable',        score: Number((4   + Math.random()).toFixed(1))        },
+                            { label: 'Build Quality & Safety', subLabel: 'Build Quality & Paint Issues', score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                            { label: 'Features & Tech', subLabel: 'Missing basic features', score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                            { label: 'After Sales Service', subLabel: 'Need improvements - High Impact', score: Number((2 + Math.random() * 2.5).toFixed(1)) },
+                            { label: 'Engine Reliability', subLabel: 'Mixed long term feedback', score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                            { label: 'Performance', subLabel: 'Below segment expectations', score: Number((3.5 + Math.random() * 1.5).toFixed(1)) },
+                            { label: 'Comfort & Interiors', subLabel: 'Spacious and Comfortable', score: Number((4 + Math.random()).toFixed(1)) },
                 ],
                 userFeedback: {
                     positives: ['Great mileage in city traffic', 'Excellent build quality', 'Very comfortable for long drives', 'Low maintenance costs'],
@@ -281,7 +295,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
             </nav>
 
             {/* Hero */}
-            <section className="pt-14 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '500px' }}>
+            <section className="pt-14 pb-8 bg-[#0F172A] text-white relative overflow-hidden shadow-xl" style={{ minHeight: '460px' }}>
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1E293B_0%,#0F172A_60%,#020617_100%)] z-0" />
                 <div className="absolute inset-0 z-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
@@ -291,6 +305,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
     <div className="absolute left-4 top-12">
         <FixedBackButton fallbackHref="/trims" />
     </div>
+
                     <div className="mt-5 flex flex-col items-center gap-1 relative">
                         <h1 className="text-2xl font-bold text-white leading-tight tracking-tight">
                             {car.brand} {car.model}
@@ -398,9 +413,9 @@ export default function CarDetailsPage({ params }: { params: Promise<{ trimId: s
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
-                            { label: 'Total Units (2024)', value: '23,170', sub: 'Annual Sales'  },
-                            { label: 'Best Month',         value: 'Dec',    sub: '2,600 units'   },
-                            { label: 'Avg Monthly',        value: '1,930',  sub: 'Units / month' },
+                            { label: 'Total Units (2024)', value: '23,170', sub: 'Annual Sales' },
+                            { label: 'Best Month', value: 'Dec', sub: '2,600 units' },
+                            { label: 'Avg Monthly', value: '1,930', sub: 'Units / month' },
                         ].map((s) => (
                             <Card key={s.label} className="p-4 bg-card border-none shadow-sm text-center">
                                 <p className="text-2xl font-bold text-foreground">{s.value}</p>
