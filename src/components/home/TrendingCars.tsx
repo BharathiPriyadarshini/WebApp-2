@@ -49,7 +49,7 @@ export default function TrendingCars() {
               Most searched and recently launched vehicles in your region.
             </p>
           </div>
-          <Link href="/cars" className="hidden md:flex items-center gap-1.5 text-blue-500 hover:text-blue-400 transition font-medium text-sm">
+          <Link href="/trims" className="hidden md:flex items-center gap-1.5 text-blue-500 hover:text-blue-400 transition font-medium text-sm">
             View All Cars <ChevronRight size={15} />
           </Link>
         </div>
@@ -67,7 +67,7 @@ export default function TrendingCars() {
                 transition={{ delay: (index % 3) * 0.08, duration: 0.45 }}
                 viewport={{ once: true }}
               >
-                <Link href={`/cars/${car.id}`}>
+                <Link href={`/trims/${car.id}`}>
                   <div className={`group relative flex flex-col w-full h-[400px] bg-card dark:bg-[#0f0f0f] rounded-2xl overflow-hidden cursor-pointer border border-border transition-all duration-300 ${rank.border} ${rank.glow}`}>
 
                     {/* image */}
@@ -155,7 +155,7 @@ export default function TrendingCars() {
 
         {/* mobile view all */}
         <div className="mt-10 md:hidden text-center">
-          <Link href="/cars" className="inline-flex items-center gap-1 text-blue-500 hover:text-blue-400 transition font-medium text-sm">
+          <Link href="/trims" className="inline-flex items-center gap-1 text-blue-500 hover:text-blue-400 transition font-medium text-sm">
             View All Cars <ChevronRight size={15} />
           </Link>
         </div>

@@ -193,7 +193,7 @@ export default function UpcomingCars() {
             </p>
           </div>
           <Link
-            href="/cars"
+            href="/trims"
             className="hidden md:flex items-center text-blue-500 hover:text-blue-400 transition font-medium text-sm"
           >
             View All Cars <ChevronRight size={16} className="ml-1" />
@@ -225,7 +225,7 @@ export default function UpcomingCars() {
 
         <div className="mt-10 md:hidden text-center">
           <Link
-            href="/cars"
+            href="/trims"
             className="inline-flex items-center text-blue-500 hover:text-blue-400 transition font-medium text-sm"
           >
             View All Cars <ChevronRight size={16} className="ml-1" />

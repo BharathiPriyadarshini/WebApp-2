@@ -26,7 +26,7 @@ const cars: CarItem[] = [
     status: "launched",
     date: "26 March 2026",
     image: "/006.png",
-    link: "/cars/1",
+    link: "/trims/1",
     priceRange: "18 L – 24 L",
     fuelType: "Diesel",
     seating: 7,
@@ -38,7 +38,7 @@ const cars: CarItem[] = [
     status: "launched",
     date: "15 April 2026",
     image: "/006.png",
-    link: "/cars/2",
+    link: "/trims/2",
     priceRange: "22 L – 28 L",
     fuelType: "Electric",
     seating: 5,
@@ -50,7 +50,7 @@ const cars: CarItem[] = [
     status: "launched",
     date: "15 Feb 2026",
     image: "/006.png",
-    link: "/cars/3",
+    link: "/trims/3",
     priceRange: "30 L – 38 L",
     fuelType: "Petrol",
     seating: 5,
@@ -62,7 +62,7 @@ const cars: CarItem[] = [
     status: "launched",
     date: "10 Jan 2026",
     image: "/006.png",
-    link: "/cars/4",
+    link: "/trims/4",
     priceRange: "8 L – 11 L",
     fuelType: "CNG",
     seating: 5,
@@ -207,7 +207,7 @@ export default function RecentlyLaunched() {
           </div>
 
           <Link
-            href="/cars"
+            href="/trims"
             className="hidden md:flex items-center text-blue-500 hover:text-blue-400 transition font-medium text-sm"
           >
             View All Cars <ChevronRight size={16} className="ml-1" />
@@ -233,7 +233,7 @@ export default function RecentlyLaunched() {
         {/* Mobile view all */}
         <div className="mt-10 md:hidden text-center">
           <Link
-            href="/cars"
+            href="/trims"
             className="inline-flex items-center text-blue-500 hover:text-blue-400 transition font-medium text-sm"
           >
             View All Cars <ChevronRight size={16} className="ml-1" />
