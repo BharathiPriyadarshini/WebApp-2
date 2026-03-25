@@ -114,7 +114,21 @@ export function Design({ car, sectionRef }: DesignProps) {
     const [selectedColor, setSelectedColor] = useState(car.colors[0] ?? '#FFFFFF');
     const [lightbox,      setLightbox]      = useState<number | null>(null);
 
-    const images    = activeTab === 'exterior' ? EXTERIOR_IMAGES : INTERIOR_IMAGES;
+    // Map the API gallery strings to the object structure expected by this component
+    const apiExterior = (car.gallery?.exterior || []).map((src, i) => ({ 
+        src, 
+        title: i === 0 ? "Primary Exterior" : `Exterior View ${i + 1}` 
+    }));
+    const apiInterior = (car.gallery?.interior || []).map((src, i) => ({ 
+        src, 
+        title: i === 0 ? "Interior Cabin" : `Interior View ${i + 1}` 
+    }));
+
+    // Fallback logic: If API has images, use them. Otherwise, use mocks.
+    const exteriorToDisplay = apiExterior.length > 0 ? apiExterior : EXTERIOR_IMAGES;
+    const interiorToDisplay = apiInterior.length > 0 ? apiInterior : INTERIOR_IMAGES;
+
+    const images    = activeTab === 'exterior' ? exteriorToDisplay : interiorToDisplay;
     const colorName = COLOR_NAMES[selectedColor] ?? 'Custom';
 
     return (
@@ -162,7 +176,7 @@ export function Design({ car, sectionRef }: DesignProps) {
                         then the color wash overlays the selected hue */}
                     <div className="relative w-full h-full">
                         <Image
-                            src={EXTERIOR_IMAGES[0].src}
+                            src={exteriorToDisplay[0].src}
                             alt={`${car.brand} ${car.model} in ${colorName}`}
                             fill
                             className="object-contain transition-all duration-500"
