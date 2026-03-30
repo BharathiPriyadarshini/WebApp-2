@@ -674,10 +674,14 @@ export default function CarDetailsPage({
                     borderRadius: "12px",
                     fontSize: "13px",
                   }}
-                  formatter={(value: number | undefined) => [
-                    `${(value ?? 0).toLocaleString()} units`,
-                    "Sales",
-                  ]}
+                  formatter={(value) => {
+                    const n =
+                      typeof value === "number"
+                        ? value
+                        : Number(value ?? 0);
+                    const safe = Number.isFinite(n) ? n : 0;
+                    return [`${safe.toLocaleString()} units`, "Sales"];
+                  }}
                 />
                 <Line
                   type="monotone"
@@ -752,10 +756,14 @@ export default function CarDetailsPage({
                     borderRadius: "12px",
                     fontSize: "13px",
                   }}
-                  formatter={(value: number | undefined) => [
-                    `${(value ?? 0).toLocaleString()} units`,
-                    "Sales",
-                  ]}
+                  formatter={(value) => {
+                    const n =
+                      typeof value === "number"
+                        ? value
+                        : Number(value ?? 0);
+                    const safe = Number.isFinite(n) ? n : 0;
+                    return [`${safe.toLocaleString()} units`, "Sales"];
+                  }}
                 />
                 <Bar dataKey="sales" fill="#6366f1" radius={[6, 6, 0, 0]} />
               </BarChart>

@@ -134,7 +134,9 @@ export default function ExpertReviewTabs() {
 
         {/* Desktop Cards */}
         <div className="hidden md:grid md:grid-cols-3 gap-8">
-          {getCurrentData().map((item, index) => (
+          {getCurrentData().map((item, index) => {
+            const rating = item.rating;
+            return (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 40 }}
@@ -161,16 +163,16 @@ export default function ExpertReviewTabs() {
                     <div>
                       <h3 className="text-lg font-semibold text-card-foreground">{item.title}</h3>
                       <p className="text-muted-foreground text-sm mt-2">{item.summary}</p>
-                      {item.rating !== undefined && (
+                      {rating !== undefined && (
                         <div className="mt-2 flex items-center">
                           <span className="text-yellow-400 font-bold mr-2">
                             {Array.from({ length: 5 }, (_, i) => (
                               <span key={i}>
-                                {i < Math.round(item.rating) ? "★" : "☆"}
+                                {i < Math.round(rating) ? "★" : "☆"}
                               </span>
                             ))}
                           </span>
-                          <span className="text-muted-foreground text-sm">{item.rating.toFixed(1)}</span>
+                          <span className="text-muted-foreground text-sm">{rating.toFixed(1)}</span>
                         </div>
                       )}
                       {item.reviewer && (
@@ -184,12 +186,15 @@ export default function ExpertReviewTabs() {
                 </Card>
               </Link>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Mobile Horizontal Scroll */}
         <div className="md:hidden flex gap-4 overflow-x-auto pb-4">
-          {getCurrentData().map((item, index) => (
+          {getCurrentData().map((item, index) => {
+            const rating = item.rating;
+            return (
             <motion.div
               key={item.id}
               className="min-w-[280px] shrink-0"
@@ -217,16 +222,16 @@ export default function ExpertReviewTabs() {
                     <div>
                       <h3 className="text-lg font-semibold text-card-foreground">{item.title}</h3>
                       <p className="text-muted-foreground text-sm mt-2">{item.summary}</p>
-                      {item.rating !== undefined && (
+                      {rating !== undefined && (
                         <div className="mt-2 flex items-center">
                           <span className="text-yellow-400 font-bold mr-2">
                             {Array.from({ length: 5 }, (_, i) => (
                               <span key={i}>
-                                {i < Math.round(item.rating) ? "★" : "☆"}
+                                {i < Math.round(rating) ? "★" : "☆"}
                               </span>
                             ))}
                           </span>
-                          <span className="text-muted-foreground text-sm">{item.rating.toFixed(1)}</span>
+                          <span className="text-muted-foreground text-sm">{rating.toFixed(1)}</span>
                         </div>
                       )}
                       {item.reviewer && (
@@ -240,7 +245,8 @@ export default function ExpertReviewTabs() {
                 </Card>
               </Link>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

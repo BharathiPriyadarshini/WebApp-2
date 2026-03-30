@@ -106,7 +106,7 @@ export default function NavbarWrapper() {
               key={item.name}
               href={item.link}
               onClick={(e) => {
-                handleProtectedClick(e, item.protected, item.link);
+                handleProtectedClick(e, item.protected);
                 setIsOpen(false);
               }}
               className="block py-2"
