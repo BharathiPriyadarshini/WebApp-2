@@ -1,13 +1,10 @@
-"use client"
+import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import NavbarWrapper from "@/components/layout/NavbarWrapper";
-import AuthModal from "@/components/auth/AuthModal";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ThemeProvider from "@/components/ThemeProvider";
+import RootProviders from "./root-providers";
 
-const queryClient = new QueryClient()
-
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://rimello.ai";
 
 const urbanist = localFont({
   src: [
@@ -105,10 +102,21 @@ const urbanist = localFont({
   variable: "--font-urbanist",
 });
 
-// export const metadata: Metadata = {
-//   title: "Rimello",
-//   description: "Luxury Automotive Platform",
-// };
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Rimello — AI-powered car suggestions",
+    template: "%s | Rimello",
+  },
+  description:
+    "Discover cars with AI-powered suggestions, compare trims, explore brands, and get clear specs and pricing in one place.",
+  openGraph: {
+    title: "Rimello — AI-powered car suggestions",
+    description:
+      "Discover cars with AI-powered suggestions, compare trims, explore brands, and get clear specs and pricing in one place.",
+    type: "website",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -120,14 +128,7 @@ export default function RootLayout({
       <body
         className={`${urbanist.variable} font-sans bg-background text-foreground antialiased transition-colors duration-300`}
       >
-        <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
-            <NavbarWrapper />
-            <AuthModal />
-
-            <main className="pt-32 min-h-screen">{children}</main>
-          </QueryClientProvider>
-        </ThemeProvider>
+        <RootProviders>{children}</RootProviders>
       </body>
     </html>
   );
